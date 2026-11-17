@@ -2,5 +2,10 @@
 ~$*.xlsx
 .ipynb_checkpoints/
 __pycache__/
+*.pyc
 output/
 .env
+
+# Kept local for now (not public): internal handoffs and review files
+dev/
+review/

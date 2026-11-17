@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>VTS Hub prototype</title>
+<meta name="description" content="Prototype of a hub for vegetated treatment systems in the Salinas Valley: plan a system, learn to maintain it, or ask for a crew. Sample data only.">
+<meta name="theme-color" content="#1C5D8A">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 22'%3E%3Cpath d='M1 6 C7 0 11 12 17 8 S27 14 33 9' fill='none' stroke='%231C5D8A' stroke-width='3' stroke-linecap='round'/%3E%3Cpath d='M1 17 C7 11 11 22 17 18 S27 23 33 18' fill='none' stroke='%2344701F' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<noscript><p style="padding:1rem">This prototype needs JavaScript to show its pages.</p></noscript>
+<div class="proto"><div class="wrap">Prototype for review. Structure, words and order are drafts. Everything in the tool is sample data; no real records are shown.</div></div>
+<header class="top"><div class="wrap">
+  <a class="brand" href="#home"><svg viewBox="0 0 34 22" aria-hidden="true"><path d="M1 6 C7 0 11 12 17 8 S27 14 33 9" fill="none" stroke="var(--water)" stroke-width="3" stroke-linecap="round"/><path d="M1 17 C7 11 11 22 17 18 S27 23 33 18" fill="none" stroke="var(--field)" stroke-width="3" stroke-linecap="round"/></svg>VTS Hub</a>
+  <nav class="main" aria-label="Main">
+    <a href="#home" data-r="home">Home</a>
+    <a href="#start" data-r="start">Start a project</a>
+    <a href="#maintain" data-r="maintain">Maintain</a>
+    <a href="#learn" data-r="learn">Learn</a>
+    <a href="#tool" data-r="tool">Sign in</a>
+  </nav>
+  <a class="btn field sm" href="#request">Request maintenance</a>
+</div></header>
+
+<main>
+<!-- HOME -->
+<section class="view" id="v-home"><div class="wrap stack lg">
+  <div class="hero stack">
+    <h1>Treatment that keeps working, from the field to Monterey Bay</h1>
+    <p class="lede">Vegetated treatment systems clean farm runoff before it reaches creeks, sloughs and the bay. They only work if someone looks after them. This is the place to plan one, learn to maintain one, or ask for a crew.</p>
+    <div class="row"><a class="btn" href="#start">Plan a new system</a><a class="btn ghost" href="#maintain">Maintain a system</a></div>
+    <div class="transect" role="img" aria-label="Drawing of a watershed: water runs from the hills through farm fields, passes a sediment basin, a vegetated ditch, a woodchip bioreactor and a treatment wetland, and reaches Monterey Bay.">
+      <svg viewBox="0 0 1200 360" aria-hidden="true">
+        <defs><pattern id="rows" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(-18)"><line x1="0" y1="7" x2="14" y2="7" stroke="var(--field)" stroke-width="3" opacity=".55"/></pattern></defs>
+        <g fill="none" stroke="var(--line)" stroke-width="1.5">
+          <path d="M0 120 C110 40 230 20 330 80 C400 122 480 110 560 160"/><path d="M0 150 C120 78 220 60 320 112 C390 148 470 140 540 185"/><path d="M0 182 C130 118 220 104 310 144 C370 170 430 170 500 205"/>
+          <path d="M40 70 C100 30 180 22 240 44"/>
+        </g>
+        <path d="M0 215 C200 200 360 205 470 222 C570 240 720 260 900 283 L990 296 L990 360 L0 360Z" fill="var(--field-soft)"/>
+        <path d="M250 208 L560 236 L540 300 L210 268Z" fill="url(#rows)"/>
+        <path d="M600 246 L850 277 L836 330 L580 300Z" fill="url(#rows)"/>
+        <rect x="990" y="296" width="210" height="64" fill="var(--water-soft)"/>
+        <g fill="none" stroke="var(--water)" stroke-width="2" stroke-linecap="round" opacity=".7"><path d="M1010 318 q12 -8 24 0 t24 0 t24 0"/><path d="M1090 338 q12 -8 24 0 t24 0 t24 0"/><path d="M1120 312 q10 -7 20 0 t20 0"/></g>
+        <path d="M150 95 C250 150 360 200 470 222 C520 232 570 240 620 246 C670 252 720 260 770 266 C815 272 860 278 900 283 C930 287 960 292 990 296 L1200 302" fill="none" stroke="var(--water)" stroke-width="6" stroke-linecap="round"/>
+        <!-- SB -->
+        <g transform="translate(470 222)"><path d="M-34 -44 L34 -44 L22 -18 L-22 -18Z" fill="var(--water-soft)" stroke="var(--ink)" stroke-width="2.5"/><path d="M-22 -22 L22 -22" stroke="var(--silt)" stroke-width="5"/><line x1="0" y1="-18" x2="0" y2="-9" stroke="var(--ink)" stroke-width="2"/><circle r="9" fill="var(--surface)" stroke="var(--water)" stroke-width="4"/></g>
+        <!-- VD -->
+        <g transform="translate(620 246)"><path d="M-36 -44 L-12 -20 L12 -20 L36 -44" fill="none" stroke="var(--ink)" stroke-width="2.5"/><g stroke="var(--field)" stroke-width="3" stroke-linecap="round"><path d="M-28 -40 l-3 -10 M-20 -32 l-3 -10 M-8 -22 l-2 -10 M8 -22 l2 -10 M20 -32 l3 -10 M28 -40 l3 -10 M0 -21 l0 -10"/></g><line x1="0" y1="-20" x2="0" y2="-9" stroke="var(--ink)" stroke-width="2"/><circle r="9" fill="var(--surface)" stroke="var(--water)" stroke-width="4"/></g>
+        <!-- WB -->
+        <g transform="translate(770 266)"><rect x="-34" y="-46" width="68" height="26" rx="3" fill="var(--silt-soft)" stroke="var(--ink)" stroke-width="2.5"/><g fill="var(--silt)"><rect x="-27" y="-41" width="9" height="5"/><rect x="-12" y="-37" width="9" height="5"/><rect x="3" y="-42" width="9" height="5"/><rect x="17" y="-36" width="9" height="5"/><rect x="-22" y="-30" width="9" height="5"/><rect x="-4" y="-29" width="9" height="5"/><rect x="12" y="-28" width="9" height="5"/></g><line x1="0" y1="-20" x2="0" y2="-9" stroke="var(--ink)" stroke-width="2"/><circle r="9" fill="var(--surface)" stroke="var(--water)" stroke-width="4"/></g>
+        <!-- TW -->
+        <g transform="translate(900 283)"><ellipse cx="0" cy="-30" rx="38" ry="12" fill="var(--water-soft)" stroke="var(--ink)" stroke-width="2.5"/><g stroke="var(--field)" stroke-width="3" stroke-linecap="round"><path d="M-22 -30 l0 -20 M-14 -28 l-3 -22 M-4 -27 l0 -24 M8 -28 l3 -22 M18 -30 l0 -19"/></g><line x1="0" y1="-18" x2="0" y2="-9" stroke="var(--ink)" stroke-width="2"/><circle r="9" fill="var(--surface)" stroke="var(--water)" stroke-width="4"/></g>
+        <g font-family="Archivo, Arial, sans-serif" font-weight="700" fill="var(--muted)" font-size="17"><text x="60" y="62">Hills and headwaters</text><text x="330" y="330">Farm fields</text><text x="1020" y="286">Monterey Bay</text></g>
+      </svg>
+    </div>
+    <div class="stations" id="stations"></div>
+    <div class="panel" id="sysdetail" aria-live="polite"></div>
+  </div>
+
+  <div class="stack">
+    <h2>What do you need today?</h2>
+    <div class="doors">
+      <a href="#start"><strong>I’m thinking about installing a system</strong><span>Which system fits, where to put it, what it costs, and the food safety questions.</span></a>
+      <a href="#learn"><strong>I have a system and my own people maintain it</strong><span>Checklists, the manual, quick cards, and a free tool to plan visits and keep the record.</span></a>
+      <a href="#request"><strong>I want a trained crew to maintain it</strong><span>Tell us about the system. We’ll call you before anyone visits.</span></a>
+    </div>
+  </div>
+
+  <div class="stack">
+    <h2>Where the systems are</h2>
+    <p class="muted">Shown by watershed only. Exact locations, owners and site records stay private unless the site partners choose to share them.</p>
+    <div class="mapbox">
+      <div class="map panel" id="homemap"></div>
+      <div class="stack">
+        <div class="chips" id="mapchips" role="group" aria-label="Filter by system"></div>
+        <div id="mapcounts"></div>
+        <p class="small muted">Counts come from the project’s draft site file (18 sites, November 2026). They will change as the inventory grows.</p>
+        <div class="row"><a class="btn ghost" href="#request">Add my system to the map</a></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel stack">
+    <h2>Not a regulatory tool</h2>
+    <p>This site is run by [HOST ORGANIZATION], not by a regulator. What you record about your system is yours. Nothing is sent to an agency unless you export it and send it yourself.</p>
+    <p class="small muted">Draft wording, to be agreed with CMSF and partners.</p>
+  </div>
+</div></section>
+
+<!-- START -->
+<section class="view" id="v-start"><div class="wrap stack lg">
+  <div class="stack"><h1>Start a project</h1><p class="lede">Three questions most people ask before they put in a treatment system.</p></div>
+  <div>
+    <div class="tabs" role="tablist" data-tabs="start">
+      <button role="tab" aria-selected="true" data-t="choose">Which system fits?</button>
+      <button role="tab" aria-selected="false" data-t="where">Where should it go?</button>
+      <button role="tab" aria-selected="false" data-t="food">What about food safety?</button>
+    </div>
+    <div class="tabpanel on" data-p="choose"><div class="stack">
+      <div class="chips" id="startchips" role="group" aria-label="System"></div>
+      <div class="grid3" id="startgrid"></div>
+    </div></div>
+    <div class="tabpanel" data-p="where"><div class="grid2">
+      <div class="stack">
+        <h3>Regional opportunity map</h3>
+        <p class="muted">Broad areas where a system would help most. It shows areas, never individual ranches or problem spots.</p>
+        <div class="map panel" id="whereMap"></div>
+        <fieldset><legend>Layers</legend><div id="layers"></div></fieldset>
+        <p class="note">Placeholder. The layers from the prioritization analysis will be loaded here. The shading you see is not real data.</p>
+      </div>
+      <div class="stack">
+        <h3>Find the best spot on my land</h3>
+        <p class="muted">Answer a few questions and someone from the technical team will get back to you with a suggestion.</p>
+        <form id="siteForm" class="panel">
+          <div class="f"><label for="sf1">Watershed or nearest town</label><input id="sf1" required placeholder="For example: Chualar"></div>
+          <div class="f"><label for="sf2">What leaves your field that you want to treat?</label><select id="sf2"><option>Sediment</option><option>Nitrate</option><option>Pesticides</option><option>Not sure</option></select></div>
+          <div class="f"><label for="sf3">Where does your runoff go now?</label><select id="sf3"><option>A ditch on the ranch</option><option>A sediment basin</option><option>A tailwater pond</option><option>Off the ranch, I’m not sure where</option></select></div>
+          <div class="f"><label for="sf4">Do you own or lease the land?</label><select id="sf4"><option>Own</option><option>Lease</option><option>Manage for the owner</option></select></div>
+          <div class="f"><label for="sf5">Phone or email</label><input id="sf5" required></div>
+          <button class="btn" type="submit">Ask for a site suggestion</button>
+        </form>
+        <div id="siteDone"></div>
+      </div>
+    </div></div>
+    <div class="tabpanel" data-p="food"><div class="stack">
+      <h2>We know food safety comes first</h2>
+      <p class="muted">Two worries come up again and again: animals near the crop, and losing ground to buffers. Here is what the research says and what you can show an auditor.</p>
+      <div class="grid3">
+        <div class="panel stack"><h3>Research</h3><ul class="plain"><li>[STUDY SUMMARY 1]</li><li>[STUDY SUMMARY 2]</li><li>[STUDY SUMMARY 3]</li></ul><p class="small muted">To be filled with CMSF’s food safety work so the two efforts don’t repeat each other.</p></div>
+        <div class="panel stack"><h3>One-page sheets and videos</h3><ul class="plain"><li>[SHEET] What to tell your auditor about a vegetated ditch</li><li>[SHEET] Buffers and treatment systems: what applies</li><li>[VIDEO] A grower walks through their system</li></ul></div>
+        <div class="panel stack"><h3>How maintenance helps</h3><p>A system that is mowed, checked and logged on a schedule is easier to defend than one nobody visits. The maintenance tool gives you a dated record you can print.</p><a class="btn ghost" href="#maintain">See how the record works</a></div>
+      </div>
+    </div></div>
+  </div>
+</div></section>
+
+<!-- MAINTAIN -->
+<section class="view" id="v-maintain"><div class="wrap stack lg">
+  <div class="stack"><h1>Maintain a system</h1><p class="lede">Two ways to keep it working. Pick one, or mix them.</p></div>
+  <div class="grid2">
+    <div class="panel stack"><h2>A trained crew does it</h2><p>A maintenance workforce visits on a schedule, does the checks and the hands-on work, and leaves you the record.</p><ul class="plain"><li>You always know who is coming, when, and in what vehicle.</li><li>The crew talks to you first about anything they find.</li><li>What the crew sees stays with the team and the site partners.</li></ul><a class="btn field" href="#request">Request maintenance</a><p class="small muted">The workforce model is a proposal. Who hosts it and how it is funded are still open.</p></div>
+    <div class="panel stack"><h2>Your own people do it</h2><p>Use the same checklists and plan the crew uses. The tool reminds you what is due and keeps the log.</p><ul class="plain"><li>Checklists your irrigators can fill on a phone or on paper.</li><li>A yearly plan for each system.</li><li>Records you can print and share if you choose.</li></ul><div class="row"><a class="btn" href="#tool">Open the tool demo</a><a class="btn ghost" href="#learn">Training materials</a></div></div>
+  </div>
+  <div class="stack"><h2>How it works</h2>
+    <ol class="flow">
+      <li><span class="fnum" aria-hidden="true">1</span><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 56 C20 40 12 31 12 22 a20 20 0 0 1 40 0 C52 31 44 40 32 56Z" fill="var(--water-soft)" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round"/><path d="M22 24 q5 -6 10 0 t10 0" fill="none" stroke="var(--water)" stroke-width="3" stroke-linecap="round"/></svg><strong>Register your system</strong><span>Type, size and watershed. Location stays private.</span></li>
+      <li><span class="fnum" aria-hidden="true">2</span><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="8" y="12" width="48" height="44" rx="5" fill="var(--surface)" stroke="var(--ink)" stroke-width="3"/><path d="M8 24 H56" stroke="var(--ink)" stroke-width="3"/><path d="M20 6 V16 M44 6 V16" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/><g fill="var(--field)"><rect x="15" y="30" width="8" height="7"/><rect x="41" y="30" width="8" height="7"/><rect x="28" y="42" width="8" height="7"/></g><rect x="28" y="30" width="8" height="7" fill="var(--water)"/></svg><strong>Get a yearly plan</strong><span>Routine visits, a spring visit, a pre-storm visit in August, a January review, and checks after storms.</span></li>
+      <li><span class="fnum" aria-hidden="true">3</span><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="18" y="5" width="28" height="54" rx="6" fill="var(--surface)" stroke="var(--ink)" stroke-width="3"/><g fill="none" stroke="var(--field)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M24 19 l3 3 l5 -6"/><path d="M24 31 l3 3 l5 -6"/></g><path d="M36 20 H41 M36 32 H41 M36 44 H41" stroke="var(--muted)" stroke-width="3" stroke-linecap="round"/><circle cx="28" cy="44" r="4" fill="var(--silt)"/></svg><strong>Do the visit or request one</strong><span>The checklist goes to a phone. Anything abnormal becomes a follow-up job.</span></li>
+      <li><span class="fnum" aria-hidden="true">4</span><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M14 8 H50 V56 H14Z" fill="var(--surface)" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round"/><path d="M14 20 H50 M14 32 H50 M14 44 H50 M27 8 V56" stroke="var(--line)" stroke-width="2.5"/><path d="M14 8 H50 V20 H14Z" fill="var(--water-soft)" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round"/></svg><strong>Keep the record</strong><span>Every visit lands in the Site History. Fixes land in the Corrective Maintenance Log.</span></li>
+    </ol>
+  </div>
+</div></section>
+
+<!-- REQUEST -->
+<section class="view" id="v-request"><div class="wrap stack lg">
+  <div class="stack"><h1>Request maintenance</h1><p class="lede">Tell us about your system. Someone will call you before any visit is planned.</p></div>
+  <div class="grid2">
+    <form id="reqForm" class="panel">
+      <div class="f"><label for="r1">Your name</label><input id="r1" required></div>
+      <div class="f"><label for="r2">Phone or email</label><input id="r2" required></div>
+      <div class="f"><label for="r3">You are the</label><select id="r3"><option>Landowner</option><option>Grower or lessee</option><option>Ranch manager</option><option>Organization that manages the system</option></select></div>
+      <fieldset><legend>Which systems?</legend>
+        <label class="check"><input type="checkbox" name="sys" value="Sediment basin">Sediment basin</label>
+        <label class="check"><input type="checkbox" name="sys" value="Vegetated ditch">Vegetated ditch</label>
+        <label class="check"><input type="checkbox" name="sys" value="Woodchip bioreactor">Woodchip bioreactor</label>
+        <label class="check"><input type="checkbox" name="sys" value="Treatment wetland">Treatment wetland</label>
+      </fieldset>
+      <div class="f"><label for="r4">Watershed or nearest town</label><input id="r4" placeholder="No address needed yet"></div>
+      <fieldset><legend>What do you need?</legend>
+        <label class="check"><input type="checkbox" name="need" value="Regular visits through the year">Regular visits through the year</label>
+        <label class="check"><input type="checkbox" name="need" value="A check before the rainy season">A check before the rainy season</label>
+        <label class="check"><input type="checkbox" name="need" value="A check after a storm">A check after a storm</label>
+        <label class="check"><input type="checkbox" name="need" value="One job (sediment removal, mowing, repair)">One job (sediment removal, mowing, repair)</label>
+        <label class="check"><input type="checkbox" name="need" value="Someone to look at it and tell me what it needs">Someone to look at it and tell me what it needs</label>
+      </fieldset>
+      <div class="f"><label for="r5">Who should the crew call before arriving, and anything they should know about access</label><textarea id="r5"></textarea></div>
+      <button class="btn field" type="submit">Send request</button>
+    </form>
+    <div class="stack">
+      <div id="reqDone"></div>
+      <div class="panel stack"><h3>What happens next</h3><ol class="steps"><li>We call you to understand the system and agree on access.</li><li>A first visit to look at the system with you.</li><li>You get a proposed yearly plan and decide what you want.</li></ol></div>
+      <div class="panel stack"><h3>What we ask before a crew can come</h3><ul class="plain"><li>Permission from the landowner.</li><li>A contact on the ranch who knows the crew is coming.</li><li>Any food safety or biosecurity rules the crew must follow.</li></ul><p class="small muted">Liability and insurance terms: [TO BE DEFINED WITH THE HOST].</p></div>
+    </div>
+  </div>
+</div></section>
+
+<!-- LEARN -->
+<section class="view" id="v-learn"><div class="wrap stack lg">
+  <div class="stack"><h1>Learn</h1><p class="lede">Everything is free to download. Pick who it’s for and which system.</p></div>
+  <div class="stack">
+    <div class="chips" id="audchips" role="group" aria-label="Who is it for"></div>
+    <div class="chips" id="lsyschips" role="group" aria-label="System"></div>
+    <div class="scroll"><table><thead><tr><th>Material</th><th>What it is</th><th>For</th><th>Status</th></tr></thead><tbody id="learnBody"></tbody></table></div>
+    <p class="small muted">“Proposed” rows are ideas that came out of the stakeholder interviews. They don’t exist yet.</p>
+  </div>
+</div></section>
+
+<!-- TOOL -->
+<section class="view" id="v-tool"><div class="wrap stack lg">
+  <div class="stack"><h1>Maintenance tool</h1><p class="lede">Demo with sample data. This is what a signed-in owner or crew lead would see.</p></div>
+  <div>
+    <div class="tabs" role="tablist" data-tabs="tool">
+      <button role="tab" aria-selected="true" data-t="over">Overview</button>
+      <button role="tab" aria-selected="false" data-t="plan">Yearly plan</button>
+      <button role="tab" aria-selected="false" data-t="sched">Scheduled</button>
+      <button role="tab" aria-selected="false" data-t="log">Site History</button>
+      <button role="tab" aria-selected="false" data-t="corr">Corrective log</button>
+    </div>
+    <div class="tabpanel on" data-p="over"><div class="stack">
+      <div class="tiles" id="tiles"></div>
+      <div class="grid2">
+        <div class="panel stack"><h3>Storm readiness</h3><p>Rainy season runs Oct 1 to Apr 30. After 0.5 in of rain in 24 hours, every system gets an inspection within 48 hours.</p><p class="small muted">Draft values from the manual.</p><div class="row"><button class="btn" id="stormBtn" type="button">Report a storm</button><span id="stormMsg" class="small" aria-live="polite"></span></div></div>
+        <div class="panel stack"><h3>Water Check (optional)</h3><p class="small muted">Nitrate test strips at the inlet and outlet of “Sample wetland 1”. Sample numbers.</p><div id="nchart"></div></div>
+      </div>
+      <h3>Your systems</h3>
+      <div class="scroll"><table><thead><tr><th>System</th><th>Type</th><th>Watershed</th><th>Last visit</th><th>Next due</th><th>Status</th></tr></thead><tbody id="sysBody"></tbody></table></div>
+      <div class="row"><button class="btn ghost" type="button" id="addSysBtn">Register a system</button></div>
+    </div></div>
+    <div class="tabpanel" data-p="plan"><div class="stack">
+      <p class="muted">Pick a system to see its planned maintenance for the year. Same layout as the Annual Plan form (F03) in the manual.</p>
+      <div class="fpick"><label for="fs1">System</label><select id="fs1" class="fsel"></select></div>
+      <div id="planForm"></div>
+    </div></div>
+    <div class="tabpanel" data-p="sched"><div class="stack">
+      <div class="scroll"><table><thead><tr><th>When</th><th>System</th><th>Visit type</th><th>Tasks</th><th>Who</th><th>Status</th><th>Visit Sheet</th></tr></thead><tbody id="schedBody"></tbody></table></div>
+      <form id="schedForm" class="panel"><h3 style="margin-bottom:.8rem">Schedule a visit</h3><div class="grid3">
+        <div class="f"><label for="s1">System</label><select id="s1"></select></div>
+        <div class="f"><label for="s2">Visit type</label><select id="s2"></select></div>
+        <div class="f"><label for="s3">Date</label><input id="s3" type="date" required></div>
+        <div class="f"><label for="s4">Who</label><input id="s4" placeholder="Name or crew" required></div>
+      </div><button class="btn" type="submit">Add to schedule</button></form>
+    </div></div>
+    <div class="tabpanel" data-p="log"><div class="stack">
+      <p class="muted">One line per visit, in the Site History form (VTS_F06) from the manual. Kept by the supervisor, one per system.</p>
+      <div class="fpick"><label for="fs2">System</label><select id="fs2" class="fsel"></select></div>
+      <div id="logFormView"></div>
+      <p class="small muted">* Hours and materials cost are proposed additions. They are not in the manual form yet.</p>
+      <form id="logForm" class="panel"><h3 style="margin-bottom:.8rem">Add a visit to the Site History</h3><div class="grid3">
+        <div class="f"><label for="l1">Date</label><input id="l1" type="date" required></div>
+        <div class="f"><label for="l2">System</label><select id="l2"></select></div>
+        <div class="f"><label for="l3">Visit type</label><select id="l3"></select></div>
+        <div class="f"><label for="l4">Crew members</label><input id="l4" required></div>
+        <div class="f"><label for="l5">Tasks performed</label><input id="l5" placeholder="For example: SB_T01, SB_T02"></div>
+        <div class="f"><label for="l6">Hours</label><input id="l6" type="number" min="0" step="0.5"></div>
+        <div class="f"><label for="l7">Cost of materials ($)</label><input id="l7" type="number" min="0" step="1"></div>
+        <div class="f"><label for="l8">Notes</label><input id="l8"></div>
+      </div><button class="btn" type="submit">Save visit</button></form>
+    </div></div>
+    <div class="tabpanel" data-p="corr"><div class="stack">
+      <p class="muted">One row per fix, in the Corrective Maintenance Log form (VTS_F05) from the manual. Rows appear when a Visit Sheet item is marked “Needs attention”.</p>
+      <div class="fpick"><label for="fs3">System</label><select id="fs3" class="fsel"></select></div>
+      <div id="corrFormView"></div>
+    </div></div>
+  </div>
+</div></section>
+</main>
+
+<footer><div class="wrap">VTS Hub prototype, November 2026. A capstone project at UC Santa Cruz with the California Marine Sanctuary Foundation. Content is in draft and has not had technical review.</div></footer>
+
+<dialog id="phoneDlg" aria-labelledby="phTitle"><div class="phone">
+  <div class="row" style="justify-content:space-between"><h3 id="phTitle">Visit Sheet</h3><button class="btn ghost sm" type="button" id="phClose">Close</button></div>
+  <p class="small muted" id="phSub"></p>
+  <div id="phBody"></div>
+  <button class="btn" type="button" id="phSend" style="width:100%;margin-top:.5rem">Send visit to the Site History</button>
+</div></dialog>
+
+<script src="geo.js"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

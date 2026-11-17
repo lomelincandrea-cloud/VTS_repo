@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 330" font-family="Public Sans, Arial, sans-serif">
+<rect width="560" height="330" fill="white"/>
+<g stroke="#03467E" fill="none" stroke-width="2.2" stroke-linejoin="round">
+ <path d="M10 80 L120 80 L190 230 L370 230 L440 80 L550 80" stroke-dasharray="8 5" stroke="#8fa9c2"/>
+ <path d="M10 80 L120 80 L180 205 L215 215 L300 198 L370 214 L430 112 L445 80 L550 80" stroke="#03467E"/>
+</g>
+<path d="M180 205 L215 215 L300 198 L370 214 L405 150 L212 150 Z" fill="#cfe1f3" opacity=".75"/>
+<path d="M190 230 L370 230 L370 214 L300 198 L215 215 L180 205 Z" fill="#e8d9b5" opacity=".9"/>
+<g stroke="#B4361F" stroke-width="1.4" fill="#B4361F" font-size="12">
+ <line x1="120" y1="58" x2="440" y2="58"/><polygon points="120,58 130,54 130,62"/><polygon points="440,58 430,54 430,62"/>
+ <line x1="190" y1="262" x2="370" y2="262"/><polygon points="190,262 200,258 200,266"/><polygon points="370,262 360,258 360,266"/>
+ <line x1="500" y1="80" x2="500" y2="230"/><polygon points="500,80 496,90 504,90"/><polygon points="500,230 496,220 504,220"/>
+</g>
+<g font-size="13" fill="#1F2D3D">
+ <text x="280" y="50" text-anchor="middle" font-weight="700" fill="#B4361F">Top width</text>
+ <text x="280" y="284" text-anchor="middle" font-weight="700" fill="#B4361F">Bottom width</text>
+ <text x="512" y="160" font-weight="700" fill="#B4361F">Depth</text>
+ <text x="52" y="168" font-weight="700" fill="#03467E">Side slope</text>
+ <text x="262" y="182" text-anchor="middle" fill="#2B7BBF">Water</text>
+ <text x="282" y="224" text-anchor="middle" fill="#7a5a14" font-size="12">Sediment buildup</text>
+ <text x="458" y="108" fill="#03467E" font-size="12">Slumped bank</text>
+</g>
+<g font-size="12" fill="#566A7F"><line x1="20" y1="308" x2="60" y2="308" stroke="#8fa9c2" stroke-width="2.2" stroke-dasharray="8 5"/><text x="68" y="312">Original design profile</text>
+<line x1="250" y1="308" x2="290" y2="308" stroke="#03467E" stroke-width="2.2"/><text x="298" y="312">Current profile</text></g>
+</svg>
