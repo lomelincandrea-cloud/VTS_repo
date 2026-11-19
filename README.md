@@ -7,12 +7,11 @@ Open materials for operating and maintaining vegetated treatment systems (VTS) i
 ## What is here
 | Folder | What it is |
 |---|---|
-| `docs/` | The web prototype (static site). Open `docs/index.html`, or publish it with GitHub Pages. |
+| `docs/` | The web prototype (static site), published with GitHub Pages. The first prototype is in `docs/v0/`. |
 | `tools/manual_builder/` | Notebook that builds the manual (PDF), checklists, forms, and diagrams from one Excel file. |
 | `tools/plant_catalogue_builder/` | Notebook that builds the Plant Catalogue (VTS_D02) from one Excel file. |
 | `tools/build_site_data.py` | Script that turns the two Excel files into the data the web prototype reads. |
 | `data/geo/` | Site locations and watershed layers (GeoJSON) taken from the project's GIS file. |
-| `review/` | Content review and its status. |
 
 ## Publish the site
 Settings → Pages → Build and deployment → Source: *Deploy from a branch* → Branch: `main`, folder: `/docs` → Save. The address appears on that page after a minute or two.
