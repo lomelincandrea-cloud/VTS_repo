@@ -382,3 +382,21 @@ body .g-c.on[data-k]{cursor:inherit}
 .t-cor{display:grid;grid-template-columns:minmax(0,1fr);gap:.35rem;border-left:6px solid var(--line)}
 .t-cor.open{border-left-color:#E39B0B}.t-cor.escalated{border-left-color:var(--alert)}.t-cor.resolved{border-left-color:#2F8F4E}
 .t-cor p{margin:0}.t-corf{font-weight:600}
+
+/* How-to-use guides (Learn and Tool) */
+.guide{background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:var(--sh);padding:1rem 1.1rem}
+.guide-head{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+.guide-head h2{margin:0;font-size:1.35rem}
+.guide-intro{color:var(--muted);margin:.3rem 0 .8rem}
+.guide-steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));gap:.75rem;counter-reset:none}
+.guide-step{position:relative;display:flex;flex-direction:column;gap:.35rem;height:100%;padding:.85rem .9rem;border-radius:14px;background:var(--water-soft);color:var(--ink);text-decoration:none;border:1.5px solid transparent;transition:transform .15s,border-color .15s}
+.guide-step:hover{border-color:var(--water);transform:translateY(-2px)}
+.guide-num{position:absolute;top:.6rem;right:.7rem;width:1.6rem;height:1.6rem;border-radius:50%;background:var(--water);color:var(--surface);font:700 .85rem/1.6rem var(--head);text-align:center}
+.guide-ic{display:flex;width:2.6rem;height:2.6rem;border-radius:12px;background:var(--surface);color:var(--water);align-items:center;justify-content:center}
+.guide-ic svg{width:1.6rem;height:1.6rem}
+.guide-t{font:700 1.1rem var(--head);color:var(--water)}
+.guide-d{font-size:.88rem;line-height:1.4}
+.guide-tip{margin:.8rem 0 0;font-size:.88rem;background:var(--silt-soft);border-radius:10px;padding:.45rem .7rem}
+.g-open{display:inline-flex;align-items:center;gap:.4rem;border:1.5px solid var(--water);background:var(--surface);color:var(--water);border-radius:999px;padding:.35rem .9rem;font:600 .9rem var(--body);cursor:pointer;min-height:36px}
+.g-open svg{width:1.1rem;height:1.1rem}
+@media (prefers-reduced-motion:reduce){.guide-step{transition:none}.guide-step:hover{transform:none}}
