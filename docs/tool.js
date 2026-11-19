@@ -40,6 +40,7 @@
     else if (which === "plan" && window.ToolPlan) window.ToolPlan.plan(a, parts[2]);
     else if (which === "visit" && window.ToolPlan) { qa("#toolTabs a").forEach(x => x.dataset.t === "plan" ? x.setAttribute("aria-current", "page") : 0); window.ToolPlan.visit(a); }
     else if (which === "visits" && window.ToolPlan) window.ToolPlan.next(a);
+    else if (which === "corrective" && window.ToolPlan) window.ToolPlan.corrective(a);
     else if (which === "dashboard") later("Dashboard and reports", "One card per indicator of the Monitoring framework, and the Food Safety Record and Water Quality and Maintenance Summary exports.", "4d");
   };
   function gate() {

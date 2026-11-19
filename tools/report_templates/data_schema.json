@@ -1005,13 +1005,40 @@
             "string",
             "null"
           ],
-          "format": "date"
+          "format": "date",
+          "description": "Date the entry was resolved. Recorded by the Tool when the action is recorded (the paper F05 has no column for it)."
         },
         "photos": {
           "type": "array",
           "items": {
             "type": "string"
           }
+        },
+        "scheduled": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "properties": {
+            "date": {
+              "type": "string",
+              "format": "date"
+            },
+            "planned_id": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "description": "The repair scheduled in the Annual Plan (Tool)."
+        },
+        "material_cost": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Cost of the materials used, in dollars. Entered by the supervisor in the Tool; crews do not record costs."
         }
       }
     },

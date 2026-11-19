@@ -376,3 +376,9 @@ body .g-c.on[data-k]{cursor:inherit}
 .t-pvrow summary{cursor:pointer;display:flex;gap:.4rem;flex-wrap:wrap;align-items:center}
 .t-pvrow[open] summary{margin-bottom:.5rem}
 .t-mat{min-width:560px;font-size:.88rem}.t-mat input{min-height:36px}
+
+/* Corrective log */
+.t-corgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:.9rem}
+.t-cor{display:grid;grid-template-columns:minmax(0,1fr);gap:.35rem;border-left:6px solid var(--line)}
+.t-cor.open{border-left-color:#E39B0B}.t-cor.escalated{border-left-color:var(--alert)}.t-cor.resolved{border-left-color:#2F8F4E}
+.t-cor p{margin:0}.t-corf{font-weight:600}

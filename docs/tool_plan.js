@@ -529,5 +529,100 @@ window.ToolPlan = (function () {
       q("#toolView #vImpMsg").innerHTML = `<p class="l-banner">Imported ${Object.keys((w.form || {}).items || {}).length} checklist answers from the phone (sent ${esc(r.exported_at.replace("T", " "))}). Check them, then close the visit.</p>`;
     } catch (e) { msg.innerHTML = `<p class="l-warn">${esc(e.message || "The file could not be read.")}</p>`; }
   }
-  return {plan, visit, next, phone};
+  /* ================= Corrective Maintenance Log (F05), interactive ================= */
+  const COR_T04_ACTIONS = ["filled an inactive burrow", "reduced cover near the berm", "stopped work (nest or possible protected species)", "passed to the supervisor"];
+  const STATUS_CHIP = {open: "y", escalated: "r", resolved: "g"};
+  let corFilter = {status: "active", site: ""};
+  function corrective(siteArg) {
+    if (siteArg !== undefined) corFilter.site = siteArg || "";
+    const all = St.data.corrective_entries.slice().sort((a, b) => b.date.localeCompare(a.date));
+    const list = all.filter(c => (!corFilter.site || c.site === corFilter.site) && (corFilter.status === "all" || (corFilter.status === "active" ? c.status !== "resolved" : c.status === corFilter.status)));
+    const count = st => all.filter(c => (!corFilter.site || c.site === corFilter.site) && (st === "active" ? c.status !== "resolved" : st === "all" || c.status === st)).length;
+    K().view().innerHTML = `<div class="l-row"><h2 style="margin:0">Corrective log</h2><span class="l-sp"></span>
+        <label class="l-lab">VTS <select id="cSite"><option value="">All</option>${St.sites().map(s => `<option value="${s.id}"${s.id === corFilter.site ? " selected" : ""}>${esc(s.name)}</option>`).join("")}</select></label>
+        <button class="btn sm" type="button" id="cNew">Add a finding</button></div>
+      <p class="muted">Every repair the inspections found (Corrective Maintenance Log, F05). Schedule the repair into the yearly plan, then record what was done.</p>
+      <div class="l-pills" role="group" aria-label="Status">${[["active", "Open and escalated"], ["open", "Open"], ["escalated", "Escalated"], ["resolved", "Resolved"], ["all", "All"]].map(([k, n]) => `<button type="button" class="l-pill${corFilter.status === k ? " on" : ""}" data-cf="${k}" aria-pressed="${corFilter.status === k}">${n} <small>${count(k)}</small></button>`).join("")}</div>
+      <div class="t-corgrid">${list.map(corCard).join("") || `<div class="panel">Nothing here.</div>`}</div>`;
+    q("#cSite").onchange = e => corrective(e.target.value);
+    qa("[data-cf]").forEach(b => b.onclick = () => { corFilter.status = b.dataset.cf; corrective(); });
+    q("#cNew").onclick = newFindingDlg;
+    qa("[data-csched]").forEach(b => b.onclick = () => scheduleDlg(all.find(c => c.id === b.dataset.csched)));
+    qa("[data-cact]").forEach(b => b.onclick = () => actionDlg(all.find(c => c.id === b.dataset.cact)));
+  }
+  function corCard(c) {
+    const s = St.site(c.site) || {name: c.site, type: "SB"}, t = c.task && taskBy(c.task), v = c.visit && St.visit(c.visit);
+    return `<div class="panel t-cor ${c.status}"><div class="l-row"><span class="sdot" style="background:${K().COLOR[s.type]}"></span><b>${esc(s.name)}</b><span class="l-sp"></span><span class="l-chip ${STATUS_CHIP[c.status] || ""}">${esc(c.status)}</span></div>
+      <p class="t-corf">${esc(c.finding)}</p>
+      <p class="l-src">Found ${esc(c.date)}${c.location ? " · " + esc(c.location) : ""}${c.urgency ? " · urgency: " + esc(c.urgency) : ""}${v ? ` · <a href="#tool/visit/${v.id}">from the ${esc(v.type)} visit</a>` : ""}</p>
+      ${t ? `<p>Task: <a href="#learn/task/${t.id}">${esc(t.name)}</a> <span class="l-src">${t.id}</span></p>` : ""}
+      ${c.scheduled ? `<p><span class="l-chip">Scheduled ${esc(c.scheduled.date)}</span> <a href="#tool/plan/${c.site}/${c.scheduled.date.slice(0, 4)}">see the plan</a></p>` : ""}
+      ${c.action_taken ? `<p><b>Action:</b> ${esc(c.action_taken)}${c.resolved_date ? ` <span class="l-src">(${esc(c.resolved_date)})</span>` : ""}</p>` : ""}
+      ${c.materials_used || c.hours || c.material_cost ? `<p class="l-src">${[c.materials_used && "Materials: " + esc(c.materials_used), c.hours && c.hours + " h", c.material_cost != null && "materials $" + c.material_cost].filter(Boolean).join(" · ")}</p>` : ""}
+      ${(c.photos || []).length ? `<p class="l-src">Photos: ${c.photos.map(esc).join(", ")}</p>` : ""}
+      <div class="row">${c.status !== "resolved" ? `<button class="btn ghost sm" type="button" data-csched="${c.id}">${c.scheduled ? "Reschedule" : "Schedule the repair"}</button>` : ""}<button class="btn sm" type="button" data-cact="${c.id}">${c.action_taken ? "Update the action" : "Record the action"}</button></div></div>`;
+  }
+  function planFor(s, year) { let p = St.planOf(s.id, year); if (!p) { newPlan(s, year); p = St.planOf(s.id, year); } return p; }
+  function scheduleDlg(c) {
+    const s = St.site(c.site), cors = L.tasks.filter(t => t.sys === "COR" || t.sys === s.type);
+    K().openDlg(`<h3>Schedule the repair</h3><p>${esc(c.finding)}</p><form id="scF" class="stack">
+      <div class="grid2"><div class="f"><label for="scD">Day</label><input type="date" id="scD" required value="${c.scheduled ? c.scheduled.date : K().today()}"></div>
+        <div class="f"><label for="scT">Task</label><select id="scT">${cors.map(t => `<option value="${t.id}"${t.id === c.task ? " selected" : ""}>${esc(t.id + " " + t.name)}</option>`).join("")}<option value="+"${!c.task ? " selected" : ""}>Another task (the finding)</option></select></div></div>
+      <p class="l-src">It is added to the yearly plan of ${esc(s.name)} on that day (a new Corrective visit, or the visit already planned that day) and shows in Next visits.</p>
+      <div class="row"><button class="btn" type="submit">Schedule</button><button class="btn ghost" type="button" data-close>Cancel</button></div></form>`);
+    q("#scF").onsubmit = e => {
+      e.preventDefault(); const day = q("#scD").value; if (!day) return;
+      const k = q("#scT").value === "+" ? "+" + c.finding.slice(0, 80) : q("#scT").value, p = planFor(s, +day.slice(0, 4));
+      let next = clone(p.planned_visits);
+      if (c.scheduled && c.scheduled.date !== day) next = removeFrom(s, next, k, next.filter(v => v.date === c.scheduled.date).map(v => v.id));
+      next = addTo(s, next, k, day, p);
+      const pv = next.find(v => v.date === day);
+      const finish = () => { St.update("corrective_entries", c.id, {scheduled: {date: day, planned_id: pv.id}, task: k[0] === "+" ? c.task : k}, `Repair scheduled for ${day}`, "scheduled"); corrective(); };
+      q("#toolDlg").close();
+      if (p.status === "approved") reasonCat(`Add the repair to the approved ${p.year} plan`, (reason, cat) => { St.update("annual_plans", p.id, {planned_visits: next}, `Repair scheduled (${c.id}) on ${day}. ${reason}`, cat); finish(); }, () => corrective());
+      else { p.planned_visits = next; St.persist(); finish(); }
+    };
+  }
+  function actionDlg(c) {
+    const isBurrow = c.task === "COR_T04";
+    K().openDlg(`<h3>Record the action</h3><p>${esc(c.finding)}</p><form id="acF" class="stack">
+      <div class="f"><label for="acA">Action taken</label>${isBurrow ? `<select id="acA">${COR_T04_ACTIONS.map(a => `<option${a === c.action_taken ? " selected" : ""}>${a}</option>`).join("")}</select><p class="l-src">The four actions of Animal Burrows and Activity (COR_T04).</p>`
+        : `<input id="acA" value="${esc(c.action_taken || "")}" required placeholder="For example: cleared the inlet">`}</div>
+      <div class="grid2"><div class="f"><label for="acC">Likely cause</label><input id="acC" value="${esc(c.likely_cause || "")}"></div>
+        <div class="f"><label for="acU">Urgency</label><select id="acU">${["", "Low", "Normal", "High"].map(u => `<option${u === (c.urgency || "") ? " selected" : ""}>${u}</option>`).join("")}</select></div>
+        <div class="f"><label for="acM">Materials used</label><input id="acM" value="${esc(c.materials_used || "")}"></div>
+        <div class="f"><label for="acMC">Cost of the materials ($, supervisor)</label><input id="acMC" type="number" min="0" step="any" value="${c.material_cost ?? ""}"></div>
+        <div class="f"><label for="acH">Hours (crew total)</label><input id="acH" type="number" min="0" step="0.25" value="${c.hours ?? ""}"></div>
+        <div class="f"><label for="acS">Status</label><select id="acS">${["open", "escalated", "resolved"].map(x => `<option${x === c.status ? " selected" : ""}>${x}</option>`).join("")}</select></div>
+        <div class="f"><label for="acD">Date resolved</label><input id="acD" type="date" value="${c.resolved_date || K().today()}"></div></div>
+      <label class="check"><input type="checkbox" id="acP"${(c.photos || []).some(p => /after/.test(p)) ? " checked" : ""}> Photo after the repair taken</label>
+      <div class="row"><button class="btn" type="submit">Save</button><button class="btn ghost" type="button" data-close>Cancel</button></div></form>`);
+    q("#acF").onsubmit = e => {
+      e.preventDefault();
+      const st = q("#acS").value, photos = (c.photos || []).filter(p => !/after/.test(p)).concat(q("#acP").checked ? [`PH-${c.id}-after`] : []);
+      const patch = {action_taken: q("#acA").value.trim() || null, likely_cause: q("#acC").value.trim() || null, urgency: q("#acU").value || null, materials_used: q("#acM").value.trim() || null,
+                     material_cost: q("#acMC").value === "" ? null : +q("#acMC").value, hours: q("#acH").value === "" ? null : +q("#acH").value, status: st, resolved_date: st === "resolved" ? q("#acD").value : null, photos};
+      const changed = Object.fromEntries(Object.entries(patch).filter(([k, v]) => JSON.stringify(v) !== JSON.stringify(c[k] ?? null)));
+      q("#toolDlg").close();
+      if (Object.keys(changed).length) St.update("corrective_entries", c.id, changed, st === "resolved" && c.status !== "resolved" ? "Repair done and recorded" : "Action recorded", "action");
+      corrective();
+    };
+  }
+  function newFindingDlg() {
+    const sites = St.sites().filter(s => s.status !== "decommissioned");
+    K().openDlg(`<h3>Add a finding</h3><form id="nfF" class="stack">
+      <div class="grid2"><div class="f"><label for="nfS">VTS</label><select id="nfS">${sites.map(s => `<option value="${s.id}"${s.id === corFilter.site ? " selected" : ""}>${esc(s.name)}</option>`).join("")}</select></div>
+        <div class="f"><label for="nfD">Date found</label><input type="date" id="nfD" value="${K().today()}" required></div></div>
+      <div class="f"><label for="nfF2">What was found</label><input id="nfF2" required></div>
+      <div class="grid2"><div class="f"><label for="nfL">Location in the system</label><input id="nfL"></div>
+        <div class="f"><label for="nfT">Task that fixes it</label><select id="nfT"><option value="">Not sure yet</option>${L.tasks.filter(t => t.sys === "COR").map(t => `<option value="${t.id}">${esc(t.id + " " + t.name)}</option>`).join("")}</select></div></div>
+      <div class="row"><button class="btn" type="submit">Add</button><button class="btn ghost" type="button" data-close>Cancel</button></div></form>`);
+    q("#nfF").onsubmit = e => {
+      e.preventDefault();
+      St.add("corrective_entries", {id: St.nextId("corrective_entries", "C-NEW-"), site: q("#nfS").value, visit: null, observation: null, task: q("#nfT").value || null, date: q("#nfD").value, finding: q("#nfF2").value.trim(),
+        location: q("#nfL").value.trim() || null, likely_cause: null, action_taken: null, urgency: null, materials_used: null, material_cost: null, hours: null, status: "open", resolved_date: null, scheduled: null, photos: []});
+      q("#toolDlg").close(); corFilter.status = "active"; corrective();
+    };
+  }
+  return {plan, visit, next, phone, corrective};
 })();
