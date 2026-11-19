@@ -1,0 +1,92 @@
+[
+  {
+    "id": "IND-01",
+    "goal": "Water reaches the system and moves through all of it",
+    "indicator": "Visits with water at the inlet and no shortcuts (%)",
+    "method": "Look at the inlet, the pump, and the flow path; short video",
+    "frequency": "Every visit",
+    "unit": "%",
+    "recorded_in": "Visit Sheet"
+  },
+  {
+    "id": "IND-02",
+    "goal": "The system traps sediment",
+    "indicator": "Sediment depth at each reference point (in), against the cleanout mark",
+    "method": "Marked rod at the reference points",
+    "frequency": "Pre-storm visit; quick look every visit",
+    "unit": "in",
+    "recorded_in": "Visit Sheet; Site History"
+  },
+  {
+    "id": "IND-03",
+    "goal": "The water leaves cleaner",
+    "indicator": "Outlet jar clearer than the inlet jar (yes / no)",
+    "method": "Jars of inlet and outlet water, photographed side by side",
+    "frequency": "Spring visit",
+    "unit": "yes / no",
+    "recorded_in": "Visit Sheet (photo)"
+  },
+  {
+    "id": "IND-04",
+    "goal": "The system removes nitrate (TW, VD, WB)",
+    "indicator": "Nitrate at the inlet and at the outlet (mg/L), and the difference",
+    "method": "Test strip at each point, photographed with its color scale",
+    "frequency": "Spring visit",
+    "unit": "mg/L",
+    "recorded_in": "Visit Sheet (photo); Site History"
+  },
+  {
+    "id": "IND-05",
+    "goal": "The water leaves cleaner (laboratory check)",
+    "indicator": "Nitrate at the inlet and outlet from a laboratory (mg/L), and turbidity if measured",
+    "method": "Laboratory analysis of one inlet and one outlet sample",
+    "frequency": "Spring visit, once a year",
+    "unit": "mg/L",
+    "recorded_in": "Visit Sheet; Site History"
+  },
+  {
+    "id": "IND-06",
+    "goal": "Plants hold the soil and do their job",
+    "indicator": "Plant cover per zone (class); number of invasive species",
+    "method": "Vegetation survey with the Field Guide",
+    "frequency": "Spring visit",
+    "unit": "class",
+    "recorded_in": "Visit Sheet; Site History"
+  },
+  {
+    "id": "IND-07",
+    "goal": "Structures and berms are sound",
+    "indicator": "Number of findings at the condition check, and how many were repaired before October 1",
+    "method": "Condition check with the drawing of the system",
+    "frequency": "Pre-storm visit",
+    "unit": null,
+    "recorded_in": "Visit Sheet; Corrective Log"
+  },
+  {
+    "id": "IND-08",
+    "goal": "Problems are fixed",
+    "indicator": "Repairs opened and closed in the year; problems that came back",
+    "method": "Corrective Maintenance Log",
+    "frequency": "Every January",
+    "unit": null,
+    "recorded_in": "Corrective Log; Site History"
+  },
+  {
+    "id": "IND-09",
+    "goal": "Maintenance happens as planned",
+    "indicator": "Planned visits that were done (%)",
+    "method": "Annual Plan against the Site History",
+    "frequency": "Every January",
+    "unit": "%",
+    "recorded_in": "Site History"
+  },
+  {
+    "id": "IND-10",
+    "goal": "The site is documented over time",
+    "indicator": "Overview photos from the same photo points",
+    "method": "Photo points",
+    "frequency": "Every visit",
+    "unit": null,
+    "recorded_in": "Visit Sheet"
+  }
+]

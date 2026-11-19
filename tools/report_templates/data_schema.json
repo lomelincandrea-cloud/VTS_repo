@@ -342,6 +342,101 @@
               "default": false
             }
           }
+        },
+        "status": {
+          "enum": [
+            "active",
+            "decommissioned"
+          ],
+          "default": "active"
+        },
+        "decommissioned": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "properties": {
+            "date": {
+              "type": "string",
+              "format": "date"
+            },
+            "category": {
+              "type": "string"
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "description": "Set when the site is taken out of service. The record is kept; the site stays on the map, greyed out."
+        },
+        "privacy": {
+          "type": "object",
+          "description": "Who sees each part of the site record. private: the organization and people it invites; watershed: only inside sub-watershed (HUC-12) summaries for watershed partners, never the exact place or the owner; public: anyone.",
+          "properties": {
+            "location": {
+              "enum": [
+                "private",
+                "watershed",
+                "public"
+              ]
+            },
+            "documents": {
+              "enum": [
+                "private",
+                "watershed",
+                "public"
+              ]
+            },
+            "status": {
+              "enum": [
+                "private",
+                "watershed",
+                "public"
+              ]
+            }
+          }
+        },
+        "design": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "label": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            }
+          },
+          "description": "Design facts from the design documents (free list)."
+        },
+        "documents": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "title": {
+                "type": "string"
+              },
+              "kind": {
+                "type": "string"
+              },
+              "date": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "url": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
         }
       }
     },

@@ -26,8 +26,8 @@
     "name": "Sample sub-watershed A"
    },
    "location": {
-    "lat": 36.0,
-    "lon": -121.0
+    "lat": 36.7105,
+    "lon": -121.663
    },
    "project_owner": "Sample Farms A",
    "params": {
@@ -54,7 +54,48 @@
    "sharing": {
     "wildlife_in_food_safety_record": true,
     "show_owner_in_water_summary": false
-   }
+   },
+   "status": "active",
+   "decommissioned": null,
+   "privacy": {
+    "location": "private",
+    "documents": "private",
+    "status": "private"
+   },
+   "design": [
+    {
+     "label": "Basin volume",
+     "value": "0.8 acre-feet"
+    },
+    {
+     "label": "Basin depth",
+     "value": "4 ft"
+    },
+    {
+     "label": "Outlet",
+     "value": "Riser pipe with a trash rack"
+    }
+   ],
+   "documents": [
+    {
+     "title": "Design drawings (sample)",
+     "kind": "PDF",
+     "date": "2019-03-01",
+     "url": null
+    },
+    {
+     "title": "Planting plan (sample)",
+     "kind": "PDF",
+     "date": "2019-05-15",
+     "url": null
+    },
+    {
+     "title": "Site Card, VTS_F07 (sample)",
+     "kind": "Form",
+     "date": "2026-01-14",
+     "url": null
+    }
+   ]
   },
   {
    "id": "S-TW",
@@ -70,8 +111,8 @@
     "name": "Sample sub-watershed B"
    },
    "location": {
-    "lat": 36.1,
-    "lon": -121.1
+    "lat": 36.769,
+    "lon": -121.736
    },
    "project_owner": "Sample Farms B",
    "params": {
@@ -103,7 +144,48 @@
    "sharing": {
     "wildlife_in_food_safety_record": true,
     "show_owner_in_water_summary": false
-   }
+   },
+   "status": "active",
+   "decommissioned": null,
+   "privacy": {
+    "location": "watershed",
+    "documents": "private",
+    "status": "watershed"
+   },
+   "design": [
+    {
+     "label": "Wetland area",
+     "value": "1.2 acres"
+    },
+    {
+     "label": "Design retention time",
+     "value": "about 3 days"
+    },
+    {
+     "label": "Cells",
+     "value": "2, in series"
+    }
+   ],
+   "documents": [
+    {
+     "title": "Design drawings (sample)",
+     "kind": "PDF",
+     "date": "2017-03-01",
+     "url": null
+    },
+    {
+     "title": "Planting plan (sample)",
+     "kind": "PDF",
+     "date": "2017-05-15",
+     "url": null
+    },
+    {
+     "title": "Site Card, VTS_F07 (sample)",
+     "kind": "Form",
+     "date": "2026-01-14",
+     "url": null
+    }
+   ]
   },
   {
    "id": "S-VD",
@@ -119,8 +201,8 @@
     "name": "Sample sub-watershed A"
    },
    "location": {
-    "lat": 36.2,
-    "lon": -121.2
+    "lat": 36.642,
+    "lon": -121.548
    },
    "project_owner": "Sample Farms C",
    "params": {
@@ -147,7 +229,48 @@
    "sharing": {
     "wildlife_in_food_safety_record": false,
     "show_owner_in_water_summary": false
-   }
+   },
+   "status": "active",
+   "decommissioned": null,
+   "privacy": {
+    "location": "private",
+    "documents": "private",
+    "status": "private"
+   },
+   "design": [
+    {
+     "label": "Length",
+     "value": "600 ft"
+    },
+    {
+     "label": "Bottom width",
+     "value": "4 ft"
+    },
+    {
+     "label": "Side slopes",
+     "value": "3 to 1"
+    }
+   ],
+   "documents": [
+    {
+     "title": "Design drawings (sample)",
+     "kind": "PDF",
+     "date": "2021-03-01",
+     "url": null
+    },
+    {
+     "title": "Planting plan (sample)",
+     "kind": "PDF",
+     "date": "2021-05-15",
+     "url": null
+    },
+    {
+     "title": "Site Card, VTS_F07 (sample)",
+     "kind": "Form",
+     "date": "2026-01-14",
+     "url": null
+    }
+   ]
   },
   {
    "id": "S-WB",
@@ -163,8 +286,8 @@
     "name": "Sample sub-watershed C"
    },
    "location": {
-    "lat": 36.3,
-    "lon": -121.3
+    "lat": 36.583,
+    "lon": -121.471
    },
    "project_owner": "Sample Farms D",
    "params": {
@@ -188,7 +311,137 @@
    "sharing": {
     "wildlife_in_food_safety_record": true,
     "show_owner_in_water_summary": false
-   }
+   },
+   "status": "active",
+   "decommissioned": null,
+   "privacy": {
+    "location": "private",
+    "documents": "private",
+    "status": "private"
+   },
+   "design": [
+    {
+     "label": "Bed size",
+     "value": "100 ft x 20 ft x 5 ft"
+    },
+    {
+     "label": "Media",
+     "value": "Woodchips"
+    },
+    {
+     "label": "Control structures",
+     "value": "Inlet and outlet boxes with stoplogs"
+    }
+   ],
+   "documents": [
+    {
+     "title": "Design drawings (sample)",
+     "kind": "PDF",
+     "date": "2020-03-01",
+     "url": null
+    },
+    {
+     "title": "Planting plan (sample)",
+     "kind": "PDF",
+     "date": "2020-05-15",
+     "url": null
+    },
+    {
+     "title": "Site Card, VTS_F07 (sample)",
+     "kind": "Form",
+     "date": "2026-01-14",
+     "url": null
+    }
+   ]
+  },
+  {
+   "id": "S-SB2",
+   "name": "Sample sediment basin, old",
+   "type": "SB",
+   "year_built": 2012,
+   "drainage_area": {
+    "value": 40,
+    "unit": "acres"
+   },
+   "huc12": {
+    "code": "SAMPLE-HUC12-A",
+    "name": "Sample sub-watershed A"
+   },
+   "location": {
+    "lat": 36.656,
+    "lon": -121.59
+   },
+   "project_owner": "Sample Farms C",
+   "params": {
+    "target_vegetation_height": "12 in",
+    "warning_level_sediment": {
+     "value": 9,
+     "unit": "in"
+    },
+    "cleanout_level_sediment": {
+     "value": 14,
+     "unit": "in"
+    },
+    "nitrate_removal_target": null,
+    "vegetation_cover_target": {
+     "min_percent": 70
+    },
+    "photo_points": {
+     "count": 3,
+     "where": "Blue stakes at the inlet, the north berm and the outlet"
+    },
+    "designated_mowing_areas": "Embankments and the access path",
+    "areas_left_unmowed": "Sedges on the basin floor, left because they slow the water"
+   },
+   "sharing": {
+    "wildlife_in_food_safety_record": true,
+    "show_owner_in_water_summary": false
+   },
+   "status": "decommissioned",
+   "decommissioned": {
+    "date": "2024-03-01",
+    "category": "Replaced",
+    "reason": "Replaced by the vegetated ditch downstream; the basin was filled in."
+   },
+   "privacy": {
+    "location": "private",
+    "documents": "private",
+    "status": "private"
+   },
+   "design": [
+    {
+     "label": "Basin volume",
+     "value": "0.8 acre-feet"
+    },
+    {
+     "label": "Basin depth",
+     "value": "4 ft"
+    },
+    {
+     "label": "Outlet",
+     "value": "Riser pipe with a trash rack"
+    }
+   ],
+   "documents": [
+    {
+     "title": "Design drawings (sample)",
+     "kind": "PDF",
+     "date": "2019-03-01",
+     "url": null
+    },
+    {
+     "title": "Planting plan (sample)",
+     "kind": "PDF",
+     "date": "2019-05-15",
+     "url": null
+    },
+    {
+     "title": "Site Card, VTS_F07 (sample)",
+     "kind": "Form",
+     "date": "2026-01-14",
+     "url": null
+    }
+   ]
   }
  ],
  "annual_plans": [

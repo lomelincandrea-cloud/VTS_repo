@@ -6,6 +6,7 @@ Reads   tools/manual_builder/data/VTS_manual_content.xlsx        (manual: tasks,
 Writes  docs/learn_data.js      window.VTS_LEARN = {...}   (the Tool keeps its own docs/data.js)
         docs/img/manual/*        figures used by the topics
         docs/downloads/*         latest draft PDFs and Excel forms (marked DRAFT on the site)
+        docs/tool/*.json         sample records and indicators for the Tool (copied from tools/report_templates)
 
 Run from the repo root with the conda environment "vts" (Graphviz 'dot' must be on the PATH for the flow diagrams):
     python tools/build_site_data.py
@@ -175,6 +176,11 @@ for code, title, f, kind, what in (
         print(f"  download missing (build it first): {code}"); continue
     shutil.copy(f, DL / f.name)
     docs.append({"code": code, "title": title, "file": f"downloads/{f.name}", "kind": kind, "size_kb": round(f.stat().st_size / 1024), "what": what, "status": "Draft"})
+
+# ---------------- Tool sample records (same file the report templates use)
+(DOCS / "tool").mkdir(exist_ok=True)
+shutil.copy(ROOT / "tools" / "report_templates" / "sample_data.json", DOCS / "tool" / "sample_data.json")
+shutil.copy(ROOT / "tools" / "report_templates" / "indicators.json", DOCS / "tool" / "indicators.json")
 
 data = {"built": date.today().isoformat(), "visits": VISIT_ORDER, "systems": SYS_NAME, "tasks": tasks, "groups": groups, "topics": topics,
         "checklist": checklist, "siteParams": site_params, "plants": plants, "watch": watch, "plantSources": plant_sources,

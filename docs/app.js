@@ -13,6 +13,7 @@ const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&g
 const ROUTES=["home","start","maintain","request","learn","tool"];
 function route(){const parts=(location.hash||"#home").slice(1).split("/");const r=ROUTES.includes(parts[0])?parts[0]:"home";
   if(r==="learn"&&window.learnRoute)window.learnRoute(parts.slice(1));
+  if(r==="tool"&&window.toolRoute)window.toolRoute(parts.slice(1));
   $$("section.view").forEach(v=>v.classList.toggle("on",v.id==="v-"+r));
   $$("nav.main a").forEach(a=>{const on=a.dataset.r===r||(r==="request"&&a.dataset.r==="maintain");on?a.setAttribute("aria-current","page"):a.removeAttribute("aria-current")});
   window.scrollTo(0,0);

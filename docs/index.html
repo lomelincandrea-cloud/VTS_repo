@@ -210,8 +210,15 @@
 
 <!-- TOOL -->
 <section class="view" id="v-tool"><div class="wrap stack lg">
-  <div class="stack"><h1>Maintenance tool</h1><p class="lede">Demo with sample data. This is what a signed-in owner or crew lead would see.</p></div>
-  <div>
+  <div class="stack"><h1>Maintenance tool</h1><p class="lede">Plan the year, keep the record of every visit, and see how each system is doing. Prototype with sample data.</p></div>
+  <div id="toolGate"></div>
+  <div id="toolApp" class="stack" hidden>
+    <nav class="l-pills l-tabs" id="toolTabs" aria-label="Tool sections">
+      <a class="l-pill" data-t="vts" href="#tool/vts">My VTS</a><a class="l-pill" data-t="plan" href="#tool/plan">Yearly plan</a><a class="l-pill" data-t="visits" href="#tool/visits">Next visits</a><a class="l-pill" data-t="dashboard" href="#tool/dashboard">Dashboard and reports</a><a class="l-pill" data-t="old" href="#tool/old">Earlier demo</a>
+    </nav>
+    <div id="toolView" class="stack"></div>
+  <div id="toolOld" hidden>
+    <p class="small muted">The first version of the Tool, kept while the new sections are built.</p>
     <div class="tabs" role="tablist" data-tabs="tool">
       <button role="tab" aria-selected="true" data-t="over">Overview</button>
       <button role="tab" aria-selected="false" data-t="plan">Yearly plan</button>
@@ -265,12 +272,14 @@
       <div id="corrFormView"></div>
     </div></div>
   </div>
+  </div>
 </div></section>
 </main>
 
 <footer><div class="wrap">VTS Hub prototype, November 2026. A capstone project at UC Santa Cruz with the California Marine Sanctuary Foundation. Content is in draft and has not had technical review. <a href="v0/">See the first prototype</a>.</div></footer>
 
 <dialog id="learnDlg" class="l-dlg" aria-label="Plant card"></dialog>
+<dialog id="toolDlg" class="l-dlg" aria-label="Tool form"></dialog>
 <dialog id="phoneDlg" aria-labelledby="phTitle"><div class="phone">
   <div class="row" style="justify-content:space-between"><h3 id="phTitle">Visit Sheet</h3><button class="btn ghost sm" type="button" id="phClose">Close</button></div>
   <p class="small muted" id="phSub"></p>
@@ -284,6 +293,8 @@
 <script src="data.js"></script>
 <script src="learn_data.js"></script>
 <script src="learn.js"></script>
+<script src="store.js"></script>
+<script src="tool.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
