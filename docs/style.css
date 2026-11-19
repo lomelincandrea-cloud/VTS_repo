@@ -343,3 +343,36 @@ th{font-stretch:normal}
 .t-qr img,.t-qr canvas{max-width:100%;height:auto}
 .t-done{border:2px solid var(--field);margin-bottom:1rem}
 #v-phone .wrap{max-width:720px;padding-top:1rem}
+
+/* Yearly plan Gantt */
+.g-wrap{border-radius:14px}
+.g-tab{min-width:760px;border-collapse:separate;border-spacing:0;font-size:.85rem;background:var(--surface)}
+.g-tab th,.g-tab td{border-bottom:1px solid var(--line);border-right:1px solid var(--line);padding:.3rem .25rem;text-align:center;vertical-align:middle}
+.g-tab thead th{background:var(--water);color:var(--surface);position:sticky;top:0}
+.g-t{position:sticky;left:0;z-index:1;background:var(--surface);text-align:left!important;min-width:12rem;max-width:16rem;white-space:normal;font-family:var(--body);font-weight:600;color:var(--ink)}
+.g-tab thead .g-t{background:var(--water);color:var(--surface);z-index:2}
+.g-t a{color:var(--ink);text-decoration:none}.g-t a:hover{text-decoration:underline}
+.g-visits td,.g-visits th{background:var(--water-soft)}
+.g-rout td,.g-rout th{background:var(--ground)}
+.g-c{min-width:2.6rem;height:2.2rem}
+.g-c.g-add{cursor:pointer}.g-c.g-add:hover{background:var(--silt-soft)}
+.g-c.on{cursor:default}
+body .g-c.on[data-k]{cursor:inherit}
+.g-plus{color:var(--muted);opacity:.45;font-weight:700}
+.g-mark{display:inline-flex;align-items:baseline;gap:1px;font-weight:700;border-radius:6px;padding:0 .25rem;margin:1px}
+.g-mark small{font-size:.65rem;font-weight:600}
+.g-mark.plan{color:var(--water);background:var(--water-soft)}
+.g-mark.done{color:#fff;background:#2F8F4E}
+.g-mark.miss{color:var(--muted);background:var(--ground)}
+.g-v{display:inline-flex;flex-direction:column;align-items:center;border:1.5px solid var(--water);background:var(--surface);color:var(--water);border-radius:8px;padding:0 .3rem;margin:1px;font:700 .8rem var(--body);cursor:pointer;line-height:1.1;text-decoration:none}
+.g-v small{font-size:.6rem;font-weight:600}
+.g-v.done{background:#2F8F4E;border-color:#2F8F4E;color:#fff}
+.g-v.extra{border-style:dashed}
+.g-dot{color:var(--muted)}
+.g-del{border:0;background:none;cursor:pointer;font-size:.95rem;padding:0 .2rem}
+.g-addrow th{background:var(--surface)}
+.g-plusbig{display:inline-flex;align-items:center;justify-content:center;width:1.6rem;height:1.6rem;border-radius:50%;background:var(--water);color:var(--surface);font-weight:700}
+.g-addrow select{width:auto;max-width:100%;flex:1 1 14rem}.g-addrow input{flex:1 1 12rem;width:auto}
+.t-pvrow summary{cursor:pointer;display:flex;gap:.4rem;flex-wrap:wrap;align-items:center}
+.t-pvrow[open] summary{margin-bottom:.5rem}
+.t-mat{min-width:560px;font-size:.88rem}.t-mat input{min-height:36px}

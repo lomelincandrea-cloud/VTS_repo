@@ -669,7 +669,9 @@
    "hours_on_site": 2,
    "hours_crew_total": 2,
    "last_rain": null,
-   "tasks_done": [],
+   "tasks_done": [
+    "SB_T08"
+   ],
    "mowing": null,
    "invasive_removed": [],
    "photos": [],
@@ -776,7 +778,9 @@
    "hours_crew_total": 6,
    "last_rain": null,
    "tasks_done": [
-    "SB_T01"
+    "SB_T01",
+    "SB_T02",
+    "SB_T06"
    ],
    "mowing": null,
    "invasive_removed": [],
@@ -858,7 +862,11 @@
    "last_rain": null,
    "tasks_done": [
     "SB_T01",
-    "SB_T03"
+    "SB_T02",
+    "SB_T03",
+    "SB_T04",
+    "SB_T05",
+    "SB_T07"
    ],
    "mowing": {
     "areas": [
@@ -1123,7 +1131,9 @@
    "hours_on_site": 2,
    "hours_crew_total": 2,
    "last_rain": null,
-   "tasks_done": [],
+   "tasks_done": [
+    "TW_T09"
+   ],
    "mowing": null,
    "invasive_removed": [],
    "photos": [],
@@ -1240,7 +1250,10 @@
    "hours_crew_total": 6,
    "last_rain": null,
    "tasks_done": [
-    "TW_T01"
+    "TW_T01",
+    "TW_T02",
+    "TW_T06",
+    "TW_T07"
    ],
    "mowing": null,
    "invasive_removed": [],
@@ -1334,7 +1347,11 @@
    "last_rain": null,
    "tasks_done": [
     "TW_T01",
-    "TW_T03"
+    "TW_T02",
+    "TW_T03",
+    "TW_T04",
+    "TW_T05",
+    "TW_T08"
    ],
    "mowing": {
     "areas": [
@@ -1470,7 +1487,9 @@
    "hours_on_site": 2,
    "hours_crew_total": 2,
    "last_rain": null,
-   "tasks_done": [],
+   "tasks_done": [
+    "VD_T10"
+   ],
    "mowing": null,
    "invasive_removed": [],
    "photos": [],
@@ -1567,7 +1586,10 @@
    "hours_crew_total": 6,
    "last_rain": null,
    "tasks_done": [
-    "VD_T01"
+    "VD_T01",
+    "VD_T02",
+    "VD_T07",
+    "VD_T08"
    ],
    "mowing": null,
    "invasive_removed": [],
@@ -1603,7 +1625,12 @@
    "last_rain": null,
    "tasks_done": [
     "VD_T01",
-    "VD_T03"
+    "VD_T02",
+    "VD_T03",
+    "VD_T04",
+    "VD_T05",
+    "VD_T06",
+    "VD_T09"
    ],
    "mowing": {
     "areas": [
@@ -1712,7 +1739,9 @@
    "hours_on_site": 2,
    "hours_crew_total": 2,
    "last_rain": null,
-   "tasks_done": [],
+   "tasks_done": [
+    "WB_T09"
+   ],
    "mowing": null,
    "invasive_removed": [],
    "photos": [],
@@ -1809,7 +1838,10 @@
    "hours_crew_total": 6,
    "last_rain": null,
    "tasks_done": [
-    "WB_T01"
+    "WB_T01",
+    "WB_T02",
+    "WB_T03",
+    "WB_T06"
    ],
    "mowing": null,
    "invasive_removed": [],
@@ -1888,7 +1920,12 @@
    "last_rain": null,
    "tasks_done": [
     "WB_T01",
-    "WB_T03"
+    "WB_T02",
+    "WB_T03",
+    "WB_T04",
+    "WB_T05",
+    "WB_T07",
+    "WB_T08"
    ],
    "mowing": {
     "areas": [
