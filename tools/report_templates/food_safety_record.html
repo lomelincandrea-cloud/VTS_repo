@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>{{ r.report }} · {{ r.site_name }}</title>{% include "_style.html" %}</head>
+<body>
+{# Food Safety Record. Factual and dated, organized by visit. Rendered by render_reports.py from report_model.food_safety(). #}
+<section class="cover">
+  <span class="eyebrow">Food Safety Record</span>
+  <h1>{{ r.site_name }}</h1>
+  {% if r.sample %}<div class="sample-banner">Sample data. These records are made up to show how the record works. They are not a real site.</div>{% endif %}
+  <table class="kv">
+    <tr><td class="k">System</td><td>{{ r.type }}</td></tr>
+    <tr><td class="k">Project owner</td><td>{{ r.project_owner }}</td></tr>
+    <tr><td class="k">Period covered</td><td>{{ r.period_start }} to {{ r.period_end }}</td></tr>
+    <tr><td class="k">Generated</td><td>{{ r.generated }}, by {{ r.generated_by }}</td></tr>
+  </table>
+  <p class="note">{{ r.source_line }} It is documentation you can show an auditor. The auditor or the program decides what it needs.</p>
+</section>
+
+<h2>1. Summary</h2>
+<div class="tiles">
+  <div class="tile"><b>{{ r.summary.planned_done }} of {{ r.summary.planned }}</b>planned visits done</div>
+  <div class="tile"><b>{{ r.summary.done }}</b>visits recorded (including unplanned)</div>
+  <div class="tile"><b>{{ r.summary.open_corrective }}</b>corrective items open or passed to the supervisor</div>
+</div>
+
+<h2>2. Vegetation management</h2>
+<table class="kv">
+  <tr><td class="k">Designated mowing areas</td><td>{{ r.vegetation.designated }}</td></tr>
+  <tr><td class="k">Areas left unmowed on purpose, and why</td><td>{{ r.vegetation.unmowed }}</td></tr>
+  <tr><td class="k">Target vegetation height</td><td>{{ r.vegetation.target_height }}</td></tr>
+</table>
+<h3>Mowing</h3>
+{% if r.vegetation.mowing %}<table class="t"><tr><th>Date</th><th>Areas mowed</th><th>At the target height</th><th>Photo</th></tr>
+{% for m in r.vegetation.mowing %}<tr><td>{{ m.date }}</td><td>{{ m.areas }}</td><td>{{ m.at_target }}</td><td>{{ m.photo }}</td></tr>{% endfor %}</table>
+{% else %}<p class="nodata">No data recorded</p>{% endif %}
+<h3>Vegetation survey</h3>
+<table class="kv"><tr><td class="k">Plant cover</td><td>{{ r.vegetation.survey.cover }}</td></tr><tr><td class="k">Invasive species found</td><td>{{ r.vegetation.survey.invasive }}</td></tr><tr><td class="k">Date</td><td>{{ r.vegetation.survey.date }}</td></tr></table>
+<h3>Invasive plants removed</h3>
+{% if r.vegetation.invasive_removed %}<table class="t"><tr><th>Date</th><th>Species</th><th>Location</th><th>Extent</th><th>Photo</th></tr>
+{% for x in r.vegetation.invasive_removed %}<tr><td>{{ x.date }}</td><td>{{ x.species }}</td><td>{{ x.location }}</td><td>{{ x.extent }}</td><td>{{ x.photo or "none" }}</td></tr>{% endfor %}</table>
+{% else %}<p class="nodata">No data recorded</p>{% endif %}
+
+<h2>3. Wildlife</h2>
+{% if r.wildlife.shared %}
+<h3>Observations (from the Visit Sheet)</h3>
+{% if r.wildlife.observations %}<table class="t"><tr><th>Date</th><th>Item</th><th>Location in the system</th><th>About how many</th><th>In use</th><th>Since last visit</th><th>Photo</th></tr>
+{% for o in r.wildlife.observations %}<tr><td>{{ o.date }}</td><td>{{ o.item }}</td><td>{{ o.location }}</td><td>{{ o.range }}</td><td>{{ o.in_use }}</td><td>{{ o.trend }}</td><td>{{ o.photo }}</td></tr>{% endfor %}</table>
+{% else %}<p class="nodata">No data recorded</p>{% endif %}
+<h3>Actions (from the Corrective Maintenance Log)</h3>
+{% if r.wildlife.actions %}<table class="t"><tr><th>Date</th><th>Finding</th><th>Action taken</th><th>Status</th></tr>
+{% for c in r.wildlife.actions %}<tr><td>{{ c.date }}</td><td>{{ c.finding }}</td><td>{{ c.action_taken }}</td><td>{{ c.status }}{% if c.resolved_date %} ({{ c.resolved_date }}){% endif %}</td></tr>{% endfor %}</table>
+{% else %}<p class="nodata">No data recorded</p>{% endif %}
+<p class="note">Crews do not trap or poison animals. "In use" is judged only from fresh soil, tracks, or droppings.</p>
+{% else %}
+<div class="withheld">The project owner chose not to include wildlife records in this document.</div>
+{% endif %}
+
+<h2>4. Boundaries and farm activity</h2>
+{% if r.farm %}<table class="t"><tr><th>Date</th><th>Item</th><th>Answer</th><th>Note</th><th>Photo</th></tr>
+{% for f in r.farm %}<tr><td>{{ f.date }}</td><td>{{ f.item }}</td><td>{{ f.answer }}</td><td>{{ f.note }}</td><td>{{ f.photo }}</td></tr>{% endfor %}</table>
+<p class="note">Item checked: {{ r.farm[0].question }}</p>
+{% else %}<p class="nodata">No data recorded</p>{% endif %}
+
+<h2>5. Structures</h2>
+<table class="kv"><tr><td class="k">Condition check</td><td>{{ r.structures.visit }}</td></tr><tr><td class="k">Findings</td><td>{{ r.structures.findings }}</td></tr><tr><td class="k">Repaired before October 1</td><td>{{ r.structures.fixed_before_oct1 }}</td></tr></table>
+{% if r.structures.rows %}<table class="t"><tr><th>Item</th><th>Finding</th><th>Location</th></tr>{% for f in r.structures.rows %}<tr><td>{{ f.item }}</td><td>{{ f.note or f.question }}</td><td>{{ f.location }}</td></tr>{% endfor %}</table>{% endif %}
+
+<h2>6. Water</h2>
+<h3>Unusual color, odor, algae, or oil sheen</h3>
+{% if r.water.unusual %}<table class="t"><tr><th>Date</th><th>Answer</th><th>Note</th><th>Photo</th></tr>{% for w in r.water.unusual %}<tr><td>{{ w.date }}</td><td>{{ w.answer }}</td><td>{{ w.note }}</td><td>{{ w.photo }}</td></tr>{% endfor %}</table>
+{% else %}<p class="nodata">No data recorded</p>{% endif %}
+<h3>Jar comparison (outlet clearer than inlet)</h3>
+{% if r.water.jar %}<table class="t"><tr><th>Date</th><th>Outlet clearer</th><th>Photo</th></tr>{% for j in r.water.jar %}<tr><td>{{ j.date }}</td><td>{{ j.answer }}</td><td>{{ j.photo }}</td></tr>{% endfor %}</table>
+{% else %}<p class="nodata">No data recorded</p>{% endif %}
+<h3>Nitrate readings</h3>
+{% if r.water.nitrate %}<table class="t"><tr><th>Date</th><th>Point</th><th>Value</th><th>Evidence</th><th>Kit or instrument</th><th>Water flowing</th><th>Recorded by</th></tr>
+{% for n in r.water.nitrate %}<tr><td>{{ n.date }} {{ n.time }}</td><td>{{ n.point }}</td><td>{{ n.value }}<br><span class="small">{{ n.detail }}</span></td><td><span class="ev ev-{{ n.evidence|replace(' ','-') }}">{{ n.evidence }}</span><br><span class="small">{{ n.method }}</span></td><td>{{ n.kit }}</td><td>{{ n.flow }}</td><td>{{ n.role }}</td></tr>{% endfor %}</table>
+{% else %}<p class="nodata">No data recorded</p>{% endif %}
+<p class="conv">{{ r.water.conversion_note }}</p>
+
+<h2>7. Trash and debris</h2>
+<table class="kv"><tr><td class="k">Visits with trash and debris removal</td><td>{{ r.trash.visits_with_trash_task|join(", ") or "No data recorded" }}</td></tr></table>
+{% if r.trash.findings %}<table class="t"><tr><th>Date</th><th>Finding</th><th>Fixed on the spot</th></tr>{% for t in r.trash.findings %}<tr><td>{{ t.date }}</td><td>{{ t.note }}</td><td>{{ t.fixed_now }}</td></tr>{% endfor %}</table>{% endif %}
+<h3>Visit notes (what was done, waste handling)</h3>
+{% if r.trash.notes %}<table class="t"><tr><th>Date</th><th>Note</th></tr>{% for n in r.trash.notes %}<tr><td>{{ n.date }}</td><td>{{ n.note }}</td></tr>{% endfor %}</table>{% else %}<p class="nodata">No data recorded</p>{% endif %}
+
+<h2>8. Corrective Maintenance Log</h2>
+{% if r.corrective %}<table class="t"><tr><th>Date</th><th>Finding</th><th>Action taken</th><th>Materials</th><th>Hours</th><th>Status</th></tr>
+{% for c in r.corrective %}<tr><td>{{ c.date }}</td><td>{{ c.finding }}</td><td>{{ c.action_taken or "No data recorded" }}</td><td>{{ c.materials_used or "" }}</td><td>{{ c.hours_text }}</td><td>{{ c.status }}{% if c.resolved_date %} ({{ c.resolved_date }}){% endif %}</td></tr>{% endfor %}</table>
+{% else %}<p class="nodata">No data recorded</p>{% endif %}
+
+<h2>9. Photo log</h2>
+<table class="kv"><tr><td class="k">Photo points</td><td>{{ r.photos.points }}</td></tr></table>
+<table class="t"><tr><th>Date</th><th>Visit</th><th>All photo points</th><th>Photos</th></tr>
+{% for p in r.photos.rows %}<tr><td>{{ p.date }}</td><td>{{ p.type }}</td><td>{{ p.all_points }}</td><td class="small">{{ p.photos|join(", ") or "No data recorded" }}</td></tr>{% endfor %}</table>
+
+<h2>10. Sign-off</h2>
+<table class="t"><tr><th>Visit date</th><th>Visit</th><th>Supervisor initials</th><th>Signed</th></tr>
+{% for s in r.signoff %}<tr><td>{{ s.date }}</td><td>{{ s.type }}</td><td>{{ s.initials }}</td><td>{{ s.signed }}</td></tr>{% endfor %}</table>
+<p class="note">Crew member names are not shown unless the project owner asks for them.</p>
+
+{% if r.include_history %}
+<h2 class="pb">Appendix. Change history of these records</h2>
+{% if r.history %}<table class="t"><tr><th>When</th><th>Record</th><th>Field</th><th>Old value</th><th>New value</th><th>Reason</th><th>By</th></tr>
+{% for h in r.history %}<tr><td>{{ h.when_text }}</td><td>{{ h.record_type }} {{ h.record_id }}</td><td>{{ h.field }}</td><td>{{ h.old_value }}</td><td>{{ h.new_value }}</td><td>{{ h.reason }}{% if h.category %} ({{ h.category }}){% endif %}</td><td>{{ h.who_role }}</td></tr>{% endfor %}</table>
+{% else %}<p class="nodata">No changes recorded in this period.</p>{% endif %}
+{% endif %}
+</body></html>

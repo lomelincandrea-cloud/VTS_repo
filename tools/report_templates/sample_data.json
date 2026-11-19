@@ -1,0 +1,3959 @@
+{
+ "meta": {
+  "sample": true,
+  "note": "Made-up records for the report templates. Not a real site.",
+  "generated_for_period": {
+   "start": "2026-01-01",
+   "end": "2026-11-19"
+  }
+ },
+ "organization": {
+  "id": "ORG-SAMPLE",
+  "name": "Sample maintenance organization"
+ },
+ "sites": [
+  {
+   "id": "S-SB",
+   "name": "Sample sediment basin",
+   "type": "SB",
+   "year_built": 2019,
+   "drainage_area": {
+    "value": 40,
+    "unit": "acres"
+   },
+   "huc12": {
+    "code": "SAMPLE-HUC12-A",
+    "name": "Sample sub-watershed A"
+   },
+   "location": {
+    "lat": 36.0,
+    "lon": -121.0
+   },
+   "project_owner": "Sample Farms A",
+   "params": {
+    "target_vegetation_height": "12 in",
+    "warning_level_sediment": {
+     "value": 9,
+     "unit": "in"
+    },
+    "cleanout_level_sediment": {
+     "value": 14,
+     "unit": "in"
+    },
+    "nitrate_removal_target": null,
+    "vegetation_cover_target": {
+     "min_percent": 70
+    },
+    "photo_points": {
+     "count": 3,
+     "where": "Blue stakes at the inlet, the north berm and the outlet"
+    },
+    "designated_mowing_areas": "Embankments and the access path",
+    "areas_left_unmowed": "Sedges on the basin floor, left because they slow the water"
+   },
+   "sharing": {
+    "wildlife_in_food_safety_record": true,
+    "show_owner_in_water_summary": false
+   }
+  },
+  {
+   "id": "S-TW",
+   "name": "Sample treatment wetland",
+   "type": "TW",
+   "year_built": 2017,
+   "drainage_area": {
+    "value": 120,
+    "unit": "acres"
+   },
+   "huc12": {
+    "code": "SAMPLE-HUC12-B",
+    "name": "Sample sub-watershed B"
+   },
+   "location": {
+    "lat": 36.1,
+    "lon": -121.1
+   },
+   "project_owner": "Sample Farms B",
+   "params": {
+    "target_vegetation_height": "8 in on berms and paths",
+    "warning_level_sediment": {
+     "value": 6,
+     "unit": "in"
+    },
+    "cleanout_level_sediment": {
+     "value": 10,
+     "unit": "in"
+    },
+    "nitrate_removal_target": {
+     "text": "Outlet at least 2 mg/L NO3-N lower than the inlet in the laboratory pair",
+     "min_difference": 2,
+     "unit": "mg/L NO3-N",
+     "method": "laboratory"
+    },
+    "vegetation_cover_target": {
+     "min_percent": 80
+    },
+    "photo_points": {
+     "count": 4,
+     "where": "Numbered posts at the inlet, both berms and the outlet"
+    },
+    "designated_mowing_areas": "Berms and access paths",
+    "areas_left_unmowed": "Emergent wetland plants (treatment); a strip on the east berm where birds nest in spring"
+   },
+   "sharing": {
+    "wildlife_in_food_safety_record": true,
+    "show_owner_in_water_summary": false
+   }
+  },
+  {
+   "id": "S-VD",
+   "name": "Sample vegetated ditch",
+   "type": "VD",
+   "year_built": 2021,
+   "drainage_area": {
+    "value": 60,
+    "unit": "acres"
+   },
+   "huc12": {
+    "code": "SAMPLE-HUC12-A",
+    "name": "Sample sub-watershed A"
+   },
+   "location": {
+    "lat": 36.2,
+    "lon": -121.2
+   },
+   "project_owner": "Sample Farms C",
+   "params": {
+    "target_vegetation_height": "10 in",
+    "warning_level_sediment": {
+     "value": 4,
+     "unit": "in"
+    },
+    "cleanout_level_sediment": {
+     "value": 6,
+     "unit": "in"
+    },
+    "nitrate_removal_target": null,
+    "vegetation_cover_target": {
+     "min_percent": 70
+    },
+    "photo_points": {
+     "count": 2,
+     "where": "Upstream and downstream culverts"
+    },
+    "designated_mowing_areas": "Both banks and the access path",
+    "areas_left_unmowed": "Ditch bottom grasses, left to slow the flow"
+   },
+   "sharing": {
+    "wildlife_in_food_safety_record": false,
+    "show_owner_in_water_summary": false
+   }
+  },
+  {
+   "id": "S-WB",
+   "name": "Sample woodchip bioreactor",
+   "type": "WB",
+   "year_built": 2020,
+   "drainage_area": {
+    "value": 25,
+    "unit": "acres"
+   },
+   "huc12": {
+    "code": "SAMPLE-HUC12-C",
+    "name": "Sample sub-watershed C"
+   },
+   "location": {
+    "lat": 36.3,
+    "lon": -121.3
+   },
+   "project_owner": "Sample Farms D",
+   "params": {
+    "target_vegetation_height": "12 in on the berms",
+    "warning_level_sediment": null,
+    "cleanout_level_sediment": null,
+    "nitrate_removal_target": {
+     "text": "Outlet at least 5 mg/L NO3-N lower than the inlet in the laboratory pair",
+     "min_difference": 5,
+     "unit": "mg/L NO3-N",
+     "method": "laboratory"
+    },
+    "vegetation_cover_target": null,
+    "photo_points": {
+     "count": 2,
+     "where": "Inlet box and outlet box"
+    },
+    "designated_mowing_areas": "Berms over the bed and the access path",
+    "areas_left_unmowed": null
+   },
+   "sharing": {
+    "wildlife_in_food_safety_record": true,
+    "show_owner_in_water_summary": false
+   }
+  }
+ ],
+ "annual_plans": [
+  {
+   "site": "S-SB",
+   "year": 2026,
+   "planned_visits": [
+    {
+     "date": "2026-01-14",
+     "type": "January review"
+    },
+    {
+     "date": "2026-02-06",
+     "type": "Routine"
+    },
+    {
+     "date": "2026-04-15",
+     "type": "Spring"
+    },
+    {
+     "date": "2026-06-10",
+     "type": "Routine"
+    },
+    {
+     "date": "2026-08-19",
+     "type": "Pre-storm"
+    },
+    {
+     "date": "2026-10-21",
+     "type": "Routine"
+    },
+    {
+     "date": "2026-12-09",
+     "type": "Routine"
+    }
+   ]
+  },
+  {
+   "site": "S-TW",
+   "year": 2026,
+   "planned_visits": [
+    {
+     "date": "2026-01-14",
+     "type": "January review"
+    },
+    {
+     "date": "2026-02-06",
+     "type": "Routine"
+    },
+    {
+     "date": "2026-04-15",
+     "type": "Spring"
+    },
+    {
+     "date": "2026-06-10",
+     "type": "Routine"
+    },
+    {
+     "date": "2026-08-19",
+     "type": "Pre-storm"
+    },
+    {
+     "date": "2026-10-21",
+     "type": "Routine"
+    },
+    {
+     "date": "2026-12-09",
+     "type": "Routine"
+    }
+   ]
+  },
+  {
+   "site": "S-VD",
+   "year": 2026,
+   "planned_visits": [
+    {
+     "date": "2026-01-14",
+     "type": "January review"
+    },
+    {
+     "date": "2026-02-06",
+     "type": "Routine"
+    },
+    {
+     "date": "2026-04-15",
+     "type": "Spring"
+    },
+    {
+     "date": "2026-06-10",
+     "type": "Routine"
+    },
+    {
+     "date": "2026-08-19",
+     "type": "Pre-storm"
+    },
+    {
+     "date": "2026-10-21",
+     "type": "Routine"
+    },
+    {
+     "date": "2026-12-09",
+     "type": "Routine"
+    }
+   ]
+  },
+  {
+   "site": "S-WB",
+   "year": 2026,
+   "planned_visits": [
+    {
+     "date": "2026-01-14",
+     "type": "January review"
+    },
+    {
+     "date": "2026-02-06",
+     "type": "Routine"
+    },
+    {
+     "date": "2026-04-15",
+     "type": "Spring"
+    },
+    {
+     "date": "2026-06-10",
+     "type": "Routine"
+    },
+    {
+     "date": "2026-08-19",
+     "type": "Pre-storm"
+    },
+    {
+     "date": "2026-10-21",
+     "type": "Routine"
+    },
+    {
+     "date": "2026-12-09",
+     "type": "Routine"
+    }
+   ]
+  }
+ ],
+ "visits": [
+  {
+   "id": "V-SB-2024-08-20",
+   "site": "S-SB",
+   "date": "2024-08-20",
+   "type": "Pre-storm",
+   "status": "closed",
+   "crew_size": 3,
+   "hours_on_site": 4,
+   "hours_crew_total": 12,
+   "last_rain": null,
+   "tasks_done": [],
+   "mowing": null,
+   "invasive_removed": [],
+   "photos": [
+    {
+     "id": "PH-SB-2024-08-20-1",
+     "photo_point": 1,
+     "caption": "Overview from photo point 1"
+    },
+    {
+     "id": "PH-SB-2024-08-20-2",
+     "photo_point": 2,
+     "caption": "Overview from photo point 2"
+    },
+    {
+     "id": "PH-SB-2024-08-20-3",
+     "photo_point": 3,
+     "caption": "Overview from photo point 3"
+    }
+   ],
+   "all_photo_points_taken": true,
+   "notes": null,
+   "supervisor_role": "supervisor",
+   "sign_off": {
+    "initials": "SUP",
+    "date": "2024-08-20"
+   }
+  },
+  {
+   "id": "V-SB-2025-08-20",
+   "site": "S-SB",
+   "date": "2025-08-20",
+   "type": "Pre-storm",
+   "status": "closed",
+   "crew_size": 3,
+   "hours_on_site": 4,
+   "hours_crew_total": 12,
+   "last_rain": null,
+   "tasks_done": [],
+   "mowing": null,
+   "invasive_removed": [],
+   "photos": [
+    {
+     "id": "PH-SB-2025-08-20-1",
+     "photo_point": 1,
+     "caption": "Overview from photo point 1"
+    },
+    {
+     "id": "PH-SB-2025-08-20-2",
+     "photo_point": 2,
+     "caption": "Overview from photo point 2"
+    },
+    {
+     "id": "PH-SB-2025-08-20-3",
+     "photo_point": 3,
+     "caption": "Overview from photo point 3"
+    }
+   ],
+   "all_photo_points_taken": true,
+   "notes": null,
+   "supervisor_role": "supervisor",
+   "sign_off": {
+    "initials": "SUP",
+    "date": "2025-08-20"
+   }
+  },
+  {
+   "id": "V-SB-2026-01-14",
+   "site": "S-SB",
+   "date": "2026-01-14",
+   "type": "January review",
+   "status": "closed",
+   "crew_size": 1,
+   "hours_on_site": 2,
+   "hours_crew_total": 2,
+   "last_rain": null,
+   "tasks_done": [],
+   "mowing": null,
+   "invasive_removed": [],
+   "photos": [],
+   "all_photo_points_taken": null,
+   "notes": "Site History read; Annual Plan written.",
+   "supervisor_role": "supervisor",
+   "sign_off": {
+    "initials": "SUP",
+    "date": "2026-01-14"
+   }
+  },
+  {
+   "id": "V-SB-2026-02-06",
+   "site": "S-SB",
+   "date": "2026-02-06",
+   "type": "Routine",
+   "status": "closed",
+   "crew_size": 2,
+   "hours_on_site": 1.5,
+   "hours_crew_total": 3.0,
+   "last_rain": null,
+   "tasks_done": [
+    "SB_T01",
+    "SB_T02"
+   ],
+   "mowing": null,
+   "invasive_removed": [],
+   "photos": [
+    {
+     "id": "PH-SB-2026-02-06-1",
+     "photo_point": 1,
+     "caption": "Overview from photo point 1"
+    },
+    {
+     "id": "PH-SB-2026-02-06-2",
+     "photo_point": 2,
+     "caption": "Overview from photo point 2"
+    },
+    {
+     "id": "PH-SB-2026-02-06-3",
+     "photo_point": 3,
+     "caption": "Overview from photo point 3"
+    }
+   ],
+   "all_photo_points_taken": true,
+   "notes": "Trash removed at the inlet.",
+   "supervisor_role": "supervisor",
+   "sign_off": {
+    "initials": "SUP",
+    "date": "2026-02-06"
+   }
+  },
+  {
+   "id": "V-SB-2026-02-17",
+   "site": "S-SB",
+   "date": "2026-02-17",
+   "type": "After storm",
+   "status": "closed",
+   "crew_size": 2,
+   "hours_on_site": 1.5,
+   "hours_crew_total": 3.0,
+   "last_rain": {
+    "date": "2026-02-15",
+    "amount_in": 1.2
+   },
+   "tasks_done": [
+    "SB_T01"
+   ],
+   "mowing": null,
+   "invasive_removed": [],
+   "photos": [
+    {
+     "id": "PH-SB-2026-02-17-1",
+     "photo_point": 1,
+     "caption": "Overview from photo point 1"
+    },
+    {
+     "id": "PH-SB-2026-02-17-2",
+     "photo_point": 2,
+     "caption": "Overview from photo point 2"
+    },
+    {
+     "id": "PH-SB-2026-02-17-3",
+     "photo_point": 3,
+     "caption": "Overview from photo point 3"
+    }
+   ],
+   "all_photo_points_taken": true,
+   "notes": null,
+   "supervisor_role": "supervisor",
+   "sign_off": {
+    "initials": "SUP",
+    "date": "2026-02-17"
+   }
+  },
+  {
+   "id": "V-SB-2026-04-15",
+   "site": "S-SB",
+   "date": "2026-04-15",
+   "type": "Spring",
+   "status": "closed",
+   "crew_size": 2,
+   "hours_on_site": 3,
+   "hours_crew_total": 6,
+   "last_rain": null,
+   "tasks_done": [
+    "SB_T01"
+   ],
+   "mowing": null,
+   "invasive_removed": [],
+   "photos": [
+    {
+     "id": "PH-SB-2026-04-15-1",
+     "photo_point": 1,
+     "caption": "Overview from photo point 1"
+    },
+    {
+     "id": "PH-SB-2026-04-15-2",
+     "photo_point": 2,
+     "caption": "Overview from photo point 2"
+    },
+    {
+     "id": "PH-SB-2026-04-15-3",
+     "photo_point": 3,
+     "caption": "Overview from photo point 3"
+    }
+   ],
+   "all_photo_points_taken": true,
+   "notes": null,
+   "supervisor_role": "supervisor",
+   "sign_off": {
+    "initials": "SUP",
+    "date": "2026-04-15"
+   }
+  },
+  {
+   "id": "V-SB-2026-06-10",
+   "site": "S-SB",
+   "date": "2026-06-10",
+   "type": "Routine",
+   "status": "closed",
+   "crew_size": 2,
+   "hours_on_site": 2.5,
+   "hours_crew_total": 5.0,
+   "last_rain": null,
+   "tasks_done": [
+    "SB_T01",
+    "SB_T02"
+   ],
+   "mowing": null,
+   "invasive_removed": [],
+   "photos": [
+    {
+     "id": "PH-SB-2026-06-10-1",
+     "photo_point": 1,
+     "caption": "Overview from photo point 1"
+    },
+    {
+     "id": "PH-SB-2026-06-10-2",
+     "photo_point": 2,
+     "caption": "Overview from photo point 2"
+    },
+    {
+     "id": "PH-SB-2026-06-10-3",
+     "photo_point": 3,
+     "caption": "Overview from photo point 3"
+    }
+   ],
+   "all_photo_points_taken": true,
+   "notes": null,
+   "supervisor_role": "supervisor",
+   "sign_off": {
+    "initials": "SUP",
+    "date": "2026-06-10"
+   }
+  },
+  {
+   "id": "V-SB-2026-08-19",
+   "site": "S-SB",
+   "date": "2026-08-19",
+   "type": "Pre-storm",
+   "status": "closed",
+   "crew_size": 3,
+   "hours_on_site": 4,
+   "hours_crew_total": 12,
+   "last_rain": null,
+   "tasks_done": [
+    "SB_T01",
+    "SB_T03"
+   ],
+   "mowing": {
+    "areas": [
+     "Embankments and the access path"
+    ],
+    "at_target_height": true,
+    "photo": "PH-S-SB-mow"
+   },
+   "invasive_removed": [
+    {
+     "species": "Poison hemlock",
+     "location": "North berm",
+     "extent": "About 2 square yards",
+     "photo": "PH-S-SB-inv"
+    }
+   ],
+   "photos": [
+    {
+     "id": "PH-SB-2026-08-19-1",
+     "photo_point": 1,
+     "caption": "Overview from photo point 1"
+    },
+    {
+     "id": "PH-SB-2026-08-19-2",
+     "photo_point": 2,
+     "caption": "Overview from photo point 2"
+    },
+    {
+     "id": "PH-SB-2026-08-19-3",
+     "photo_point": 3,
+     "caption": "Overview from photo point 3"
+    }
+   ],
+   "all_photo_points_taken": true,
+   "notes": null,
+   "supervisor_role": "supervisor",
+   "sign_off": {
+    "initials": "SUP",
+    "date": "2026-08-19"
+   }
+  },
+  {
+   "id": "V-SB-2026-10-21",
+   "site": "S-SB",
+   "date": "2026-10-21",
+   "type": "Routine",
+   "status": "closed",
+   "crew_size": 2,
+   "hours_on_site": 1.5,
+   "hours_crew_total": 3.0,
+   "last_rain": null,
+   "tasks_done": [
+    "SB_T01",
+    "SB_T02"
+   ],
+   "mowing": null,
+   "invasive_removed": [],
+   "photos": [
+    {
+     "id": "PH-SB-2026-10-21-1",
+     "photo_point": 1,
+     "caption": "Overview from photo point 1"
+    },
+    {
+     "id": "PH-SB-2026-10-21-2",
+     "photo_point": 2,
+     "caption": "Overview from photo point 2"
+    },
+    {
+     "id": "PH-SB-2026-10-21-3",
+     "photo_point": 3,
+     "caption": "Overview from photo point 3"
+    }
+   ],
+   "all_photo_points_taken": true,
+   "notes": null,
+   "supervisor_role": "supervisor",
+   "sign_off": {
+    "initials": "SUP",
+    "date": "2026-10-21"
+   }
+  },
+  {
+   "id": "V-TW-2024-04-16",
+   "site": "S-TW",
+   "date": "2024-04-16",
+   "type": "Spring",
+   "status": "closed",
+   "crew_size": 2,
+   "hours_on_site": 3,
+   "hours_crew_total": 6,
+   "last_rain": null,
+   "tasks_done": [],
+   "mowing": null,
+   "invasive_removed": [],
+   "photos": [
+    {
+     "id": "PH-TW-2024-04-16-1",
+     "photo_point": 1,
+     "caption": "Overview from photo point 1"
+    },
+    {
+     "id": "PH-TW-2024-04-16-2",
+     "photo_point": 2,
+     "caption": "Overview from photo point 2"
+    },
+    {
+     "id": "PH-TW-2024-04-16-3",
+     "photo_point": 3,
+     "caption": "Overview from photo point 3"
+    },
+    {
+     "id": "PH-TW-2024-04-16-4",
+     "photo_point": 4,
+     "caption": "Overview from photo point 4"
+    }
+   ],
+   "all_photo_points_taken": true,
+   "notes": null,
+   "supervisor_role": "supervisor",
+   "sign_off": {
+    "initials": "SUP",
+    "date": "2024-04-16"
+   }
+  },
+  {
+   "id": "V-TW-2025-04-16",
+   "site": "S-TW",
+   "date": "2025-04-16",
+   "type": "Spring",
+   "status": "closed",
+   "crew_size": 2,
+   "hours_on_site": 3,
+   "hours_crew_total": 6,
+   "last_rain": null,
+   "tasks_done": [],
+   "mowing": null,
+   "invasive_removed": [],
+   "photos": [
+    {
+     "id": "PH-TW-2025-04-16-1",
+     "photo_point": 1,
+     "caption": "Overview from photo point 1"
+    },
+    {
+     "id": "PH-TW-2025-04-16-2",
+     "photo_point": 2,
+     "caption": "Overview from photo point 2"
+    },
+    {
+     "id": "PH-TW-2025-04-16-3",
+     "photo_point": 3,
+     "caption": "Overview from photo point 3"
+    },
+    {
+     "id": "PH-TW-2025-04-16-4",
+     "photo_point": 4,
+     "caption": "Overview from photo point 4"
+    }
+   ],
+   "all_photo_points_taken": true,
+   "notes": null,
+   "supervisor_role": "supervisor",
+   "sign_off": {
+    "initials": "SUP",
+    "date": "2025-04-16"
+   }
+  },
+  {
+   "id": "V-TW-2025-06-12",
+   "site": "S-TW",
+   "date": "2025-06-12",
+   "type": "Routine",
+   "status": "closed",
+   "crew_size": 2,
+   "hours_on_site": 2,
+   "hours_crew_total": 4,
+   "last_rain": null,
+   "tasks_done": [],
+   "mowing": null,
+   "invasive_removed": [],
+   "photos": [
+    {
+     "id": "PH-TW-2025-06-12-1",
+     "photo_point": 1,
+     "caption": "Overview from photo point 1"
+    },
+    {
+     "id": "PH-TW-2025-06-12-2",
+     "photo_point": 2,
+     "caption": "Overview from photo point 2"
+    },
+    {
+     "id": "PH-TW-2025-06-12-3",
+     "photo_point": 3,
+     "caption": "Overview from photo point 3"
+    },
+    {
+     "id": "PH-TW-2025-06-12-4",
+     "photo_point": 4,
+     "caption": "Overview from photo point 4"
+    }
+   ],
+   "all_photo_points_taken": true,
+   "notes": null,
+   "supervisor_role": "supervisor",
+   "sign_off": {
+    "initials": "SUP",
+    "date": "2025-06-12"
+   }
+  },
+  {
+   "id": "V-TW-2025-08-20",
+   "site": "S-TW",
+   "date": "2025-08-20",
+   "type": "Pre-storm",
+   "status": "closed",
+   "crew_size": 3,
+   "hours_on_site": 4,
+   "hours_crew_total": 12,
+   "last_rain": null,
+   "tasks_done": [],
+   "mowing": null,
+   "invasive_removed": [],
+   "photos": [
+    {
+     "id": "PH-TW-2025-08-20-1",
+     "photo_point": 1,
+     "caption": "Overview from photo point 1"
+    },
+    {
+     "id": "PH-TW-2025-08-20-2",
+     "photo_point": 2,
+     "caption": "Overview from photo point 2"
+    },
+    {
+     "id": "PH-TW-2025-08-20-3",
+     "photo_point": 3,
+     "caption": "Overview from photo point 3"
+    },
+    {
+     "id": "PH-TW-2025-08-20-4",
+     "photo_point": 4,
+     "caption": "Overview from photo point 4"
+    }
+   ],
+   "all_photo_points_taken": true,
+   "notes": null,
+   "supervisor_role": "supervisor",
+   "sign_off": {
+    "initials": "SUP",
+    "date": "2025-08-20"
+   }
+  },
+  {
+   "id": "V-TW-2026-01-14",
+   "site": "S-TW",
+   "date": "2026-01-14",
+   "type": "January review",
+   "status": "closed",
+   "crew_size": 1,
+   "hours_on_site": 2,
+   "hours_crew_total": 2,
+   "last_rain": null,
+   "tasks_done": [],
+   "mowing": null,
+   "invasive_removed": [],
+   "photos": [],
+   "all_photo_points_taken": null,
+   "notes": "Site History read; Annual Plan written.",
+   "supervisor_role": "supervisor",
+   "sign_off": {
+    "initials": "SUP",
+    "date": "2026-01-14"
+   }
+  },
+  {
+   "id": "V-TW-2026-02-06",
+   "site": "S-TW",
+   "date": "2026-02-06",
+   "type": "Routine",
+   "status": "closed",
+   "crew_size": 2,
+   "hours_on_site": 1.5,
+   "hours_crew_total": 3.0,
+   "last_rain": null,
+   "tasks_done": [
+    "TW_T01",
+    "TW_T02"
+   ],
+   "mowing": null,
+   "invasive_removed": [],
+   "photos": [
+    {
+     "id": "PH-TW-2026-02-06-1",
+     "photo_point": 1,
+     "caption": "Overview from photo point 1"
+    },
+    {
+     "id": "PH-TW-2026-02-06-2",
+     "photo_point": 2,
+     "caption": "Overview from photo point 2"
+    },
+    {
+     "id": "PH-TW-2026-02-06-3",
+     "photo_point": 3,
+     "caption": "Overview from photo point 3"
+    },
+    {
+     "id": "PH-TW-2026-02-06-4",
+     "photo_point": 4,
+     "caption": "Overview from photo point 4"
+    }
+   ],
+   "all_photo_points_taken": true,
+   "notes": "Trash removed at the inlet.",
+   "supervisor_role": "supervisor",
+   "sign_off": {
+    "initials": "SUP",
+    "date": "2026-02-06"
+   }
+  },
+  {
+   "id": "V-TW-2026-02-17",
+   "site": "S-TW",
+   "date": "2026-02-17",
+   "type": "After storm",
+   "status": "closed",
+   "crew_size": 2,
+   "hours_on_site": 1.5,
+   "hours_crew_total": 3.0,
+   "last_rain": {
+    "date": "2026-02-15",
+    "amount_in": 1.2
+   },
+   "tasks_done": [
+    "TW_T01"
+   ],
+   "mowing": null,
+   "invasive_removed": [],
+   "photos": [
+    {
+     "id": "PH-TW-2026-02-17-1",
+     "photo_point": 1,
+     "caption": "Overview from photo point 1"
+    },
+    {
+     "id": "PH-TW-2026-02-17-2",
+     "photo_point": 2,
+     "caption": "Overview from photo point 2"
+    },
+    {
+     "id": "PH-TW-2026-02-17-3",
+     "photo_point": 3,
+     "caption": "Overview from photo point 3"
+    },
+    {
+     "id": "PH-TW-2026-02-17-4",
+     "photo_point": 4,
+     "caption": "Overview from photo point 4"
+    }
+   ],
+   "all_photo_points_taken": true,
+   "notes": null,
+   "supervisor_role": "supervisor",
+   "sign_off": {
+    "initials": "SUP",
+    "date": "2026-02-17"
+   }
+  },
+  {
+   "id": "V-TW-2026-04-15",
+   "site": "S-TW",
+   "date": "2026-04-15",
+   "type": "Spring",
+   "status": "closed",
+   "crew_size": 2,
+   "hours_on_site": 3,
+   "hours_crew_total": 6,
+   "last_rain": null,
+   "tasks_done": [
+    "TW_T01"
+   ],
+   "mowing": null,
+   "invasive_removed": [],
+   "photos": [
+    {
+     "id": "PH-TW-2026-04-15-1",
+     "photo_point": 1,
+     "caption": "Overview from photo point 1"
+    },
+    {
+     "id": "PH-TW-2026-04-15-2",
+     "photo_point": 2,
+     "caption": "Overview from photo point 2"
+    },
+    {
+     "id": "PH-TW-2026-04-15-3",
+     "photo_point": 3,
+     "caption": "Overview from photo point 3"
+    },
+    {
+     "id": "PH-TW-2026-04-15-4",
+     "photo_point": 4,
+     "caption": "Overview from photo point 4"
+    }
+   ],
+   "all_photo_points_taken": true,
+   "notes": null,
+   "supervisor_role": "supervisor",
+   "sign_off": {
+    "initials": "SUP",
+    "date": "2026-04-15"
+   }
+  },
+  {
+   "id": "V-TW-2026-06-10",
+   "site": "S-TW",
+   "date": "2026-06-10",
+   "type": "Routine",
+   "status": "closed",
+   "crew_size": 2,
+   "hours_on_site": 2.5,
+   "hours_crew_total": 5.0,
+   "last_rain": null,
+   "tasks_done": [
+    "TW_T01",
+    "TW_T02",
+    "TW_T03"
+   ],
+   "mowing": {
+    "areas": [
+     "Berms and access paths"
+    ],
+    "at_target_height": true,
+    "photo": null
+   },
+   "invasive_removed": [],
+   "photos": [
+    {
+     "id": "PH-TW-2026-06-10-1",
+     "photo_point": 1,
+     "caption": "Overview from photo point 1"
+    },
+    {
+     "id": "PH-TW-2026-06-10-2",
+     "photo_point": 2,
+     "caption": "Overview from photo point 2"
+    },
+    {
+     "id": "PH-TW-2026-06-10-3",
+     "photo_point": 3,
+     "caption": "Overview from photo point 3"
+    }
+   ],
+   "all_photo_points_taken": false,
+   "notes": null,
+   "supervisor_role": "supervisor",
+   "sign_off": {
+    "initials": "SUP",
+    "date": "2026-06-10"
+   }
+  },
+  {
+   "id": "V-TW-2026-08-19",
+   "site": "S-TW",
+   "date": "2026-08-19",
+   "type": "Pre-storm",
+   "status": "closed",
+   "crew_size": 3,
+   "hours_on_site": 4,
+   "hours_crew_total": 12,
+   "last_rain": null,
+   "tasks_done": [
+    "TW_T01",
+    "TW_T03"
+   ],
+   "mowing": {
+    "areas": [
+     "Berms and access paths"
+    ],
+    "at_target_height": true,
+    "photo": "PH-S-TW-mow"
+   },
+   "invasive_removed": [
+    {
+     "species": "Poison hemlock",
+     "location": "North berm",
+     "extent": "About 2 square yards",
+     "photo": "PH-S-TW-inv"
+    }
+   ],
+   "photos": [
+    {
+     "id": "PH-TW-2026-08-19-1",
+     "photo_point": 1,
+     "caption": "Overview from photo point 1"
+    },
+    {
+     "id": "PH-TW-2026-08-19-2",
+     "photo_point": 2,
+     "caption": "Overview from photo point 2"
+    },
+    {
+     "id": "PH-TW-2026-08-19-3",
+     "photo_point": 3,
+     "caption": "Overview from photo point 3"
+    },
+    {
+     "id": "PH-TW-2026-08-19-4",
+     "photo_point": 4,
+     "caption": "Overview from photo point 4"
+    }
+   ],
+   "all_photo_points_taken": true,
+   "notes": null,
+   "supervisor_role": "supervisor",
+   "sign_off": {
+    "initials": "SUP",
+    "date": "2026-08-19"
+   }
+  },
+  {
+   "id": "V-TW-2026-10-21",
+   "site": "S-TW",
+   "date": "2026-10-21",
+   "type": "Routine",
+   "status": "closed",
+   "crew_size": 2,
+   "hours_on_site": 1.5,
+   "hours_crew_total": 3.0,
+   "last_rain": null,
+   "tasks_done": [
+    "TW_T01",
+    "TW_T02"
+   ],
+   "mowing": null,
+   "invasive_removed": [],
+   "photos": [
+    {
+     "id": "PH-TW-2026-10-21-1",
+     "photo_point": 1,
+     "caption": "Overview from photo point 1"
+    },
+    {
+     "id": "PH-TW-2026-10-21-2",
+     "photo_point": 2,
+     "caption": "Overview from photo point 2"
+    },
+    {
+     "id": "PH-TW-2026-10-21-3",
+     "photo_point": 3,
+     "caption": "Overview from photo point 3"
+    },
+    {
+     "id": "PH-TW-2026-10-21-4",
+     "photo_point": 4,
+     "caption": "Overview from photo point 4"
+    }
+   ],
+   "all_photo_points_taken": true,
+   "notes": null,
+   "supervisor_role": "supervisor",
+   "sign_off": {
+    "initials": "SUP",
+    "date": "2026-10-21"
+   }
+  },
+  {
+   "id": "V-VD-2025-08-20",
+   "site": "S-VD",
+   "date": "2025-08-20",
+   "type": "Pre-storm",
+   "status": "closed",
+   "crew_size": 3,
+   "hours_on_site": 4,
+   "hours_crew_total": 12,
+   "last_rain": null,
+   "tasks_done": [],
+   "mowing": null,
+   "invasive_removed": [],
+   "photos": [
+    {
+     "id": "PH-VD-2025-08-20-1",
+     "photo_point": 1,
+     "caption": "Overview from photo point 1"
+    },
+    {
+     "id": "PH-VD-2025-08-20-2",
+     "photo_point": 2,
+     "caption": "Overview from photo point 2"
+    }
+   ],
+   "all_photo_points_taken": true,
+   "notes": null,
+   "supervisor_role": "supervisor",
+   "sign_off": {
+    "initials": "SUP",
+    "date": "2025-08-20"
+   }
+  },
+  {
+   "id": "V-VD-2026-01-14",
+   "site": "S-VD",
+   "date": "2026-01-14",
+   "type": "January review",
+   "status": "closed",
+   "crew_size": 1,
+   "hours_on_site": 2,
+   "hours_crew_total": 2,
+   "last_rain": null,
+   "tasks_done": [],
+   "mowing": null,
+   "invasive_removed": [],
+   "photos": [],
+   "all_photo_points_taken": null,
+   "notes": "Site History read; Annual Plan written.",
+   "supervisor_role": "supervisor",
+   "sign_off": {
+    "initials": "SUP",
+    "date": "2026-01-14"
+   }
+  },
+  {
+   "id": "V-VD-2026-02-06",
+   "site": "S-VD",
+   "date": "2026-02-06",
+   "type": "Routine",
+   "status": "closed",
+   "crew_size": 2,
+   "hours_on_site": 1.5,
+   "hours_crew_total": 3.0,
+   "last_rain": null,
+   "tasks_done": [
+    "VD_T01",
+    "VD_T02"
+   ],
+   "mowing": null,
+   "invasive_removed": [],
+   "photos": [
+    {
+     "id": "PH-VD-2026-02-06-1",
+     "photo_point": 1,
+     "caption": "Overview from photo point 1"
+    },
+    {
+     "id": "PH-VD-2026-02-06-2",
+     "photo_point": 2,
+     "caption": "Overview from photo point 2"
+    }
+   ],
+   "all_photo_points_taken": true,
+   "notes": "Trash removed at the inlet.",
+   "supervisor_role": "supervisor",
+   "sign_off": {
+    "initials": "SUP",
+    "date": "2026-02-06"
+   }
+  },
+  {
+   "id": "V-VD-2026-02-20",
+   "site": "S-VD",
+   "date": "2026-02-20",
+   "type": "After storm",
+   "status": "closed",
+   "crew_size": 2,
+   "hours_on_site": 1.5,
+   "hours_crew_total": 3.0,
+   "last_rain": {
+    "date": "2026-02-15",
+    "amount_in": 1.2
+   },
+   "tasks_done": [
+    "VD_T01"
+   ],
+   "mowing": null,
+   "invasive_removed": [],
+   "photos": [
+    {
+     "id": "PH-VD-2026-02-20-1",
+     "photo_point": 1,
+     "caption": "Overview from photo point 1"
+    },
+    {
+     "id": "PH-VD-2026-02-20-2",
+     "photo_point": 2,
+     "caption": "Overview from photo point 2"
+    }
+   ],
+   "all_photo_points_taken": true,
+   "notes": null,
+   "supervisor_role": "supervisor",
+   "sign_off": {
+    "initials": "SUP",
+    "date": "2026-02-20"
+   }
+  },
+  {
+   "id": "V-VD-2026-04-15",
+   "site": "S-VD",
+   "date": "2026-04-15",
+   "type": "Spring",
+   "status": "closed",
+   "crew_size": 2,
+   "hours_on_site": 3,
+   "hours_crew_total": 6,
+   "last_rain": null,
+   "tasks_done": [
+    "VD_T01"
+   ],
+   "mowing": null,
+   "invasive_removed": [],
+   "photos": [
+    {
+     "id": "PH-VD-2026-04-15-1",
+     "photo_point": 1,
+     "caption": "Overview from photo point 1"
+    },
+    {
+     "id": "PH-VD-2026-04-15-2",
+     "photo_point": 2,
+     "caption": "Overview from photo point 2"
+    }
+   ],
+   "all_photo_points_taken": true,
+   "notes": null,
+   "supervisor_role": "supervisor",
+   "sign_off": {
+    "initials": "SUP",
+    "date": "2026-04-15"
+   }
+  },
+  {
+   "id": "V-VD-2026-08-19",
+   "site": "S-VD",
+   "date": "2026-08-19",
+   "type": "Pre-storm",
+   "status": "closed",
+   "crew_size": 3,
+   "hours_on_site": 4,
+   "hours_crew_total": 12,
+   "last_rain": null,
+   "tasks_done": [
+    "VD_T01",
+    "VD_T03"
+   ],
+   "mowing": {
+    "areas": [
+     "Both banks and the access path"
+    ],
+    "at_target_height": true,
+    "photo": "PH-S-VD-mow"
+   },
+   "invasive_removed": [],
+   "photos": [
+    {
+     "id": "PH-VD-2026-08-19-1",
+     "photo_point": 1,
+     "caption": "Overview from photo point 1"
+    },
+    {
+     "id": "PH-VD-2026-08-19-2",
+     "photo_point": 2,
+     "caption": "Overview from photo point 2"
+    }
+   ],
+   "all_photo_points_taken": true,
+   "notes": null,
+   "supervisor_role": "supervisor",
+   "sign_off": {
+    "initials": "SUP",
+    "date": "2026-08-19"
+   }
+  },
+  {
+   "id": "V-VD-2026-10-21",
+   "site": "S-VD",
+   "date": "2026-10-21",
+   "type": "Routine",
+   "status": "closed",
+   "crew_size": 2,
+   "hours_on_site": 1.5,
+   "hours_crew_total": 3.0,
+   "last_rain": null,
+   "tasks_done": [
+    "VD_T01",
+    "VD_T02"
+   ],
+   "mowing": null,
+   "invasive_removed": [],
+   "photos": [
+    {
+     "id": "PH-VD-2026-10-21-1",
+     "photo_point": 1,
+     "caption": "Overview from photo point 1"
+    },
+    {
+     "id": "PH-VD-2026-10-21-2",
+     "photo_point": 2,
+     "caption": "Overview from photo point 2"
+    }
+   ],
+   "all_photo_points_taken": true,
+   "notes": null,
+   "supervisor_role": "supervisor",
+   "sign_off": {
+    "initials": "SUP",
+    "date": "2026-10-21"
+   }
+  },
+  {
+   "id": "V-WB-2025-04-17",
+   "site": "S-WB",
+   "date": "2025-04-17",
+   "type": "Spring",
+   "status": "closed",
+   "crew_size": 2,
+   "hours_on_site": 3,
+   "hours_crew_total": 6,
+   "last_rain": null,
+   "tasks_done": [],
+   "mowing": null,
+   "invasive_removed": [],
+   "photos": [
+    {
+     "id": "PH-WB-2025-04-17-1",
+     "photo_point": 1,
+     "caption": "Overview from photo point 1"
+    },
+    {
+     "id": "PH-WB-2025-04-17-2",
+     "photo_point": 2,
+     "caption": "Overview from photo point 2"
+    }
+   ],
+   "all_photo_points_taken": true,
+   "notes": null,
+   "supervisor_role": "supervisor",
+   "sign_off": {
+    "initials": "SUP",
+    "date": "2025-04-17"
+   }
+  },
+  {
+   "id": "V-WB-2026-01-14",
+   "site": "S-WB",
+   "date": "2026-01-14",
+   "type": "January review",
+   "status": "closed",
+   "crew_size": 1,
+   "hours_on_site": 2,
+   "hours_crew_total": 2,
+   "last_rain": null,
+   "tasks_done": [],
+   "mowing": null,
+   "invasive_removed": [],
+   "photos": [],
+   "all_photo_points_taken": null,
+   "notes": "Site History read; Annual Plan written.",
+   "supervisor_role": "supervisor",
+   "sign_off": {
+    "initials": "SUP",
+    "date": "2026-01-14"
+   }
+  },
+  {
+   "id": "V-WB-2026-02-06",
+   "site": "S-WB",
+   "date": "2026-02-06",
+   "type": "Routine",
+   "status": "closed",
+   "crew_size": 2,
+   "hours_on_site": 1.5,
+   "hours_crew_total": 3.0,
+   "last_rain": null,
+   "tasks_done": [
+    "WB_T01",
+    "WB_T02"
+   ],
+   "mowing": null,
+   "invasive_removed": [],
+   "photos": [
+    {
+     "id": "PH-WB-2026-02-06-1",
+     "photo_point": 1,
+     "caption": "Overview from photo point 1"
+    },
+    {
+     "id": "PH-WB-2026-02-06-2",
+     "photo_point": 2,
+     "caption": "Overview from photo point 2"
+    }
+   ],
+   "all_photo_points_taken": true,
+   "notes": "Trash removed at the inlet.",
+   "supervisor_role": "supervisor",
+   "sign_off": {
+    "initials": "SUP",
+    "date": "2026-02-06"
+   }
+  },
+  {
+   "id": "V-WB-2026-02-17",
+   "site": "S-WB",
+   "date": "2026-02-17",
+   "type": "After storm",
+   "status": "closed",
+   "crew_size": 2,
+   "hours_on_site": 1.5,
+   "hours_crew_total": 3.0,
+   "last_rain": {
+    "date": "2026-02-15",
+    "amount_in": 1.2
+   },
+   "tasks_done": [
+    "WB_T01"
+   ],
+   "mowing": null,
+   "invasive_removed": [],
+   "photos": [
+    {
+     "id": "PH-WB-2026-02-17-1",
+     "photo_point": 1,
+     "caption": "Overview from photo point 1"
+    },
+    {
+     "id": "PH-WB-2026-02-17-2",
+     "photo_point": 2,
+     "caption": "Overview from photo point 2"
+    }
+   ],
+   "all_photo_points_taken": true,
+   "notes": null,
+   "supervisor_role": "supervisor",
+   "sign_off": {
+    "initials": "SUP",
+    "date": "2026-02-17"
+   }
+  },
+  {
+   "id": "V-WB-2026-04-15",
+   "site": "S-WB",
+   "date": "2026-04-15",
+   "type": "Spring",
+   "status": "closed",
+   "crew_size": 2,
+   "hours_on_site": 3,
+   "hours_crew_total": 6,
+   "last_rain": null,
+   "tasks_done": [
+    "WB_T01"
+   ],
+   "mowing": null,
+   "invasive_removed": [],
+   "photos": [
+    {
+     "id": "PH-WB-2026-04-15-1",
+     "photo_point": 1,
+     "caption": "Overview from photo point 1"
+    },
+    {
+     "id": "PH-WB-2026-04-15-2",
+     "photo_point": 2,
+     "caption": "Overview from photo point 2"
+    }
+   ],
+   "all_photo_points_taken": true,
+   "notes": null,
+   "supervisor_role": "supervisor",
+   "sign_off": {
+    "initials": "SUP",
+    "date": "2026-04-15"
+   }
+  },
+  {
+   "id": "V-WB-2026-06-10",
+   "site": "S-WB",
+   "date": "2026-06-10",
+   "type": "Routine",
+   "status": "closed",
+   "crew_size": 2,
+   "hours_on_site": 2.5,
+   "hours_crew_total": 5.0,
+   "last_rain": null,
+   "tasks_done": [
+    "WB_T01",
+    "WB_T02",
+    "WB_T03"
+   ],
+   "mowing": {
+    "areas": [
+     "Berms over the bed and the access path"
+    ],
+    "at_target_height": true,
+    "photo": null
+   },
+   "invasive_removed": [],
+   "photos": [
+    {
+     "id": "PH-WB-2026-06-10-1",
+     "photo_point": 1,
+     "caption": "Overview from photo point 1"
+    },
+    {
+     "id": "PH-WB-2026-06-10-2",
+     "photo_point": 2,
+     "caption": "Overview from photo point 2"
+    }
+   ],
+   "all_photo_points_taken": true,
+   "notes": null,
+   "supervisor_role": "supervisor",
+   "sign_off": {
+    "initials": "SUP",
+    "date": "2026-06-10"
+   }
+  },
+  {
+   "id": "V-WB-2026-08-19",
+   "site": "S-WB",
+   "date": "2026-08-19",
+   "type": "Pre-storm",
+   "status": "closed",
+   "crew_size": 3,
+   "hours_on_site": 4,
+   "hours_crew_total": 12,
+   "last_rain": null,
+   "tasks_done": [
+    "WB_T01",
+    "WB_T03"
+   ],
+   "mowing": {
+    "areas": [
+     "Berms over the bed and the access path"
+    ],
+    "at_target_height": true,
+    "photo": "PH-S-WB-mow"
+   },
+   "invasive_removed": [],
+   "photos": [
+    {
+     "id": "PH-WB-2026-08-19-1",
+     "photo_point": 1,
+     "caption": "Overview from photo point 1"
+    },
+    {
+     "id": "PH-WB-2026-08-19-2",
+     "photo_point": 2,
+     "caption": "Overview from photo point 2"
+    }
+   ],
+   "all_photo_points_taken": true,
+   "notes": null,
+   "supervisor_role": "supervisor",
+   "sign_off": {
+    "initials": "SUP",
+    "date": "2026-08-19"
+   }
+  },
+  {
+   "id": "V-WB-2026-10-21",
+   "site": "S-WB",
+   "date": "2026-10-21",
+   "type": "Routine",
+   "status": "closed",
+   "crew_size": 2,
+   "hours_on_site": 1.5,
+   "hours_crew_total": 3.0,
+   "last_rain": null,
+   "tasks_done": [
+    "WB_T01",
+    "WB_T02"
+   ],
+   "mowing": null,
+   "invasive_removed": [],
+   "photos": [
+    {
+     "id": "PH-WB-2026-10-21-1",
+     "photo_point": 1,
+     "caption": "Overview from photo point 1"
+    },
+    {
+     "id": "PH-WB-2026-10-21-2",
+     "photo_point": 2,
+     "caption": "Overview from photo point 2"
+    }
+   ],
+   "all_photo_points_taken": true,
+   "notes": null,
+   "supervisor_role": "supervisor",
+   "sign_off": {
+    "initials": "SUP",
+    "date": "2026-10-21"
+   }
+  }
+ ],
+ "observations": [
+  {
+   "id": "O-001",
+   "visit": "V-SB-2026-02-06",
+   "item": "SB-CL-21",
+   "answer": "ok",
+   "location_in_system": null,
+   "note": null,
+   "photo": null,
+   "fixed_now": null,
+   "burrows": null
+  },
+  {
+   "id": "O-002",
+   "visit": "V-SB-2026-02-06",
+   "item": "SB-CL-20",
+   "answer": "ok",
+   "location_in_system": null,
+   "note": null,
+   "photo": null,
+   "fixed_now": null,
+   "burrows": null
+  },
+  {
+   "id": "O-003",
+   "visit": "V-SB-2026-02-17",
+   "item": "SB-CL-21",
+   "answer": "ok",
+   "location_in_system": null,
+   "note": null,
+   "photo": null,
+   "fixed_now": null,
+   "burrows": null
+  },
+  {
+   "id": "O-004",
+   "visit": "V-SB-2026-02-17",
+   "item": "SB-CL-20",
+   "answer": "ok",
+   "location_in_system": null,
+   "note": null,
+   "photo": null,
+   "fixed_now": null,
+   "burrows": null
+  },
+  {
+   "id": "O-005",
+   "visit": "V-SB-2026-04-15",
+   "item": "SB-CL-21",
+   "answer": "ok",
+   "location_in_system": null,
+   "note": null,
+   "photo": null,
+   "fixed_now": null,
+   "burrows": null
+  },
+  {
+   "id": "O-006",
+   "visit": "V-SB-2026-04-15",
+   "item": "SB-CL-20",
+   "answer": "ok",
+   "location_in_system": null,
+   "note": null,
+   "photo": null,
+   "fixed_now": null,
+   "burrows": null
+  },
+  {
+   "id": "O-007",
+   "visit": "V-SB-2026-06-10",
+   "item": "SB-CL-21",
+   "answer": "ok",
+   "location_in_system": null,
+   "note": null,
+   "photo": null,
+   "fixed_now": null,
+   "burrows": null
+  },
+  {
+   "id": "O-008",
+   "visit": "V-SB-2026-06-10",
+   "item": "SB-CL-20",
+   "answer": "ok",
+   "location_in_system": null,
+   "note": null,
+   "photo": null,
+   "fixed_now": null,
+   "burrows": null
+  },
+  {
+   "id": "O-009",
+   "visit": "V-SB-2026-08-19",
+   "item": "SB-CL-21",
+   "answer": "ok",
+   "location_in_system": null,
+   "note": null,
+   "photo": null,
+   "fixed_now": null,
+   "burrows": null
+  },
+  {
+   "id": "O-010",
+   "visit": "V-SB-2026-08-19",
+   "item": "SB-CL-20",
+   "answer": "ok",
+   "location_in_system": null,
+   "note": null,
+   "photo": null,
+   "fixed_now": null,
+   "burrows": null
+  },
+  {
+   "id": "O-011",
+   "visit": "V-SB-2026-10-21",
+   "item": "SB-CL-21",
+   "answer": "ok",
+   "location_in_system": null,
+   "note": null,
+   "photo": null,
+   "fixed_now": null,
+   "burrows": null
+  },
+  {
+   "id": "O-012",
+   "visit": "V-SB-2026-10-21",
+   "item": "SB-CL-20",
+   "answer": "ok",
+   "location_in_system": null,
+   "note": null,
+   "photo": null,
+   "fixed_now": null,
+   "burrows": null
+  },
+  {
+   "id": "O-013",
+   "visit": "V-SB-2026-02-17",
+   "item": "SB-CL-18",
+   "answer": "abnormal",
+   "location_in_system": "North berm",
+   "note": null,
+   "photo": "PH-O-013",
+   "fixed_now": null,
+   "burrows": {
+    "count_range": "1 to 5",
+    "in_use": "looks in use",
+    "trend": "first time"
+   }
+  },
+  {
+   "id": "O-014",
+   "visit": "V-SB-2026-08-19",
+   "item": "SB-CL-18",
+   "answer": "abnormal",
+   "location_in_system": "North berm",
+   "note": null,
+   "photo": "PH-O-014",
+   "fixed_now": null,
+   "burrows": {
+    "count_range": "1 to 5",
+    "in_use": "does not look in use",
+    "trend": "fewer"
+   }
+  },
+  {
+   "id": "O-015",
+   "visit": "V-SB-2026-08-19",
+   "item": "SB-CL-13",
+   "answer": "abnormal",
+   "location_in_system": "Outlet riser",
+   "note": "Hairline crack on the outlet riser",
+   "photo": "PH-O-015",
+   "fixed_now": null,
+   "burrows": null
+  },
+  {
+   "id": "O-016",
+   "visit": "V-TW-2026-02-06",
+   "item": "TW-CL-17",
+   "answer": "ok",
+   "location_in_system": null,
+   "note": null,
+   "photo": null,
+   "fixed_now": null,
+   "burrows": null
+  },
+  {
+   "id": "O-017",
+   "visit": "V-TW-2026-02-06",
+   "item": "TW-CL-15",
+   "answer": "ok",
+   "location_in_system": null,
+   "note": null,
+   "photo": null,
+   "fixed_now": null,
+   "burrows": null
+  },
+  {
+   "id": "O-018",
+   "visit": "V-TW-2026-02-17",
+   "item": "TW-CL-17",
+   "answer": "ok",
+   "location_in_system": null,
+   "note": null,
+   "photo": null,
+   "fixed_now": null,
+   "burrows": null
+  },
+  {
+   "id": "O-019",
+   "visit": "V-TW-2026-02-17",
+   "item": "TW-CL-15",
+   "answer": "ok",
+   "location_in_system": null,
+   "note": null,
+   "photo": null,
+   "fixed_now": null,
+   "burrows": null
+  },
+  {
+   "id": "O-020",
+   "visit": "V-TW-2026-04-15",
+   "item": "TW-CL-17",
+   "answer": "ok",
+   "location_in_system": null,
+   "note": null,
+   "photo": null,
+   "fixed_now": null,
+   "burrows": null
+  },
+  {
+   "id": "O-021",
+   "visit": "V-TW-2026-04-15",
+   "item": "TW-CL-15",
+   "answer": "ok",
+   "location_in_system": null,
+   "note": null,
+   "photo": null,
+   "fixed_now": null,
+   "burrows": null
+  },
+  {
+   "id": "O-022",
+   "visit": "V-TW-2026-06-10",
+   "item": "TW-CL-17",
+   "answer": "ok",
+   "location_in_system": null,
+   "note": null,
+   "photo": null,
+   "fixed_now": null,
+   "burrows": null
+  },
+  {
+   "id": "O-023",
+   "visit": "V-TW-2026-06-10",
+   "item": "TW-CL-15",
+   "answer": "ok",
+   "location_in_system": null,
+   "note": null,
+   "photo": null,
+   "fixed_now": null,
+   "burrows": null
+  },
+  {
+   "id": "O-024",
+   "visit": "V-TW-2026-08-19",
+   "item": "TW-CL-17",
+   "answer": "ok",
+   "location_in_system": null,
+   "note": null,
+   "photo": null,
+   "fixed_now": null,
+   "burrows": null
+  },
+  {
+   "id": "O-025",
+   "visit": "V-TW-2026-08-19",
+   "item": "TW-CL-15",
+   "answer": "ok",
+   "location_in_system": null,
+   "note": null,
+   "photo": null,
+   "fixed_now": null,
+   "burrows": null
+  },
+  {
+   "id": "O-026",
+   "visit": "V-TW-2026-10-21",
+   "item": "TW-CL-17",
+   "answer": "abnormal",
+   "location_in_system": "West berm",
+   "note": "Dumped crop waste on the berm",
+   "photo": "PH-O-026",
+   "fixed_now": null,
+   "burrows": null
+  },
+  {
+   "id": "O-027",
+   "visit": "V-TW-2026-10-21",
+   "item": "TW-CL-15",
+   "answer": "ok",
+   "location_in_system": null,
+   "note": null,
+   "photo": null,
+   "fixed_now": null,
+   "burrows": null
+  },
+  {
+   "id": "O-028",
+   "visit": "V-TW-2025-06-12",
+   "item": "TW-CL-12",
+   "answer": "abnormal",
+   "location_in_system": "East berm",
+   "note": null,
+   "photo": "PH-O-028",
+   "fixed_now": null,
+   "burrows": {
+    "count_range": "1 to 5",
+    "in_use": "looks in use",
+    "trend": "first time"
+   }
+  },
+  {
+   "id": "O-029",
+   "visit": "V-TW-2026-02-17",
+   "item": "TW-CL-13",
+   "answer": "abnormal",
+   "location_in_system": "Inlet",
+   "note": "Plastic bags caught at the inlet",
+   "photo": "PH-O-029",
+   "fixed_now": true,
+   "burrows": null
+  },
+  {
+   "id": "O-030",
+   "visit": "V-TW-2026-06-10",
+   "item": "TW-CL-12",
+   "answer": "abnormal",
+   "location_in_system": "East berm",
+   "note": null,
+   "photo": "PH-O-030",
+   "fixed_now": null,
+   "burrows": {
+    "count_range": "more than 5",
+    "in_use": "looks in use",
+    "trend": "more"
+   }
+  },
+  {
+   "id": "O-031",
+   "visit": "V-TW-2026-08-19",
+   "item": "TW-CL-12",
+   "answer": "abnormal",
+   "location_in_system": "East berm, near the nesting strip",
+   "note": "Possible nest",
+   "photo": "PH-O-031",
+   "fixed_now": null,
+   "burrows": {
+    "count_range": "1 to 5",
+    "in_use": "looks in use",
+    "trend": "fewer"
+   }
+  },
+  {
+   "id": "O-032",
+   "visit": "V-TW-2026-08-19",
+   "item": "TW-CL-04",
+   "answer": "abnormal",
+   "location_in_system": "Inlet",
+   "note": "Vegetation and shallow sediment blocking the inlet",
+   "photo": "PH-O-032",
+   "fixed_now": null,
+   "burrows": null
+  },
+  {
+   "id": "O-033",
+   "visit": "V-VD-2026-02-06",
+   "item": "VD-CL-15",
+   "answer": "ok",
+   "location_in_system": null,
+   "note": null,
+   "photo": null,
+   "fixed_now": null,
+   "burrows": null
+  },
+  {
+   "id": "O-034",
+   "visit": "V-VD-2026-02-06",
+   "item": "VD-CL-03",
+   "answer": "ok",
+   "location_in_system": null,
+   "note": null,
+   "photo": null,
+   "fixed_now": null,
+   "burrows": null
+  },
+  {
+   "id": "O-035",
+   "visit": "V-VD-2026-02-20",
+   "item": "VD-CL-15",
+   "answer": "ok",
+   "location_in_system": null,
+   "note": null,
+   "photo": null,
+   "fixed_now": null,
+   "burrows": null
+  },
+  {
+   "id": "O-036",
+   "visit": "V-VD-2026-02-20",
+   "item": "VD-CL-03",
+   "answer": "ok",
+   "location_in_system": null,
+   "note": null,
+   "photo": null,
+   "fixed_now": null,
+   "burrows": null
+  },
+  {
+   "id": "O-037",
+   "visit": "V-VD-2026-04-15",
+   "item": "VD-CL-15",
+   "answer": "ok",
+   "location_in_system": null,
+   "note": null,
+   "photo": null,
+   "fixed_now": null,
+   "burrows": null
+  },
+  {
+   "id": "O-038",
+   "visit": "V-VD-2026-04-15",
+   "item": "VD-CL-03",
+   "answer": "ok",
+   "location_in_system": null,
+   "note": null,
+   "photo": null,
+   "fixed_now": null,
+   "burrows": null
+  },
+  {
+   "id": "O-039",
+   "visit": "V-VD-2026-08-19",
+   "item": "VD-CL-15",
+   "answer": "ok",
+   "location_in_system": null,
+   "note": null,
+   "photo": null,
+   "fixed_now": null,
+   "burrows": null
+  },
+  {
+   "id": "O-040",
+   "visit": "V-VD-2026-08-19",
+   "item": "VD-CL-03",
+   "answer": "ok",
+   "location_in_system": null,
+   "note": null,
+   "photo": null,
+   "fixed_now": null,
+   "burrows": null
+  },
+  {
+   "id": "O-041",
+   "visit": "V-VD-2026-10-21",
+   "item": "VD-CL-15",
+   "answer": "ok",
+   "location_in_system": null,
+   "note": null,
+   "photo": null,
+   "fixed_now": null,
+   "burrows": null
+  },
+  {
+   "id": "O-042",
+   "visit": "V-VD-2026-10-21",
+   "item": "VD-CL-03",
+   "answer": "ok",
+   "location_in_system": null,
+   "note": null,
+   "photo": null,
+   "fixed_now": null,
+   "burrows": null
+  },
+  {
+   "id": "O-043",
+   "visit": "V-VD-2026-02-20",
+   "item": "VD-CL-14",
+   "answer": "abnormal",
+   "location_in_system": "South bank",
+   "note": null,
+   "photo": "PH-O-043",
+   "fixed_now": null,
+   "burrows": {
+    "count_range": "1 to 5",
+    "in_use": "does not look in use",
+    "trend": "first time"
+   }
+  },
+  {
+   "id": "O-044",
+   "visit": "V-WB-2026-02-06",
+   "item": "WB-CL-15",
+   "answer": "ok",
+   "location_in_system": null,
+   "note": null,
+   "photo": null,
+   "fixed_now": null,
+   "burrows": null
+  },
+  {
+   "id": "O-045",
+   "visit": "V-WB-2026-02-06",
+   "item": "WB-CL-12",
+   "answer": "ok",
+   "location_in_system": null,
+   "note": null,
+   "photo": null,
+   "fixed_now": null,
+   "burrows": null
+  },
+  {
+   "id": "O-046",
+   "visit": "V-WB-2026-02-17",
+   "item": "WB-CL-15",
+   "answer": "ok",
+   "location_in_system": null,
+   "note": null,
+   "photo": null,
+   "fixed_now": null,
+   "burrows": null
+  },
+  {
+   "id": "O-047",
+   "visit": "V-WB-2026-02-17",
+   "item": "WB-CL-12",
+   "answer": "ok",
+   "location_in_system": null,
+   "note": null,
+   "photo": null,
+   "fixed_now": null,
+   "burrows": null
+  },
+  {
+   "id": "O-048",
+   "visit": "V-WB-2026-04-15",
+   "item": "WB-CL-15",
+   "answer": "ok",
+   "location_in_system": null,
+   "note": null,
+   "photo": null,
+   "fixed_now": null,
+   "burrows": null
+  },
+  {
+   "id": "O-049",
+   "visit": "V-WB-2026-04-15",
+   "item": "WB-CL-12",
+   "answer": "ok",
+   "location_in_system": null,
+   "note": null,
+   "photo": null,
+   "fixed_now": null,
+   "burrows": null
+  },
+  {
+   "id": "O-050",
+   "visit": "V-WB-2026-06-10",
+   "item": "WB-CL-15",
+   "answer": "ok",
+   "location_in_system": null,
+   "note": null,
+   "photo": null,
+   "fixed_now": null,
+   "burrows": null
+  },
+  {
+   "id": "O-051",
+   "visit": "V-WB-2026-06-10",
+   "item": "WB-CL-12",
+   "answer": "ok",
+   "location_in_system": null,
+   "note": null,
+   "photo": null,
+   "fixed_now": null,
+   "burrows": null
+  },
+  {
+   "id": "O-052",
+   "visit": "V-WB-2026-08-19",
+   "item": "WB-CL-15",
+   "answer": "ok",
+   "location_in_system": null,
+   "note": null,
+   "photo": null,
+   "fixed_now": null,
+   "burrows": null
+  },
+  {
+   "id": "O-053",
+   "visit": "V-WB-2026-08-19",
+   "item": "WB-CL-12",
+   "answer": "abnormal",
+   "location_in_system": "Outlet box",
+   "note": "Slight rotten-egg smell at the outlet box",
+   "photo": "PH-O-053",
+   "fixed_now": null,
+   "burrows": null
+  },
+  {
+   "id": "O-054",
+   "visit": "V-WB-2026-10-21",
+   "item": "WB-CL-15",
+   "answer": "ok",
+   "location_in_system": null,
+   "note": null,
+   "photo": null,
+   "fixed_now": null,
+   "burrows": null
+  },
+  {
+   "id": "O-055",
+   "visit": "V-WB-2026-10-21",
+   "item": "WB-CL-12",
+   "answer": "ok",
+   "location_in_system": null,
+   "note": null,
+   "photo": null,
+   "fixed_now": null,
+   "burrows": null
+  },
+  {
+   "id": "O-056",
+   "visit": "V-WB-2026-06-10",
+   "item": "WB-CL-14",
+   "answer": "ok",
+   "location_in_system": null,
+   "note": null,
+   "photo": null,
+   "fixed_now": null,
+   "burrows": null
+  }
+ ],
+ "measurements": [
+  {
+   "id": "M-001",
+   "visit": "V-SB-2026-02-06",
+   "indicator": "IND-01",
+   "parameter": "water_at_inlet_no_shortcuts",
+   "point": null,
+   "value_as_entered": "yes",
+   "unit_as_entered": null,
+   "method": "visual",
+   "instrument_or_kit": null,
+   "flow_present": null,
+   "sample_time": null,
+   "photo": null,
+   "recorded_by_role": "crew",
+   "recorded_at": "2026-02-06T10:30:00"
+  },
+  {
+   "id": "M-002",
+   "visit": "V-SB-2026-02-17",
+   "indicator": "IND-01",
+   "parameter": "water_at_inlet_no_shortcuts",
+   "point": null,
+   "value_as_entered": "yes",
+   "unit_as_entered": null,
+   "method": "visual",
+   "instrument_or_kit": null,
+   "flow_present": null,
+   "sample_time": null,
+   "photo": null,
+   "recorded_by_role": "crew",
+   "recorded_at": "2026-02-17T10:30:00"
+  },
+  {
+   "id": "M-003",
+   "visit": "V-SB-2026-04-15",
+   "indicator": "IND-01",
+   "parameter": "water_at_inlet_no_shortcuts",
+   "point": null,
+   "value_as_entered": "yes",
+   "unit_as_entered": null,
+   "method": "visual",
+   "instrument_or_kit": null,
+   "flow_present": null,
+   "sample_time": null,
+   "photo": null,
+   "recorded_by_role": "crew",
+   "recorded_at": "2026-04-15T10:30:00"
+  },
+  {
+   "id": "M-004",
+   "visit": "V-SB-2026-06-10",
+   "indicator": "IND-01",
+   "parameter": "water_at_inlet_no_shortcuts",
+   "point": null,
+   "value_as_entered": "yes",
+   "unit_as_entered": null,
+   "method": "visual",
+   "instrument_or_kit": null,
+   "flow_present": null,
+   "sample_time": null,
+   "photo": null,
+   "recorded_by_role": "crew",
+   "recorded_at": "2026-06-10T10:30:00"
+  },
+  {
+   "id": "M-005",
+   "visit": "V-SB-2026-08-19",
+   "indicator": "IND-01",
+   "parameter": "water_at_inlet_no_shortcuts",
+   "point": null,
+   "value_as_entered": "yes",
+   "unit_as_entered": null,
+   "method": "visual",
+   "instrument_or_kit": null,
+   "flow_present": null,
+   "sample_time": null,
+   "photo": null,
+   "recorded_by_role": "crew",
+   "recorded_at": "2026-08-19T10:30:00"
+  },
+  {
+   "id": "M-006",
+   "visit": "V-SB-2026-10-21",
+   "indicator": "IND-01",
+   "parameter": "water_at_inlet_no_shortcuts",
+   "point": null,
+   "value_as_entered": "yes",
+   "unit_as_entered": null,
+   "method": "visual",
+   "instrument_or_kit": null,
+   "flow_present": null,
+   "sample_time": null,
+   "photo": null,
+   "recorded_by_role": "crew",
+   "recorded_at": "2026-10-21T10:30:00"
+  },
+  {
+   "id": "M-007",
+   "visit": "V-SB-2026-04-15",
+   "indicator": "IND-03",
+   "parameter": "jar_outlet_clearer",
+   "point": null,
+   "value_as_entered": "yes",
+   "unit_as_entered": null,
+   "method": "visual",
+   "instrument_or_kit": null,
+   "flow_present": true,
+   "sample_time": null,
+   "photo": "PH-S-SB-jar",
+   "recorded_by_role": "crew",
+   "recorded_at": "2026-04-15T10:30:00"
+  },
+  {
+   "id": "M-008",
+   "visit": "V-SB-2026-04-15",
+   "indicator": "IND-06",
+   "parameter": "vegetation_cover",
+   "point": null,
+   "value_as_entered": "75",
+   "unit_as_entered": "%",
+   "method": "visual",
+   "instrument_or_kit": null,
+   "flow_present": null,
+   "sample_time": null,
+   "photo": null,
+   "recorded_by_role": "crew",
+   "recorded_at": "2026-04-15T10:30:00"
+  },
+  {
+   "id": "M-009",
+   "visit": "V-SB-2026-04-15",
+   "indicator": "IND-06",
+   "parameter": "invasive_species_count",
+   "point": null,
+   "value_as_entered": "1",
+   "unit_as_entered": "species",
+   "method": "visual",
+   "instrument_or_kit": null,
+   "flow_present": null,
+   "sample_time": null,
+   "photo": null,
+   "recorded_by_role": "crew",
+   "recorded_at": "2026-04-15T10:30:00"
+  },
+  {
+   "id": "M-010",
+   "visit": "V-SB-2024-08-20",
+   "indicator": "IND-02",
+   "parameter": "sediment_depth",
+   "point": "RP1",
+   "value_as_entered": "5",
+   "unit_as_entered": "in",
+   "method": "visual",
+   "instrument_or_kit": null,
+   "flow_present": null,
+   "sample_time": null,
+   "photo": null,
+   "recorded_by_role": "crew lead",
+   "recorded_at": "2024-08-20T10:30:00"
+  },
+  {
+   "id": "M-011",
+   "visit": "V-SB-2024-08-20",
+   "indicator": "IND-02",
+   "parameter": "sediment_depth",
+   "point": "RP2",
+   "value_as_entered": "7",
+   "unit_as_entered": "in",
+   "method": "visual",
+   "instrument_or_kit": null,
+   "flow_present": null,
+   "sample_time": null,
+   "photo": null,
+   "recorded_by_role": "crew lead",
+   "recorded_at": "2024-08-20T10:30:00"
+  },
+  {
+   "id": "M-012",
+   "visit": "V-SB-2024-08-20",
+   "indicator": "IND-02",
+   "parameter": "sediment_depth",
+   "point": "RP3",
+   "value_as_entered": "4",
+   "unit_as_entered": "in",
+   "method": "visual",
+   "instrument_or_kit": null,
+   "flow_present": null,
+   "sample_time": null,
+   "photo": null,
+   "recorded_by_role": "crew lead",
+   "recorded_at": "2024-08-20T10:30:00"
+  },
+  {
+   "id": "M-013",
+   "visit": "V-SB-2025-08-20",
+   "indicator": "IND-02",
+   "parameter": "sediment_depth",
+   "point": "RP1",
+   "value_as_entered": "6",
+   "unit_as_entered": "in",
+   "method": "visual",
+   "instrument_or_kit": null,
+   "flow_present": null,
+   "sample_time": null,
+   "photo": null,
+   "recorded_by_role": "crew lead",
+   "recorded_at": "2025-08-20T10:30:00"
+  },
+  {
+   "id": "M-014",
+   "visit": "V-SB-2025-08-20",
+   "indicator": "IND-02",
+   "parameter": "sediment_depth",
+   "point": "RP2",
+   "value_as_entered": "9",
+   "unit_as_entered": "in",
+   "method": "visual",
+   "instrument_or_kit": null,
+   "flow_present": null,
+   "sample_time": null,
+   "photo": null,
+   "recorded_by_role": "crew lead",
+   "recorded_at": "2025-08-20T10:30:00"
+  },
+  {
+   "id": "M-015",
+   "visit": "V-SB-2025-08-20",
+   "indicator": "IND-02",
+   "parameter": "sediment_depth",
+   "point": "RP3",
+   "value_as_entered": "5",
+   "unit_as_entered": "in",
+   "method": "visual",
+   "instrument_or_kit": null,
+   "flow_present": null,
+   "sample_time": null,
+   "photo": null,
+   "recorded_by_role": "crew lead",
+   "recorded_at": "2025-08-20T10:30:00"
+  },
+  {
+   "id": "M-016",
+   "visit": "V-SB-2026-08-19",
+   "indicator": "IND-02",
+   "parameter": "sediment_depth",
+   "point": "RP1",
+   "value_as_entered": "8",
+   "unit_as_entered": "in",
+   "method": "visual",
+   "instrument_or_kit": null,
+   "flow_present": null,
+   "sample_time": null,
+   "photo": null,
+   "recorded_by_role": "crew lead",
+   "recorded_at": "2026-08-19T10:30:00"
+  },
+  {
+   "id": "M-017",
+   "visit": "V-SB-2026-08-19",
+   "indicator": "IND-02",
+   "parameter": "sediment_depth",
+   "point": "RP2",
+   "value_as_entered": "11",
+   "unit_as_entered": "in",
+   "method": "visual",
+   "instrument_or_kit": null,
+   "flow_present": null,
+   "sample_time": null,
+   "photo": null,
+   "recorded_by_role": "crew lead",
+   "recorded_at": "2026-08-19T10:30:00"
+  },
+  {
+   "id": "M-018",
+   "visit": "V-SB-2026-08-19",
+   "indicator": "IND-02",
+   "parameter": "sediment_depth",
+   "point": "RP3",
+   "value_as_entered": "6",
+   "unit_as_entered": "in",
+   "method": "visual",
+   "instrument_or_kit": null,
+   "flow_present": null,
+   "sample_time": null,
+   "photo": null,
+   "recorded_by_role": "crew lead",
+   "recorded_at": "2026-08-19T10:30:00"
+  },
+  {
+   "id": "M-019",
+   "visit": "V-TW-2026-02-06",
+   "indicator": "IND-01",
+   "parameter": "water_at_inlet_no_shortcuts",
+   "point": null,
+   "value_as_entered": "yes",
+   "unit_as_entered": null,
+   "method": "visual",
+   "instrument_or_kit": null,
+   "flow_present": null,
+   "sample_time": null,
+   "photo": null,
+   "recorded_by_role": "crew",
+   "recorded_at": "2026-02-06T10:30:00"
+  },
+  {
+   "id": "M-020",
+   "visit": "V-TW-2026-02-17",
+   "indicator": "IND-01",
+   "parameter": "water_at_inlet_no_shortcuts",
+   "point": null,
+   "value_as_entered": "yes",
+   "unit_as_entered": null,
+   "method": "visual",
+   "instrument_or_kit": null,
+   "flow_present": null,
+   "sample_time": null,
+   "photo": null,
+   "recorded_by_role": "crew",
+   "recorded_at": "2026-02-17T10:30:00"
+  },
+  {
+   "id": "M-021",
+   "visit": "V-TW-2026-04-15",
+   "indicator": "IND-01",
+   "parameter": "water_at_inlet_no_shortcuts",
+   "point": null,
+   "value_as_entered": "yes",
+   "unit_as_entered": null,
+   "method": "visual",
+   "instrument_or_kit": null,
+   "flow_present": null,
+   "sample_time": null,
+   "photo": null,
+   "recorded_by_role": "crew",
+   "recorded_at": "2026-04-15T10:30:00"
+  },
+  {
+   "id": "M-022",
+   "visit": "V-TW-2026-06-10",
+   "indicator": "IND-01",
+   "parameter": "water_at_inlet_no_shortcuts",
+   "point": null,
+   "value_as_entered": "yes",
+   "unit_as_entered": null,
+   "method": "visual",
+   "instrument_or_kit": null,
+   "flow_present": null,
+   "sample_time": null,
+   "photo": null,
+   "recorded_by_role": "crew",
+   "recorded_at": "2026-06-10T10:30:00"
+  },
+  {
+   "id": "M-023",
+   "visit": "V-TW-2026-08-19",
+   "indicator": "IND-01",
+   "parameter": "water_at_inlet_no_shortcuts",
+   "point": null,
+   "value_as_entered": "no",
+   "unit_as_entered": null,
+   "method": "visual",
+   "instrument_or_kit": null,
+   "flow_present": null,
+   "sample_time": null,
+   "photo": null,
+   "recorded_by_role": "crew",
+   "recorded_at": "2026-08-19T10:30:00"
+  },
+  {
+   "id": "M-024",
+   "visit": "V-TW-2026-10-21",
+   "indicator": "IND-01",
+   "parameter": "water_at_inlet_no_shortcuts",
+   "point": null,
+   "value_as_entered": "yes",
+   "unit_as_entered": null,
+   "method": "visual",
+   "instrument_or_kit": null,
+   "flow_present": null,
+   "sample_time": null,
+   "photo": null,
+   "recorded_by_role": "crew",
+   "recorded_at": "2026-10-21T10:30:00"
+  },
+  {
+   "id": "M-025",
+   "visit": "V-TW-2026-04-15",
+   "indicator": "IND-03",
+   "parameter": "jar_outlet_clearer",
+   "point": null,
+   "value_as_entered": "yes",
+   "unit_as_entered": null,
+   "method": "visual",
+   "instrument_or_kit": null,
+   "flow_present": true,
+   "sample_time": null,
+   "photo": "PH-S-TW-jar",
+   "recorded_by_role": "crew",
+   "recorded_at": "2026-04-15T10:30:00"
+  },
+  {
+   "id": "M-026",
+   "visit": "V-TW-2026-04-15",
+   "indicator": "IND-06",
+   "parameter": "vegetation_cover",
+   "point": null,
+   "value_as_entered": "85",
+   "unit_as_entered": "%",
+   "method": "visual",
+   "instrument_or_kit": null,
+   "flow_present": null,
+   "sample_time": null,
+   "photo": null,
+   "recorded_by_role": "crew",
+   "recorded_at": "2026-04-15T10:30:00"
+  },
+  {
+   "id": "M-027",
+   "visit": "V-TW-2026-04-15",
+   "indicator": "IND-06",
+   "parameter": "invasive_species_count",
+   "point": null,
+   "value_as_entered": "2",
+   "unit_as_entered": "species",
+   "method": "visual",
+   "instrument_or_kit": null,
+   "flow_present": null,
+   "sample_time": null,
+   "photo": null,
+   "recorded_by_role": "crew",
+   "recorded_at": "2026-04-15T10:30:00"
+  },
+  {
+   "id": "M-028",
+   "visit": "V-TW-2025-08-20",
+   "indicator": "IND-02",
+   "parameter": "sediment_depth",
+   "point": "RP1",
+   "value_as_entered": "3",
+   "unit_as_entered": "in",
+   "method": "visual",
+   "instrument_or_kit": null,
+   "flow_present": null,
+   "sample_time": null,
+   "photo": null,
+   "recorded_by_role": "crew lead",
+   "recorded_at": "2025-08-20T10:30:00"
+  },
+  {
+   "id": "M-029",
+   "visit": "V-TW-2025-08-20",
+   "indicator": "IND-02",
+   "parameter": "sediment_depth",
+   "point": "RP2",
+   "value_as_entered": "6",
+   "unit_as_entered": "in",
+   "method": "visual",
+   "instrument_or_kit": null,
+   "flow_present": null,
+   "sample_time": null,
+   "photo": null,
+   "recorded_by_role": "crew lead",
+   "recorded_at": "2025-08-20T10:30:00"
+  },
+  {
+   "id": "M-030",
+   "visit": "V-TW-2026-08-19",
+   "indicator": "IND-02",
+   "parameter": "sediment_depth",
+   "point": "RP1",
+   "value_as_entered": "4",
+   "unit_as_entered": "in",
+   "method": "visual",
+   "instrument_or_kit": null,
+   "flow_present": null,
+   "sample_time": null,
+   "photo": null,
+   "recorded_by_role": "crew lead",
+   "recorded_at": "2026-08-19T10:30:00"
+  },
+  {
+   "id": "M-031",
+   "visit": "V-TW-2026-08-19",
+   "indicator": "IND-02",
+   "parameter": "sediment_depth",
+   "point": "RP2",
+   "value_as_entered": "7",
+   "unit_as_entered": "in",
+   "method": "visual",
+   "instrument_or_kit": null,
+   "flow_present": null,
+   "sample_time": null,
+   "photo": null,
+   "recorded_by_role": "crew lead",
+   "recorded_at": "2026-08-19T10:30:00"
+  },
+  {
+   "id": "M-032",
+   "visit": "V-TW-2026-04-15",
+   "indicator": "IND-04",
+   "parameter": "nitrate",
+   "point": "inlet",
+   "value_as_entered": "20",
+   "unit_as_entered": "mg/L NO3-N",
+   "method": "test strip",
+   "instrument_or_kit": {
+    "name": "Sample nitrate test strips",
+    "range": "0 to 50 mg/L NO3-N",
+    "blocks": [
+     0,
+     2,
+     5,
+     10,
+     20,
+     50
+    ]
+   },
+   "flow_present": true,
+   "sample_time": "09:40",
+   "photo": "PH-S-TW-strip-in",
+   "recorded_by_role": "crew",
+   "recorded_at": "2026-04-15T10:30:00"
+  },
+  {
+   "id": "M-033",
+   "visit": "V-TW-2026-04-15",
+   "indicator": "IND-04",
+   "parameter": "nitrate",
+   "point": "outlet",
+   "value_as_entered": "10",
+   "unit_as_entered": "mg/L NO3-N",
+   "method": "test strip",
+   "instrument_or_kit": {
+    "name": "Sample nitrate test strips",
+    "range": "0 to 50 mg/L NO3-N",
+    "blocks": [
+     0,
+     2,
+     5,
+     10,
+     20,
+     50
+    ]
+   },
+   "flow_present": true,
+   "sample_time": "11:10",
+   "photo": "PH-S-TW-strip-out",
+   "recorded_by_role": "crew",
+   "recorded_at": "2026-04-15T10:30:00"
+  },
+  {
+   "id": "M-034",
+   "visit": "V-TW-2026-04-15",
+   "indicator": "IND-05",
+   "parameter": "nitrate",
+   "point": "inlet",
+   "value_as_entered": "18.6",
+   "unit_as_entered": "mg/L NO3-N",
+   "method": "laboratory",
+   "instrument_or_kit": {
+    "name": "Sample certified laboratory",
+    "laboratory": "Sample certified laboratory",
+    "report_date": "2026-05-02"
+   },
+   "flow_present": true,
+   "sample_time": "09:45",
+   "photo": null,
+   "recorded_by_role": "laboratory",
+   "recorded_at": "2026-05-02T09:00:00"
+  },
+  {
+   "id": "M-035",
+   "visit": "V-TW-2026-04-15",
+   "indicator": "IND-05",
+   "parameter": "nitrate",
+   "point": "outlet",
+   "value_as_entered": "12.9",
+   "unit_as_entered": "mg/L NO3-N",
+   "method": "laboratory",
+   "instrument_or_kit": {
+    "name": "Sample certified laboratory",
+    "laboratory": "Sample certified laboratory",
+    "report_date": "2026-05-02"
+   },
+   "flow_present": true,
+   "sample_time": "11:15",
+   "photo": null,
+   "recorded_by_role": "laboratory",
+   "recorded_at": "2026-05-02T09:00:00"
+  },
+  {
+   "id": "M-036",
+   "visit": "V-TW-2026-04-15",
+   "indicator": "IND-05",
+   "parameter": "turbidity",
+   "point": "inlet",
+   "value_as_entered": "38",
+   "unit_as_entered": "NTU",
+   "method": "laboratory",
+   "instrument_or_kit": {
+    "name": "Sample certified laboratory",
+    "laboratory": "Sample certified laboratory",
+    "report_date": "2026-05-02"
+   },
+   "flow_present": true,
+   "sample_time": "09:45",
+   "photo": null,
+   "recorded_by_role": "laboratory",
+   "recorded_at": "2026-05-02T09:00:00"
+  },
+  {
+   "id": "M-037",
+   "visit": "V-TW-2026-04-15",
+   "indicator": "IND-05",
+   "parameter": "turbidity",
+   "point": "outlet",
+   "value_as_entered": "9.5",
+   "unit_as_entered": "NTU",
+   "method": "laboratory",
+   "instrument_or_kit": {
+    "name": "Sample certified laboratory",
+    "laboratory": "Sample certified laboratory",
+    "report_date": "2026-05-02"
+   },
+   "flow_present": true,
+   "sample_time": "11:15",
+   "photo": null,
+   "recorded_by_role": "laboratory",
+   "recorded_at": "2026-05-02T09:00:00"
+  },
+  {
+   "id": "M-038",
+   "visit": "V-TW-2024-04-16",
+   "indicator": "IND-04",
+   "parameter": "nitrate",
+   "point": "inlet",
+   "value_as_entered": "20",
+   "unit_as_entered": "mg/L NO3-N",
+   "method": "test strip",
+   "instrument_or_kit": {
+    "name": "Sample nitrate test strips",
+    "range": "0 to 50 mg/L NO3-N",
+    "blocks": [
+     0,
+     2,
+     5,
+     10,
+     20,
+     50
+    ]
+   },
+   "flow_present": true,
+   "sample_time": "09:30",
+   "photo": null,
+   "recorded_by_role": "crew",
+   "recorded_at": "2024-04-16T10:30:00"
+  },
+  {
+   "id": "M-039",
+   "visit": "V-TW-2024-04-16",
+   "indicator": "IND-04",
+   "parameter": "nitrate",
+   "point": "outlet",
+   "value_as_entered": "10",
+   "unit_as_entered": "mg/L NO3-N",
+   "method": "test strip",
+   "instrument_or_kit": {
+    "name": "Sample nitrate test strips",
+    "range": "0 to 50 mg/L NO3-N",
+    "blocks": [
+     0,
+     2,
+     5,
+     10,
+     20,
+     50
+    ]
+   },
+   "flow_present": true,
+   "sample_time": "11:00",
+   "photo": null,
+   "recorded_by_role": "crew",
+   "recorded_at": "2024-04-16T10:30:00"
+  },
+  {
+   "id": "M-040",
+   "visit": "V-TW-2024-04-16",
+   "indicator": "IND-05",
+   "parameter": "nitrate",
+   "point": "inlet",
+   "value_as_entered": "19.0",
+   "unit_as_entered": "mg/L NO3-N",
+   "method": "laboratory",
+   "instrument_or_kit": {
+    "name": "Sample certified laboratory",
+    "laboratory": "Sample certified laboratory",
+    "report_date": "2024-05-04"
+   },
+   "flow_present": true,
+   "sample_time": "09:35",
+   "photo": null,
+   "recorded_by_role": "laboratory",
+   "recorded_at": "2024-05-04T09:00:00"
+  },
+  {
+   "id": "M-041",
+   "visit": "V-TW-2024-04-16",
+   "indicator": "IND-05",
+   "parameter": "nitrate",
+   "point": "outlet",
+   "value_as_entered": "13.1",
+   "unit_as_entered": "mg/L NO3-N",
+   "method": "laboratory",
+   "instrument_or_kit": {
+    "name": "Sample certified laboratory",
+    "laboratory": "Sample certified laboratory",
+    "report_date": "2024-05-04"
+   },
+   "flow_present": true,
+   "sample_time": "11:05",
+   "photo": null,
+   "recorded_by_role": "laboratory",
+   "recorded_at": "2024-05-04T09:00:00"
+  },
+  {
+   "id": "M-042",
+   "visit": "V-TW-2025-04-16",
+   "indicator": "IND-04",
+   "parameter": "nitrate",
+   "point": "inlet",
+   "value_as_entered": "20",
+   "unit_as_entered": "mg/L NO3-N",
+   "method": "test strip",
+   "instrument_or_kit": {
+    "name": "Sample nitrate test strips",
+    "range": "0 to 50 mg/L NO3-N",
+    "blocks": [
+     0,
+     2,
+     5,
+     10,
+     20,
+     50
+    ]
+   },
+   "flow_present": true,
+   "sample_time": "09:30",
+   "photo": null,
+   "recorded_by_role": "crew",
+   "recorded_at": "2025-04-16T10:30:00"
+  },
+  {
+   "id": "M-043",
+   "visit": "V-TW-2025-04-16",
+   "indicator": "IND-04",
+   "parameter": "nitrate",
+   "point": "outlet",
+   "value_as_entered": "5",
+   "unit_as_entered": "mg/L NO3-N",
+   "method": "test strip",
+   "instrument_or_kit": {
+    "name": "Sample nitrate test strips",
+    "range": "0 to 50 mg/L NO3-N",
+    "blocks": [
+     0,
+     2,
+     5,
+     10,
+     20,
+     50
+    ]
+   },
+   "flow_present": true,
+   "sample_time": "11:00",
+   "photo": null,
+   "recorded_by_role": "crew",
+   "recorded_at": "2025-04-16T10:30:00"
+  },
+  {
+   "id": "M-044",
+   "visit": "V-TW-2025-04-16",
+   "indicator": "IND-05",
+   "parameter": "nitrate",
+   "point": "inlet",
+   "value_as_entered": "17.2",
+   "unit_as_entered": "mg/L NO3-N",
+   "method": "laboratory",
+   "instrument_or_kit": {
+    "name": "Sample certified laboratory",
+    "laboratory": "Sample certified laboratory",
+    "report_date": "2025-05-04"
+   },
+   "flow_present": true,
+   "sample_time": "09:35",
+   "photo": null,
+   "recorded_by_role": "laboratory",
+   "recorded_at": "2025-05-04T09:00:00"
+  },
+  {
+   "id": "M-045",
+   "visit": "V-TW-2025-04-16",
+   "indicator": "IND-05",
+   "parameter": "nitrate",
+   "point": "outlet",
+   "value_as_entered": "10.4",
+   "unit_as_entered": "mg/L NO3-N",
+   "method": "laboratory",
+   "instrument_or_kit": {
+    "name": "Sample certified laboratory",
+    "laboratory": "Sample certified laboratory",
+    "report_date": "2025-05-04"
+   },
+   "flow_present": true,
+   "sample_time": "11:05",
+   "photo": null,
+   "recorded_by_role": "laboratory",
+   "recorded_at": "2025-05-04T09:00:00"
+  },
+  {
+   "id": "M-046",
+   "visit": "V-VD-2026-02-06",
+   "indicator": "IND-01",
+   "parameter": "water_at_inlet_no_shortcuts",
+   "point": null,
+   "value_as_entered": "yes",
+   "unit_as_entered": null,
+   "method": "visual",
+   "instrument_or_kit": null,
+   "flow_present": null,
+   "sample_time": null,
+   "photo": null,
+   "recorded_by_role": "crew",
+   "recorded_at": "2026-02-06T10:30:00"
+  },
+  {
+   "id": "M-047",
+   "visit": "V-VD-2026-02-20",
+   "indicator": "IND-01",
+   "parameter": "water_at_inlet_no_shortcuts",
+   "point": null,
+   "value_as_entered": "yes",
+   "unit_as_entered": null,
+   "method": "visual",
+   "instrument_or_kit": null,
+   "flow_present": null,
+   "sample_time": null,
+   "photo": null,
+   "recorded_by_role": "crew",
+   "recorded_at": "2026-02-20T10:30:00"
+  },
+  {
+   "id": "M-048",
+   "visit": "V-VD-2026-04-15",
+   "indicator": "IND-01",
+   "parameter": "water_at_inlet_no_shortcuts",
+   "point": null,
+   "value_as_entered": "yes",
+   "unit_as_entered": null,
+   "method": "visual",
+   "instrument_or_kit": null,
+   "flow_present": null,
+   "sample_time": null,
+   "photo": null,
+   "recorded_by_role": "crew",
+   "recorded_at": "2026-04-15T10:30:00"
+  },
+  {
+   "id": "M-049",
+   "visit": "V-VD-2026-08-19",
+   "indicator": "IND-01",
+   "parameter": "water_at_inlet_no_shortcuts",
+   "point": null,
+   "value_as_entered": "yes",
+   "unit_as_entered": null,
+   "method": "visual",
+   "instrument_or_kit": null,
+   "flow_present": null,
+   "sample_time": null,
+   "photo": null,
+   "recorded_by_role": "crew",
+   "recorded_at": "2026-08-19T10:30:00"
+  },
+  {
+   "id": "M-050",
+   "visit": "V-VD-2026-10-21",
+   "indicator": "IND-01",
+   "parameter": "water_at_inlet_no_shortcuts",
+   "point": null,
+   "value_as_entered": "yes",
+   "unit_as_entered": null,
+   "method": "visual",
+   "instrument_or_kit": null,
+   "flow_present": null,
+   "sample_time": null,
+   "photo": null,
+   "recorded_by_role": "crew",
+   "recorded_at": "2026-10-21T10:30:00"
+  },
+  {
+   "id": "M-051",
+   "visit": "V-VD-2026-04-15",
+   "indicator": "IND-03",
+   "parameter": "jar_outlet_clearer",
+   "point": null,
+   "value_as_entered": "no",
+   "unit_as_entered": null,
+   "method": "visual",
+   "instrument_or_kit": null,
+   "flow_present": true,
+   "sample_time": null,
+   "photo": "PH-S-VD-jar",
+   "recorded_by_role": "crew",
+   "recorded_at": "2026-04-15T10:30:00"
+  },
+  {
+   "id": "M-052",
+   "visit": "V-VD-2026-04-15",
+   "indicator": "IND-06",
+   "parameter": "vegetation_cover",
+   "point": null,
+   "value_as_entered": "60",
+   "unit_as_entered": "%",
+   "method": "visual",
+   "instrument_or_kit": null,
+   "flow_present": null,
+   "sample_time": null,
+   "photo": null,
+   "recorded_by_role": "crew",
+   "recorded_at": "2026-04-15T10:30:00"
+  },
+  {
+   "id": "M-053",
+   "visit": "V-VD-2026-04-15",
+   "indicator": "IND-06",
+   "parameter": "invasive_species_count",
+   "point": null,
+   "value_as_entered": "3",
+   "unit_as_entered": "species",
+   "method": "visual",
+   "instrument_or_kit": null,
+   "flow_present": null,
+   "sample_time": null,
+   "photo": null,
+   "recorded_by_role": "crew",
+   "recorded_at": "2026-04-15T10:30:00"
+  },
+  {
+   "id": "M-054",
+   "visit": "V-VD-2025-08-20",
+   "indicator": "IND-02",
+   "parameter": "sediment_depth",
+   "point": "RP1",
+   "value_as_entered": "2",
+   "unit_as_entered": "in",
+   "method": "visual",
+   "instrument_or_kit": null,
+   "flow_present": null,
+   "sample_time": null,
+   "photo": null,
+   "recorded_by_role": "crew lead",
+   "recorded_at": "2025-08-20T10:30:00"
+  },
+  {
+   "id": "M-055",
+   "visit": "V-VD-2025-08-20",
+   "indicator": "IND-02",
+   "parameter": "sediment_depth",
+   "point": "RP2",
+   "value_as_entered": "3",
+   "unit_as_entered": "in",
+   "method": "visual",
+   "instrument_or_kit": null,
+   "flow_present": null,
+   "sample_time": null,
+   "photo": null,
+   "recorded_by_role": "crew lead",
+   "recorded_at": "2025-08-20T10:30:00"
+  },
+  {
+   "id": "M-056",
+   "visit": "V-VD-2026-08-19",
+   "indicator": "IND-02",
+   "parameter": "sediment_depth",
+   "point": "RP1",
+   "value_as_entered": "3",
+   "unit_as_entered": "in",
+   "method": "visual",
+   "instrument_or_kit": null,
+   "flow_present": null,
+   "sample_time": null,
+   "photo": null,
+   "recorded_by_role": "crew lead",
+   "recorded_at": "2026-08-19T10:30:00"
+  },
+  {
+   "id": "M-057",
+   "visit": "V-VD-2026-08-19",
+   "indicator": "IND-02",
+   "parameter": "sediment_depth",
+   "point": "RP2",
+   "value_as_entered": "5",
+   "unit_as_entered": "in",
+   "method": "visual",
+   "instrument_or_kit": null,
+   "flow_present": null,
+   "sample_time": null,
+   "photo": null,
+   "recorded_by_role": "crew lead",
+   "recorded_at": "2026-08-19T10:30:00"
+  },
+  {
+   "id": "M-058",
+   "visit": "V-VD-2026-04-15",
+   "indicator": "IND-04",
+   "parameter": "nitrate",
+   "point": "inlet",
+   "value_as_entered": "10",
+   "unit_as_entered": "mg/L NO3-N",
+   "method": "test strip",
+   "instrument_or_kit": {
+    "name": "Sample nitrate test strips",
+    "range": "0 to 50 mg/L NO3-N",
+    "blocks": [
+     0,
+     2,
+     5,
+     10,
+     20,
+     50
+    ]
+   },
+   "flow_present": true,
+   "sample_time": "10:00",
+   "photo": "PH-S-VD-strip-in",
+   "recorded_by_role": "crew",
+   "recorded_at": "2026-04-15T10:30:00"
+  },
+  {
+   "id": "M-059",
+   "visit": "V-VD-2026-04-15",
+   "indicator": "IND-04",
+   "parameter": "nitrate",
+   "point": "outlet",
+   "value_as_entered": "10",
+   "unit_as_entered": "mg/L NO3-N",
+   "method": "test strip",
+   "instrument_or_kit": {
+    "name": "Sample nitrate test strips",
+    "range": "0 to 50 mg/L NO3-N",
+    "blocks": [
+     0,
+     2,
+     5,
+     10,
+     20,
+     50
+    ]
+   },
+   "flow_present": true,
+   "sample_time": "10:40",
+   "photo": "PH-S-VD-strip-out",
+   "recorded_by_role": "crew",
+   "recorded_at": "2026-04-15T10:30:00"
+  },
+  {
+   "id": "M-060",
+   "visit": "V-WB-2026-02-06",
+   "indicator": "IND-01",
+   "parameter": "water_at_inlet_no_shortcuts",
+   "point": null,
+   "value_as_entered": "yes",
+   "unit_as_entered": null,
+   "method": "visual",
+   "instrument_or_kit": null,
+   "flow_present": null,
+   "sample_time": null,
+   "photo": null,
+   "recorded_by_role": "crew",
+   "recorded_at": "2026-02-06T10:30:00"
+  },
+  {
+   "id": "M-061",
+   "visit": "V-WB-2026-02-17",
+   "indicator": "IND-01",
+   "parameter": "water_at_inlet_no_shortcuts",
+   "point": null,
+   "value_as_entered": "yes",
+   "unit_as_entered": null,
+   "method": "visual",
+   "instrument_or_kit": null,
+   "flow_present": null,
+   "sample_time": null,
+   "photo": null,
+   "recorded_by_role": "crew",
+   "recorded_at": "2026-02-17T10:30:00"
+  },
+  {
+   "id": "M-062",
+   "visit": "V-WB-2026-04-15",
+   "indicator": "IND-01",
+   "parameter": "water_at_inlet_no_shortcuts",
+   "point": null,
+   "value_as_entered": "yes",
+   "unit_as_entered": null,
+   "method": "visual",
+   "instrument_or_kit": null,
+   "flow_present": null,
+   "sample_time": null,
+   "photo": null,
+   "recorded_by_role": "crew",
+   "recorded_at": "2026-04-15T10:30:00"
+  },
+  {
+   "id": "M-063",
+   "visit": "V-WB-2026-06-10",
+   "indicator": "IND-01",
+   "parameter": "water_at_inlet_no_shortcuts",
+   "point": null,
+   "value_as_entered": "yes",
+   "unit_as_entered": null,
+   "method": "visual",
+   "instrument_or_kit": null,
+   "flow_present": null,
+   "sample_time": null,
+   "photo": null,
+   "recorded_by_role": "crew",
+   "recorded_at": "2026-06-10T10:30:00"
+  },
+  {
+   "id": "M-064",
+   "visit": "V-WB-2026-08-19",
+   "indicator": "IND-01",
+   "parameter": "water_at_inlet_no_shortcuts",
+   "point": null,
+   "value_as_entered": "yes",
+   "unit_as_entered": null,
+   "method": "visual",
+   "instrument_or_kit": null,
+   "flow_present": null,
+   "sample_time": null,
+   "photo": null,
+   "recorded_by_role": "crew",
+   "recorded_at": "2026-08-19T10:30:00"
+  },
+  {
+   "id": "M-065",
+   "visit": "V-WB-2026-10-21",
+   "indicator": "IND-01",
+   "parameter": "water_at_inlet_no_shortcuts",
+   "point": null,
+   "value_as_entered": "yes",
+   "unit_as_entered": null,
+   "method": "visual",
+   "instrument_or_kit": null,
+   "flow_present": null,
+   "sample_time": null,
+   "photo": null,
+   "recorded_by_role": "crew",
+   "recorded_at": "2026-10-21T10:30:00"
+  },
+  {
+   "id": "M-066",
+   "visit": "V-WB-2026-04-15",
+   "indicator": "IND-03",
+   "parameter": "jar_outlet_clearer",
+   "point": null,
+   "value_as_entered": "yes",
+   "unit_as_entered": null,
+   "method": "visual",
+   "instrument_or_kit": null,
+   "flow_present": true,
+   "sample_time": null,
+   "photo": "PH-S-WB-jar",
+   "recorded_by_role": "crew",
+   "recorded_at": "2026-04-15T10:30:00"
+  },
+  {
+   "id": "M-067",
+   "visit": "V-WB-2026-04-15",
+   "indicator": "IND-04",
+   "parameter": "nitrate",
+   "point": "inlet",
+   "value_as_entered": "100",
+   "unit_as_entered": "mg/L NO3",
+   "method": "test strip",
+   "instrument_or_kit": {
+    "name": "Sample nitrate test strips (nitrate scale)",
+    "range": "0 to 250 mg/L NO3",
+    "blocks": [
+     0,
+     10,
+     25,
+     50,
+     100,
+     250
+    ]
+   },
+   "flow_present": true,
+   "sample_time": "09:20",
+   "photo": "PH-S-WB-strip-in",
+   "recorded_by_role": "crew",
+   "recorded_at": "2026-04-15T10:30:00"
+  },
+  {
+   "id": "M-068",
+   "visit": "V-WB-2026-04-15",
+   "indicator": "IND-04",
+   "parameter": "nitrate",
+   "point": "outlet",
+   "value_as_entered": "25",
+   "unit_as_entered": "mg/L NO3",
+   "method": "test strip",
+   "instrument_or_kit": {
+    "name": "Sample nitrate test strips (nitrate scale)",
+    "range": "0 to 250 mg/L NO3",
+    "blocks": [
+     0,
+     10,
+     25,
+     50,
+     100,
+     250
+    ]
+   },
+   "flow_present": true,
+   "sample_time": "13:20",
+   "photo": "PH-S-WB-strip-out",
+   "recorded_by_role": "crew",
+   "recorded_at": "2026-04-15T10:30:00"
+  },
+  {
+   "id": "M-069",
+   "visit": "V-WB-2026-04-15",
+   "indicator": "IND-04",
+   "parameter": "nitrate",
+   "point": "inlet",
+   "value_as_entered": "21.4",
+   "unit_as_entered": "mg/L NO3-N",
+   "method": "portable photometer",
+   "instrument_or_kit": {
+    "name": "Sample portable nitrate photometer",
+    "range": "0 to 30 mg/L NO3-N"
+   },
+   "flow_present": true,
+   "sample_time": "09:25",
+   "photo": null,
+   "recorded_by_role": "crew lead",
+   "recorded_at": "2026-04-15T10:30:00"
+  },
+  {
+   "id": "M-070",
+   "visit": "V-WB-2026-04-15",
+   "indicator": "IND-04",
+   "parameter": "nitrate",
+   "point": "outlet",
+   "value_as_entered": "6.8",
+   "unit_as_entered": "mg/L NO3-N",
+   "method": "portable photometer",
+   "instrument_or_kit": {
+    "name": "Sample portable nitrate photometer",
+    "range": "0 to 30 mg/L NO3-N"
+   },
+   "flow_present": true,
+   "sample_time": "13:25",
+   "photo": null,
+   "recorded_by_role": "crew lead",
+   "recorded_at": "2026-04-15T10:30:00"
+  },
+  {
+   "id": "M-071",
+   "visit": "V-WB-2026-04-15",
+   "indicator": "IND-05",
+   "parameter": "nitrate",
+   "point": "inlet",
+   "value_as_entered": "22.1",
+   "unit_as_entered": "mg/L NO3-N",
+   "method": "laboratory",
+   "instrument_or_kit": {
+    "name": "Sample certified laboratory",
+    "laboratory": "Sample certified laboratory",
+    "report_date": "2026-05-06"
+   },
+   "flow_present": true,
+   "sample_time": "09:30",
+   "photo": null,
+   "recorded_by_role": "laboratory",
+   "recorded_at": "2026-05-06T09:00:00"
+  },
+  {
+   "id": "M-072",
+   "visit": "V-WB-2026-04-15",
+   "indicator": "IND-05",
+   "parameter": "nitrate",
+   "point": "outlet",
+   "value_as_entered": "7.4",
+   "unit_as_entered": "mg/L NO3-N",
+   "method": "laboratory",
+   "instrument_or_kit": {
+    "name": "Sample certified laboratory",
+    "laboratory": "Sample certified laboratory",
+    "report_date": "2026-05-06"
+   },
+   "flow_present": true,
+   "sample_time": "13:30",
+   "photo": null,
+   "recorded_by_role": "laboratory",
+   "recorded_at": "2026-05-06T09:00:00"
+  },
+  {
+   "id": "M-073",
+   "visit": "V-WB-2025-04-17",
+   "indicator": "IND-05",
+   "parameter": "nitrate",
+   "point": "inlet",
+   "value_as_entered": "20.5",
+   "unit_as_entered": "mg/L NO3-N",
+   "method": "laboratory",
+   "instrument_or_kit": {
+    "name": "Sample certified laboratory",
+    "laboratory": "Sample certified laboratory",
+    "report_date": "2025-05-05"
+   },
+   "flow_present": true,
+   "sample_time": "09:30",
+   "photo": null,
+   "recorded_by_role": "laboratory",
+   "recorded_at": "2025-05-05T09:00:00"
+  },
+  {
+   "id": "M-074",
+   "visit": "V-WB-2025-04-17",
+   "indicator": "IND-05",
+   "parameter": "nitrate",
+   "point": "outlet",
+   "value_as_entered": "9.8",
+   "unit_as_entered": "mg/L NO3-N",
+   "method": "laboratory",
+   "instrument_or_kit": {
+    "name": "Sample certified laboratory",
+    "laboratory": "Sample certified laboratory",
+    "report_date": "2025-05-05"
+   },
+   "flow_present": true,
+   "sample_time": "13:30",
+   "photo": null,
+   "recorded_by_role": "laboratory",
+   "recorded_at": "2025-05-05T09:00:00"
+  }
+ ],
+ "corrective_entries": [
+  {
+   "id": "C-001",
+   "site": "S-SB",
+   "visit": "V-SB-2026-02-17",
+   "observation": "O-013",
+   "task": "COR_T04",
+   "date": "2026-02-17",
+   "finding": "Burrows on the north berm (SB-CL-18)",
+   "location": "North berm",
+   "likely_cause": "Ground squirrels",
+   "action_taken": "passed to the supervisor",
+   "urgency": "Normal",
+   "materials_used": null,
+   "hours": null,
+   "status": "resolved",
+   "resolved_date": "2026-03-05",
+   "photos": [
+    "PH-001-before",
+    "PH-001-after"
+   ]
+  },
+  {
+   "id": "C-002",
+   "site": "S-SB",
+   "visit": "V-SB-2026-08-19",
+   "observation": "O-014",
+   "task": "COR_T04",
+   "date": "2026-08-19",
+   "finding": "Burrows on the north berm (SB-CL-18)",
+   "location": "North berm",
+   "likely_cause": "Ground squirrels",
+   "action_taken": "filled an inactive burrow",
+   "urgency": "Normal",
+   "materials_used": "Native seed mix, 1 lb",
+   "hours": 1.5,
+   "status": "resolved",
+   "resolved_date": "2026-08-19",
+   "photos": [
+    "PH-002-before",
+    "PH-002-after"
+   ]
+  },
+  {
+   "id": "C-003",
+   "site": "S-SB",
+   "visit": "V-SB-2026-08-19",
+   "observation": "O-015",
+   "task": "COR_T03",
+   "date": "2026-08-19",
+   "finding": "Hairline crack on the outlet riser (SB-CL-13)",
+   "location": "Outlet riser",
+   "likely_cause": "Settlement",
+   "action_taken": "Temporary crack reinforcement (COR_T03)",
+   "urgency": "High",
+   "materials_used": "Hydraulic cement, 10 lb",
+   "hours": 3,
+   "status": "resolved",
+   "resolved_date": "2026-09-12",
+   "photos": [
+    "PH-003-before",
+    "PH-003-after"
+   ]
+  },
+  {
+   "id": "C-004",
+   "site": "S-TW",
+   "visit": "V-TW-2025-06-12",
+   "observation": "O-028",
+   "task": "COR_T04",
+   "date": "2025-06-12",
+   "finding": "Burrows on the east berm (TW-CL-12)",
+   "location": "East berm",
+   "likely_cause": null,
+   "action_taken": "reduced cover near the berm",
+   "urgency": "Normal",
+   "materials_used": null,
+   "hours": null,
+   "status": "resolved",
+   "resolved_date": "2025-06-26",
+   "photos": [
+    "PH-004-before",
+    "PH-004-after"
+   ]
+  },
+  {
+   "id": "C-005",
+   "site": "S-TW",
+   "visit": "V-TW-2026-06-10",
+   "observation": "O-030",
+   "task": "COR_T04",
+   "date": "2026-06-10",
+   "finding": "Burrows on the east berm (TW-CL-12)",
+   "location": "East berm",
+   "likely_cause": "Dense mats of dead rushes",
+   "action_taken": "reduced cover near the berm",
+   "urgency": "Normal",
+   "materials_used": null,
+   "hours": 4,
+   "status": "resolved",
+   "resolved_date": "2026-06-24",
+   "photos": [
+    "PH-005-before",
+    "PH-005-after"
+   ]
+  },
+  {
+   "id": "C-006",
+   "site": "S-TW",
+   "visit": "V-TW-2026-08-19",
+   "observation": "O-031",
+   "task": "COR_T04",
+   "date": "2026-08-19",
+   "finding": "Possible nest near burrows on the east berm (TW-CL-12)",
+   "location": "East berm",
+   "likely_cause": null,
+   "action_taken": "stopped work (nest or possible protected species)",
+   "urgency": "Normal",
+   "materials_used": null,
+   "hours": null,
+   "status": "escalated",
+   "resolved_date": null,
+   "photos": [
+    "PH-006-before"
+   ]
+  },
+  {
+   "id": "C-007",
+   "site": "S-TW",
+   "visit": "V-TW-2026-08-19",
+   "observation": "O-032",
+   "task": "COR_T01",
+   "date": "2026-08-19",
+   "finding": "Inlet blocked by vegetation and sediment (TW-CL-04)",
+   "location": "Inlet",
+   "likely_cause": "Summer growth",
+   "action_taken": "Cleared the inlet (COR_T01)",
+   "urgency": "Normal",
+   "materials_used": null,
+   "hours": 3,
+   "status": "resolved",
+   "resolved_date": "2026-10-08",
+   "photos": [
+    "PH-007-before",
+    "PH-007-after"
+   ]
+  },
+  {
+   "id": "C-008",
+   "site": "S-TW",
+   "visit": "V-TW-2026-10-21",
+   "observation": "O-026",
+   "task": null,
+   "date": "2026-10-21",
+   "finding": "Dumped crop waste on the west berm (TW-CL-17)",
+   "location": "West berm",
+   "likely_cause": "Harvest cleanup",
+   "action_taken": "passed to the supervisor",
+   "urgency": "Normal",
+   "materials_used": null,
+   "hours": null,
+   "status": "open",
+   "resolved_date": null,
+   "photos": [
+    "PH-008-before"
+   ]
+  },
+  {
+   "id": "C-009",
+   "site": "S-VD",
+   "visit": "V-VD-2026-02-20",
+   "observation": "O-043",
+   "task": "COR_T04",
+   "date": "2026-02-20",
+   "finding": "Burrows on the south bank (VD-CL-14)",
+   "location": "South bank",
+   "likely_cause": null,
+   "action_taken": "filled an inactive burrow",
+   "urgency": "Normal",
+   "materials_used": "Native seed mix, 0.5 lb",
+   "hours": 1,
+   "status": "resolved",
+   "resolved_date": "2026-02-20",
+   "photos": [
+    "PH-009-before",
+    "PH-009-after"
+   ]
+  },
+  {
+   "id": "C-010",
+   "site": "S-WB",
+   "visit": "V-WB-2026-08-19",
+   "observation": "O-053",
+   "task": null,
+   "date": "2026-08-19",
+   "finding": "Rotten-egg smell at the outlet box (WB-CL-12)",
+   "location": "Outlet box",
+   "likely_cause": "Low flow in late summer",
+   "action_taken": "passed to the supervisor",
+   "urgency": "Normal",
+   "materials_used": null,
+   "hours": null,
+   "status": "resolved",
+   "resolved_date": "2026-09-02",
+   "photos": [
+    "PH-010-before",
+    "PH-010-after"
+   ]
+  }
+ ],
+ "laboratory_samples": [
+  {
+   "site": "S-TW",
+   "year": 2026,
+   "status": "result received",
+   "visit": "V-TW-2026-04-15",
+   "laboratory": "Sample certified laboratory",
+   "report_date": "2026-05-02"
+  },
+  {
+   "site": "S-WB",
+   "year": 2026,
+   "status": "result received",
+   "visit": "V-WB-2026-04-15",
+   "laboratory": "Sample certified laboratory",
+   "report_date": "2026-05-06"
+  },
+  {
+   "site": "S-VD",
+   "year": 2026,
+   "status": "not done this year",
+   "visit": null,
+   "laboratory": null,
+   "report_date": null
+  }
+ ],
+ "revisions": [
+  {
+   "id": "R-001",
+   "record_type": "measurement",
+   "record_id": "M-034",
+   "field": "value_as_entered",
+   "old_value": "16.8",
+   "new_value": "18.6",
+   "reason": "Digits typed in the wrong order; corrected from the laboratory report",
+   "category": "typo",
+   "who_role": "supervisor",
+   "when": "2026-05-03T08:15:00"
+  },
+  {
+   "id": "R-002",
+   "record_type": "visit",
+   "record_id": "V-TW-2026-06-10",
+   "field": "hours_on_site",
+   "old_value": 2,
+   "new_value": 2.5,
+   "reason": "Crew lead added the time spent on the berm",
+   "category": "other",
+   "who_role": "crew lead",
+   "when": "2026-06-11T17:40:00"
+  }
+ ]
+}

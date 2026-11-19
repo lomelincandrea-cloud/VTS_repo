@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>{{ r.report }} · {{ r.site_name }}</title>{% include "_style.html" %}</head>
+<body>
+{# Water Quality and Maintenance Summary. No exact location; no project owner unless they choose. Rendered from report_model.water_summary(). #}
+<section class="cover">
+  <span class="eyebrow">Water Quality and Maintenance Summary</span>
+  <h1>{{ r.site_name }}</h1>
+  {% if r.sample %}<div class="sample-banner">Sample data. These records are made up to show how the summary works. They are not a real site.</div>{% endif %}
+  <h2>1. Context</h2>
+  <table class="kv">
+    <tr><td class="k">System</td><td>{{ r.type }}</td></tr>
+    <tr><td class="k">Year built</td><td>{{ r.context.year_built }}</td></tr>
+    <tr><td class="k">Drainage area</td><td>{{ r.context.drainage_area }}</td></tr>
+    <tr><td class="k">Sub-watershed (HUC-12)</td><td>{{ r.context.huc12 }}</td></tr>
+    {% if r.context.owner %}<tr><td class="k">Project owner</td><td>{{ r.context.owner }}</td></tr>{% endif %}
+    <tr><td class="k">Period covered</td><td>{{ r.period_start }} to {{ r.period_end }}</td></tr>
+    <tr><td class="k">Generated</td><td>{{ r.generated }}, by {{ r.generated_by }}</td></tr>
+  </table>
+  <p class="note">{{ r.source_line }} The exact location is not shown. Records are shared only by choice of the project owner.</p>
+</section>
+
+<h2>2. Summary</h2>
+<p>{{ r.plain.visits }} visits were recorded in this period; {{ r.plain.done }} of the {{ r.plain.planned }} planned visits were done.
+The outlet jar was clearer than the inlet jar at the spring visit: {{ r.plain.jar }}.
+{% if r.plain.nitrate_applies %}Laboratory check of nitrate: {{ r.plain.lab }}.{% else %}A sediment basin is not built to remove nitrate; nitrate is not measured.{% endif %}
+{{ r.plain.open }} corrective item(s) are open or with the supervisor.</p>
+<p class="note">The jar comparison and the field checks of nitrate are a first sign. They do not prove how much the system removes.</p>
+
+<h2>3. Indicators</h2>
+<table class="t">
+<tr><th style="width:21%">Indicator</th><th style="width:16%">Target</th><th style="width:25%">Result this year</th><th style="width:10%">Date</th><th style="width:12%">Method</th><th>Trend over years</th></tr>
+{% for i in r.indicators %}<tr><td><b>{{ i.id }}</b> {{ i.indicator }}</td><td>{{ i.target }}</td><td>{{ i.result }}</td><td>{{ i.date }}</td><td>{{ i.method }}</td><td class="small">{{ i.trend }}</td></tr>{% endfor %}
+</table>
+
+<h3>Performance check: laboratory</h3>
+<table class="kv"><tr><td class="k">Nitrate-removal target</td><td>{{ r.lab.target }}</td></tr><tr><td class="k">Laboratory pair this year</td><td>{{ r.lab.status }}</td></tr><tr><td class="k">Result</td><td>{{ r.lab.verdict }}</td></tr></table>
+{% if r.lab.rows %}<table class="t"><tr><th>Date</th><th>Point</th><th>Value</th><th>Evidence</th><th>Laboratory</th><th>Water flowing</th><th>Sample time</th></tr>
+{% for n in r.lab.rows %}<tr><td>{{ n.date }}</td><td>{{ n.point }}</td><td>{{ n.value }}</td><td><span class="ev ev-{{ n.evidence|replace(' ','-') }}">{{ n.evidence }}</span></td><td>{{ n.kit }}</td><td>{{ n.flow }}</td><td>{{ n.time }}</td></tr>{% endfor %}</table>
+{% for c in r.lab.comparisons %}<p>{{ c.date }}: {{ c.text }}</p>{% endfor %}
+{% if r.lab.turbidity %}<p>Turbidity (laboratory): {% for t in r.lab.turbidity %}{{ t.point }} {{ t.value }}{% if not loop.last %}; {% endif %}{% endfor %}.</p>{% endif %}
+<p class="conv">{{ r.conversion_note }}</p>
+{% else %}<p class="nodata">No laboratory result recorded this year.</p>{% endif %}
+
+<h3>Field checks of nitrate (not the performance check)</h3>
+{% if r.field.rows %}<table class="t"><tr><th>Date</th><th>Point</th><th>Value</th><th>Evidence</th><th>Kit or instrument (range)</th><th>Water flowing</th><th>Recorded by</th></tr>
+{% for n in r.field.rows %}<tr><td>{{ n.date }} {{ n.time }}</td><td>{{ n.point }}</td><td>{{ n.value }}<br><span class="small">{{ n.detail }}</span></td><td><span class="ev ev-{{ n.evidence|replace(' ','-') }}">{{ n.evidence }}</span><br><span class="small">{{ n.method }}</span></td><td>{{ n.kit }}</td><td>{{ n.flow }}</td><td>{{ n.role }}</td></tr>{% endfor %}</table>
+{% for c in r.field.comparisons %}<p>{{ c.date }}, {{ c.evidence|lower }} ({{ c.method }}): {{ c.text }}</p>{% endfor %}
+<p class="conv">{{ r.conversion_note }}</p>
+{% else %}<p class="nodata">No data recorded</p>{% endif %}
+
+<h2 class="pb">4. Charts</h2>
+<p class="note">Each point is one measurement on the date shown. Points are not joined: there are too few to draw a trend line. Each method has its own series and its own chart.</p>
+<figure>{% if r.charts.lab %}{{ r.charts.lab|safe }}{% else %}<p class="nodata">No laboratory result recorded.</p>{% endif %}<figcaption>Laboratory nitrate at the inlet and the outlet, mg/L NO3-N. {{ r.conversion_note }}</figcaption></figure>
+<figure>{% if r.charts.field %}{{ r.charts.field|safe }}{% else %}<p class="nodata">No field checks recorded.</p>{% endif %}<figcaption>Field checks of nitrate. Bars are the span a test strip reading represents; diamonds are portable photometer readings. {{ r.conversion_note }}</figcaption></figure>
+<figure>{% if r.charts.sediment %}{{ r.charts.sediment|safe }}{% else %}<p class="nodata">No sediment readings recorded.</p>{% endif %}<figcaption>Sediment depth at each reference point, with the warning and cleanout levels of the site.</figcaption></figure>
+
+<h2>5. Maintenance history</h2>
+<table class="t"><tr><th>Visit type</th><th>Visits</th></tr>{% for t, n in r.maintenance.by_type %}<tr><td>{{ t }}</td><td>{{ n }}</td></tr>{% endfor %}</table>
+<table class="kv">
+  <tr><td class="k">Hours (crew total, visits and corrective work)</td><td>{{ r.maintenance.hours }}{% if r.maintenance.hours_missing %} ({{ r.maintenance.hours_missing }} visit(s) without hours recorded){% endif %}</td></tr>
+  <tr><td class="k">Corrective entries</td><td>{{ r.maintenance.corrective }}</td></tr>
+  <tr><td class="k">Cost</td><td class="nodata">{{ r.maintenance.cost }}</td></tr>
+</table>
+
+<h2>6. Events and repairs</h2>
+<h3>Heavy rain (0.5 in or more) and after-storm checks</h3>
+{% if r.events.rain %}<table class="t"><tr><th>Rain date</th><th>Amount</th><th>After-storm check</th><th>Within 48 hours</th></tr>
+{% for e in r.events.rain %}{% for c in e.checks %}<tr><td>{{ e.date }}</td><td>{{ e.amount }} in</td><td>{{ c.date }}</td><td>{{ c.within_48h }}</td></tr>{% else %}<tr><td>{{ e.date }}</td><td>{{ e.amount }} in</td><td class="nodata">No data recorded</td><td></td></tr>{% endfor %}{% endfor %}</table>
+{% else %}<p class="nodata">No data recorded</p>{% endif %}
+<h3>Repairs</h3>
+{% if r.events.repairs %}<table class="t"><tr><th>Date</th><th>Finding</th><th>Action</th><th>Done</th><th>Photos (before / after)</th></tr>
+{% for c in r.events.repairs %}<tr><td>{{ c.date }}</td><td>{{ c.finding }}</td><td>{{ c.action_taken }}</td><td>{{ c.resolved_date }}</td><td class="small">{{ c.photos|join(", ") }}</td></tr>{% endfor %}</table>
+{% else %}<p class="nodata">No data recorded</p>{% endif %}
+
+<h2 class="pb">7. Methods and limitations</h2>
+<table class="t"><tr><th>Evidence level</th><th>Method</th><th>What it is</th></tr>
+<tr><td><span class="ev ev-Field-screening">Field screening</span></td><td>test strip</td><td>The crew reads the closest color block. It is a range, not a number, and it is shown as the span between the neighbouring color blocks.</td></tr>
+<tr><td><span class="ev ev-Field-measurement">Field measurement</span></td><td>portable photometer</td><td>A number within the range of the instrument. It is not a certified laboratory result.</td></tr>
+<tr><td><span class="ev ev-Laboratory">Laboratory</span></td><td>laboratory</td><td>A certified laboratory analysis of one inlet and one outlet sample, once a year at the spring visit. This is the performance check.</td></tr>
+</table>
+<p>The jars and test strips are a first sign. A clearer outlet jar or a lower nitrate reading does not prove that the system removes a given amount of pollution.
+Inlet and outlet values are compared only when they come from the same method at the same visit, and the difference is a rough comparison: the two samples are not the same water.
+No percentage removal is shown.</p>
+<p class="conv">{{ r.conversion_note }}</p>
+{% if r.load_block %}<h3>Load removed</h3>{{ r.load_block }}{% else %}<p class="note">How much nitrate is removed (the load) needs laboratory results and the flow at the inlet and the outlet at the same time. No such records exist for this period, so no load is shown.</p>{% endif %}
+<p class="note">Anything shown as "No data recorded" was not captured on the Visit Sheet, the Site History, or the Corrective Maintenance Log. Values are never estimated or filled in.</p>
+</body></html>

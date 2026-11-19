@@ -1,0 +1,969 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "vts/report_data.schema.json",
+  "title": "VTS records read by the reports and the Tool",
+  "description": "Storage-agnostic data model (COWORK 2026-11-19, Part 4). The reports only EXTRACT these records; they never invent values. Prototype data must set meta.sample = true.",
+  "type": "object",
+  "required": [
+    "meta",
+    "organization",
+    "sites",
+    "annual_plans",
+    "visits",
+    "observations",
+    "measurements",
+    "corrective_entries",
+    "laboratory_samples",
+    "revisions"
+  ],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": [
+        "sample",
+        "generated_for_period"
+      ],
+      "properties": {
+        "sample": {
+          "type": "boolean",
+          "description": "true for made-up data. Every rendered page then says 'Sample data'."
+        },
+        "generated_for_period": {
+          "type": "object",
+          "required": [
+            "start",
+            "end"
+          ],
+          "properties": {
+            "start": {
+              "type": "string",
+              "format": "date"
+            },
+            "end": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        }
+      }
+    },
+    "organization": {
+      "type": "object",
+      "required": [
+        "id",
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "indicator": {
+      "description": "Not stored here: read from indicators.json, which is built from the Monitoring framework (TOP-07.S05).",
+      "type": "object",
+      "required": [
+        "id",
+        "goal",
+        "indicator",
+        "method",
+        "frequency",
+        "recorded_in"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^IND-\\d{2}$"
+        },
+        "goal": {
+          "type": "string"
+        },
+        "indicator": {
+          "type": "string"
+        },
+        "method": {
+          "type": "string"
+        },
+        "frequency": {
+          "type": "string"
+        },
+        "unit": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "recorded_in": {
+          "type": "string"
+        }
+      }
+    },
+    "sites": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/site"
+      }
+    },
+    "annual_plans": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/annual_plan"
+      }
+    },
+    "visits": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/visit"
+      }
+    },
+    "observations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/observation"
+      }
+    },
+    "measurements": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/measurement"
+      }
+    },
+    "corrective_entries": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/corrective_entry"
+      }
+    },
+    "laboratory_samples": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/laboratory_sample"
+      }
+    },
+    "revisions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/revision"
+      }
+    }
+  },
+  "$defs": {
+    "site": {
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "type",
+        "project_owner",
+        "params",
+        "sharing"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "enum": [
+            "SB",
+            "TW",
+            "VD",
+            "WB"
+          ]
+        },
+        "year_built": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "Site_Params 'Year built'"
+        },
+        "drainage_area": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "properties": {
+            "value": {
+              "type": "number"
+            },
+            "unit": {
+              "type": "string"
+            }
+          },
+          "description": "Site_Params 'Drainage area'"
+        },
+        "huc12": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "properties": {
+            "code": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            }
+          },
+          "description": "From the map in the Tool, not from the crew. Shared exports show this instead of the location."
+        },
+        "location": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "properties": {
+            "lat": {
+              "type": "number"
+            },
+            "lon": {
+              "type": "number"
+            }
+          },
+          "description": "Exact location. Never shown in shared or public exports."
+        },
+        "project_owner": {
+          "type": "string"
+        },
+        "params": {
+          "type": "object",
+          "description": "Site Conditions (Site_Params), filled once by the supervisor.",
+          "properties": {
+            "target_vegetation_height": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "warning_level_sediment": {
+              "type": [
+                "object",
+                "null"
+              ],
+              "properties": {
+                "value": {
+                  "type": "number"
+                },
+                "unit": {
+                  "type": "string"
+                }
+              }
+            },
+            "cleanout_level_sediment": {
+              "type": [
+                "object",
+                "null"
+              ],
+              "properties": {
+                "value": {
+                  "type": "number"
+                },
+                "unit": {
+                  "type": "string"
+                }
+              }
+            },
+            "nitrate_removal_target": {
+              "type": [
+                "object",
+                "null"
+              ],
+              "properties": {
+                "text": {
+                  "type": "string"
+                },
+                "min_difference": {
+                  "type": "number"
+                },
+                "unit": {
+                  "const": "mg/L NO3-N"
+                },
+                "method": {
+                  "const": "laboratory"
+                }
+              },
+              "description": "Set by the designer. null = 'Target not set'."
+            },
+            "vegetation_cover_target": {
+              "type": [
+                "object",
+                "null"
+              ],
+              "properties": {
+                "min_percent": {
+                  "type": "number"
+                }
+              }
+            },
+            "photo_points": {
+              "type": [
+                "object",
+                "null"
+              ],
+              "properties": {
+                "count": {
+                  "type": "integer"
+                },
+                "where": {
+                  "type": "string"
+                }
+              }
+            },
+            "designated_mowing_areas": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "areas_left_unmowed": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "Areas left unmowed on purpose, and why. Agreed once by the supervisor and the project owner."
+            }
+          }
+        },
+        "sharing": {
+          "type": "object",
+          "description": "Choices of the project owner. Records are shared only by their choice.",
+          "properties": {
+            "wildlife_in_food_safety_record": {
+              "type": "boolean"
+            },
+            "show_owner_in_water_summary": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        }
+      }
+    },
+    "annual_plan": {
+      "type": "object",
+      "required": [
+        "site",
+        "year",
+        "planned_visits"
+      ],
+      "properties": {
+        "site": {
+          "type": "string"
+        },
+        "year": {
+          "type": "integer"
+        },
+        "planned_visits": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "date": {
+                "type": "string",
+                "format": "date"
+              },
+              "type": {
+                "$ref": "#/$defs/visit_type"
+              }
+            }
+          }
+        }
+      }
+    },
+    "visit_type": {
+      "enum": [
+        "Routine",
+        "After storm",
+        "Spring",
+        "Pre-storm",
+        "January review",
+        "When needed",
+        "Corrective"
+      ]
+    },
+    "visit": {
+      "type": "object",
+      "required": [
+        "id",
+        "site",
+        "date",
+        "type",
+        "status"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "site": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "type": {
+          "$ref": "#/$defs/visit_type"
+        },
+        "status": {
+          "enum": [
+            "draft",
+            "closed"
+          ],
+          "description": "A spring visit cannot be closed without the jar answer with photo, both strip readings with photos, and the photo-point photos."
+        },
+        "crew_size": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "F04 closing block"
+        },
+        "hours_on_site": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "F04 closing block; F06 'Hours (crew total)' = crew_size x hours unless entered"
+        },
+        "hours_crew_total": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "last_rain": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "properties": {
+            "date": {
+              "type": "string",
+              "format": "date"
+            },
+            "amount_in": {
+              "type": "number"
+            }
+          },
+          "description": "F04 header 'Last rain (date / amount)'"
+        },
+        "tasks_done": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Task IDs ticked in 'Tasks of this visit'"
+        },
+        "mowing": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "properties": {
+            "areas": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "at_target_height": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            },
+            "photo": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "description": "Mowing record step (Parts 1.1)"
+        },
+        "invasive_removed": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "species": {
+                "type": "string"
+              },
+              "location": {
+                "type": "string"
+              },
+              "extent": {
+                "type": "string"
+              },
+              "photo": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        },
+        "photos": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "photo_point": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "caption": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "all_photo_points_taken": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "F04 'Overview photos taken from all photo points' (required at Routine, After storm and Pre-storm visits)"
+        },
+        "notes": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "F04 'What was done; observations' / F06 Notes"
+        },
+        "supervisor_role": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "sign_off": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "properties": {
+            "initials": {
+              "type": "string"
+            },
+            "date": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          "description": "F06 'Supervisor initials'"
+        }
+      }
+    },
+    "observation": {
+      "type": "object",
+      "required": [
+        "id",
+        "visit",
+        "item",
+        "answer"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "visit": {
+          "type": "string"
+        },
+        "item": {
+          "type": "string",
+          "description": "Checklist item ID (Checklist_Items)"
+        },
+        "answer": {
+          "enum": [
+            "ok",
+            "abnormal",
+            "na"
+          ]
+        },
+        "location_in_system": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "note": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "photo": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "fixed_now": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "burrows": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "properties": {
+            "count_range": {
+              "enum": [
+                "none",
+                "1 to 5",
+                "more than 5"
+              ]
+            },
+            "in_use": {
+              "enum": [
+                "looks in use",
+                "does not look in use",
+                "not sure"
+              ]
+            },
+            "trend": {
+              "enum": [
+                "more",
+                "fewer",
+                "about the same",
+                "first time"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "measurement": {
+      "type": "object",
+      "required": [
+        "id",
+        "visit",
+        "indicator",
+        "parameter",
+        "value_as_entered",
+        "method",
+        "recorded_by_role",
+        "recorded_at"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "visit": {
+          "type": "string"
+        },
+        "indicator": {
+          "type": "string",
+          "pattern": "^IND-\\d{2}$"
+        },
+        "parameter": {
+          "enum": [
+            "water_at_inlet_no_shortcuts",
+            "sediment_depth",
+            "jar_outlet_clearer",
+            "nitrate",
+            "turbidity",
+            "vegetation_cover",
+            "invasive_species_count"
+          ],
+          "description": "vegetation_cover (%, Vegetation Survey estimate) and invasive_species_count come from the spring Vegetation Survey (SB_T06, TW_T06, VD_T07)."
+        },
+        "point": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "inlet, outlet, or a sediment reference point (RP1, RP2...)"
+        },
+        "value_as_entered": {
+          "type": "string",
+          "description": "Never overwritten. A strip result is the color block read, not a decimal number."
+        },
+        "unit_as_entered": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Exactly as printed on the kit or the laboratory report, e.g. 'mg/L NO3-N' or 'mg/L NO3'. Conversion is for display only (NO3 = NO3-N x 4.43)."
+        },
+        "method": {
+          "enum": [
+            "test strip",
+            "portable photometer",
+            "laboratory",
+            "visual"
+          ]
+        },
+        "instrument_or_kit": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "range": {
+              "type": "string",
+              "description": "Range printed on the kit or instrument"
+            },
+            "blocks": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "description": "Color blocks of a test strip, in unit_as_entered"
+            },
+            "laboratory": {
+              "type": "string"
+            },
+            "report_date": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        },
+        "flow_present": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "sample_time": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "HH:MM"
+        },
+        "photo": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "recorded_by_role": {
+          "enum": [
+            "crew",
+            "crew lead",
+            "supervisor",
+            "project owner",
+            "laboratory"
+          ]
+        },
+        "recorded_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "corrective_entry": {
+      "type": "object",
+      "description": "The VTS_F05 columns, plus links.",
+      "required": [
+        "id",
+        "site",
+        "date",
+        "finding",
+        "status"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "site": {
+          "type": "string"
+        },
+        "visit": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "observation": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "task": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "finding": {
+          "type": "string"
+        },
+        "location": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "likely_cause": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "action_taken": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "For COR_T04 one of: filled an inactive burrow; reduced cover near the berm; stopped work (nest or possible protected species); passed to the supervisor."
+        },
+        "urgency": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "materials_used": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "hours": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "status": {
+          "enum": [
+            "open",
+            "resolved",
+            "escalated"
+          ]
+        },
+        "resolved_date": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date"
+        },
+        "photos": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "laboratory_sample": {
+      "type": "object",
+      "required": [
+        "site",
+        "year",
+        "status"
+      ],
+      "properties": {
+        "site": {
+          "type": "string"
+        },
+        "year": {
+          "type": "integer"
+        },
+        "status": {
+          "enum": [
+            "sent",
+            "result received",
+            "not done this year"
+          ]
+        },
+        "visit": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "laboratory": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "report_date": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date"
+        }
+      }
+    },
+    "revision": {
+      "type": "object",
+      "required": [
+        "id",
+        "record_type",
+        "record_id",
+        "field",
+        "old_value",
+        "new_value",
+        "reason",
+        "who_role",
+        "when"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "record_type": {
+          "type": "string"
+        },
+        "record_id": {
+          "type": "string"
+        },
+        "field": {
+          "type": "string"
+        },
+        "old_value": {},
+        "new_value": {},
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "category": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Optional: typo, wrong site, late result, other"
+        },
+        "who_role": {
+          "type": "string"
+        },
+        "when": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  }
+}
