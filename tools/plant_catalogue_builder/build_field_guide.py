@@ -34,7 +34,7 @@ ICON = {(r["Group"], r["Code"]): r["Meaning"] for r in icons}
 # ---- page numbers of manual tasks (from the Task Index of the manual PDF) ----
 TASKPAGE, TASKNAME = {}, {}
 if MANUAL_PDF and Path(MANUAL_PDF).exists():
-    txt = subprocess.run(["pdftotext", "-layout", MANUAL_PDF, "-"], capture_output=True, text=True).stdout
+    txt = subprocess.run(["pdftotext", "-layout", MANUAL_PDF, "-"], capture_output=True, text=True, encoding="utf-8", errors="replace").stdout
     for m in re.finditer(r"^\s*((?:SB|TW|VD|WB|COR)_T\d\d)\s{2,}(.+?),\s*p\.\s*(\d+)\s{2,}", txt, re.M):
         TASKPAGE[m.group(1)] = m.group(3)
         TASKNAME[m.group(1)] = m.group(2).strip()
