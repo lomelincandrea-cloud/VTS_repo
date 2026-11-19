@@ -14,7 +14,8 @@ const ROUTES=["home","start","maintain","request","learn","tool"];
 function route(){const h=(location.hash||"#home").slice(1);const r=ROUTES.includes(h)?h:"home";
   $$("section.view").forEach(v=>v.classList.toggle("on",v.id==="v-"+r));
   $$("nav.main a").forEach(a=>{const on=a.dataset.r===r||(r==="request"&&a.dataset.r==="maintain");on?a.setAttribute("aria-current","page"):a.removeAttribute("aria-current")});
-  window.scrollTo(0,0);}
+  window.scrollTo(0,0);
+  if(r==="home")setTimeout(()=>{lmap?lmap.invalidateSize():homeMap()},0);}
 addEventListener("hashchange",route);
 
 /* tabs */
@@ -39,11 +40,30 @@ function drawMap(box,opts={}){const f=opts.filter||"ALL";let h=`<svg viewBox="0 
     if(n&&!opts.plain)h+=`<text x="${w.c[0]}" y="${w.c[1]}" text-anchor="middle">${n}</text>`;});
   box.innerHTML=h+"</svg>";
   if(opts.onpick)box.querySelectorAll("path.has").forEach(p=>p.onclick=()=>opts.onpick(p.dataset.id));}
-let mapF="ALL",mapSel=null;
-function homeMap(){drawMap($("#homemap"),{filter:mapF,sel:mapSel,onpick:id=>{mapSel=mapSel===id?null:id;homeMap()}});
-  const ws=HUC.filter(w=>Object.keys(w.s).length&&(!mapSel||w.id===mapSel));let tot={};ws.forEach(w=>{for(const k in w.s)tot[k]=(tot[k]||0)+w.s[k]});
-  let h=`<h3>${mapSel?esc(ws[0].n):"All watersheds"}</h3>`;ORDER.forEach(k=>{if(mapF!=="ALL"&&mapF!==k)return;h+=`<div class="count"><b>${tot[k]||0}</b><span>${esc(SYS[k].n)}${(tot[k]||0)===1?"":"s"}</span></div>`});
-  h+=`<p class="small muted">${mapSel?"Click the watershed again to see all.":"Click a blue watershed to see its systems."}</p>`;$("#mapcounts").innerHTML=h;}
+/* home: Leaflet map of the 18 CCWG sites (public view: location and system only, no status) */
+const SCOL={SB:"#2B7BBF",TW:"#3C9D5B",VD:"#C99700",WB:"#DD6B2A"};
+let mapF="ALL";var lmap=null,lmapLay=null,lmapMk={};const mapLy={ws:true,riv:true};
+function homeMap(){const box=$("#homemap"),G=window.VTS_GEO||{},feats=((G.points||{}).features||[]).filter(f=>mapF==="ALL"||f.properties.system===mapF);
+  if(!window.L){box.innerHTML=`<p class="muted" style="padding:1rem">The map could not load. Check your internet connection and reload.</p>`;}
+  else if(lmap||box.clientWidth){
+    /* the map is created only once its box is visible, so Leaflet measures the right size */
+    if(!lmap){lmap=L.map(box,{scrollWheelZoom:false});
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:18,attribution:"© OpenStreetMap contributors"}).addTo(lmap);
+      lmapLay={ws:L.layerGroup().addTo(lmap),riv:L.layerGroup().addTo(lmap),sites:L.layerGroup().addTo(lmap)};
+      const all=((G.points||{}).features||[]).map(f=>[f.geometry.coordinates[1],f.geometry.coordinates[0]]);
+      all.length?lmap.fitBounds(all,{padding:[30,30]}):lmap.setView([36.74,-121.6],9);
+      if(window.ResizeObserver)new ResizeObserver(()=>{if(box.clientWidth)lmap.invalidateSize()}).observe(box);}
+    Object.values(lmapLay).forEach(l=>l.clearLayers());lmapMk={};
+    if(mapLy.ws&&G.calw)L.geoJSON(G.calw,{style:{color:"#03467E",weight:1,fillColor:"#03467E",fillOpacity:.05},onEachFeature:(f,l)=>{const n=f.properties.hsa&&f.properties.hsa!=="undefined"?f.properties.hsa:f.properties.ha;if(n)l.bindTooltip(esc(n))}}).addTo(lmapLay.ws);
+    if(mapLy.riv&&G.rivers)L.geoJSON(G.rivers,{style:{color:"#4AA3DF",weight:1.2,opacity:.8},onEachFeature:(f,l)=>f.properties.GNIS_NAME&&l.bindTooltip(esc(f.properties.GNIS_NAME))}).addTo(lmapLay.riv);
+    feats.forEach(f=>{const p=f.properties,c=SCOL[p.system]||"#888";
+      const m=L.circleMarker([f.geometry.coordinates[1],f.geometry.coordinates[0]],{radius:9,color:"#fff",weight:2,fillColor:c,fillOpacity:.95}).addTo(lmapLay.sites);
+      m.bindPopup(`<strong>${esc(p.name)}</strong><br>${esc(SYS[p.system]?SYS[p.system].n:p.system)}<br><small>${esc([p.ws,p.ha].filter(x=>x&&x!=="undefined").join(" · "))}</small><br><a href="#learn">How to maintain it</a>`);lmapMk[p.id]=m;});}
+  let h="";ORDER.forEach(k=>{if(mapF!=="ALL"&&mapF!==k)return;const n=feats.filter(f=>f.properties.system===k).length;h+=`<div class="count"><b>${n}</b><span><span class="sdot" style="background:${SCOL[k]}"></span>${esc(SYS[k].n)}${n===1?"":SYS[k].n.endsWith("ch")?"es":"s"}</span></div>`});
+  h+=`<div class="sitelist" role="list">${feats.map(f=>`<button type="button" role="listitem" data-id="${f.properties.id}"><span class="sdot" style="background:${SCOL[f.properties.system]}"></span><span>${esc(f.properties.name)}<small>${esc(SYS[f.properties.system].n)}</small></span></button>`).join("")}</div>`;
+  $("#mapcounts").innerHTML=h;
+  $$("#mapcounts .sitelist button").forEach(b=>b.onclick=()=>{const m=lmapMk[b.dataset.id];if(m){lmap.flyTo(m.getLatLng(),13);m.openPopup();box.scrollIntoView({behavior:"smooth",block:"center"})}});}
+function mapLayers(){$$("#maplayers input").forEach(i=>{i.checked=mapLy[i.dataset.l];i.onchange=()=>{mapLy[i.dataset.l]=i.checked;homeMap()}})}
 function mapChips(){chips($("#mapchips"),[["ALL","All systems"],...ORDER.map(k=>[k,SYS[k].n])],mapF,k=>{mapF=k;homeMap()})}
 
 /* start */
@@ -174,7 +194,7 @@ $("#phSend").onclick=()=>{const r=S.sched[phIdx];const bad=CL.filter((q,i)=>phAn
   S.log.push({d:r.d,s:r.s,v:r.v,c:r.w,t:r.t,n:phAns.filter(a=>a).length+" of "+CL.length+" items answered on phone.",f:bad.length?"F05 rows "+(start+1)+(bad.length>1?" to "+(start+bad.length):""):"",h:"",k:"",i:""});
   const sy=S.sys.find(s=>s.id===r.s);sy.last=r.d;sy.st=bad.length?"act":"ok";fSys=r.s;S.sched.splice(phIdx,1);$("#phoneDlg").close();tool();};
 
-stations();mapChips();homeMap();
+stations();mapChips();mapLayers();homeMap();
 chips($("#startchips"),ORDER.map(k=>[k,SYS[k].n]),stSys,k=>{stSys=k;startGrid()});startGrid();layers();whereMap();
 chips($("#audchips"),AUD,lAud,k=>{lAud=k;learn()});chips($("#lsyschips"),[["ALL","All systems"],...ORDER.map(k=>[k,SYS[k].n])],lSys,k=>{lSys=k;learn()});learn();
 tool();nchart();route();

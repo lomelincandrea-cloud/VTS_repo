@@ -9,6 +9,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 22'%3E%3Cpath d='M1 6 C7 0 11 12 17 8 S27 14 33 9' fill='none' stroke='%231C5D8A' stroke-width='3' stroke-linecap='round'/%3E%3Cpath d='M1 17 C7 11 11 22 17 18 S27 23 33 18' fill='none' stroke='%2344701F' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -54,7 +55,7 @@
         <g transform="translate(770 266)"><rect x="-34" y="-46" width="68" height="26" rx="3" fill="var(--silt-soft)" stroke="var(--ink)" stroke-width="2.5"/><g fill="var(--silt)"><rect x="-27" y="-41" width="9" height="5"/><rect x="-12" y="-37" width="9" height="5"/><rect x="3" y="-42" width="9" height="5"/><rect x="17" y="-36" width="9" height="5"/><rect x="-22" y="-30" width="9" height="5"/><rect x="-4" y="-29" width="9" height="5"/><rect x="12" y="-28" width="9" height="5"/></g><line x1="0" y1="-20" x2="0" y2="-9" stroke="var(--ink)" stroke-width="2"/><circle r="9" fill="var(--surface)" stroke="var(--water)" stroke-width="4"/></g>
         <!-- TW -->
         <g transform="translate(900 283)"><ellipse cx="0" cy="-30" rx="38" ry="12" fill="var(--water-soft)" stroke="var(--ink)" stroke-width="2.5"/><g stroke="var(--field)" stroke-width="3" stroke-linecap="round"><path d="M-22 -30 l0 -20 M-14 -28 l-3 -22 M-4 -27 l0 -24 M8 -28 l3 -22 M18 -30 l0 -19"/></g><line x1="0" y1="-18" x2="0" y2="-9" stroke="var(--ink)" stroke-width="2"/><circle r="9" fill="var(--surface)" stroke="var(--water)" stroke-width="4"/></g>
-        <g font-family="Archivo, Arial, sans-serif" font-weight="700" fill="var(--muted)" font-size="17"><text x="60" y="62">Hills and headwaters</text><text x="330" y="330">Farm fields</text><text x="1020" y="286">Monterey Bay</text></g>
+        <g font-family="Barlow Condensed, Arial Narrow, Arial, sans-serif" font-weight="700" fill="var(--muted)" font-size="17"><text x="60" y="62">Hills and headwaters</text><text x="330" y="330">Farm fields</text><text x="1020" y="286">Monterey Bay</text></g>
       </svg>
     </div>
     <div class="stations" id="stations"></div>
@@ -72,13 +73,17 @@
 
   <div class="stack">
     <h2>Where the systems are</h2>
-    <p class="muted">Shown by watershed only. Exact locations, owners and site records stay private unless the site partners choose to share them.</p>
-    <div class="mapbox">
-      <div class="map panel" id="homemap"></div>
+    <p class="muted">18 systems from the Central Coast Wetlands Group (CCWG) public site inventory. Some are outside the project watershed. Site records stay private unless the site partners choose to share them.</p>
+    <div class="chips" id="mapchips" role="group" aria-label="Filter by system"></div>
+    <div class="lmapbox">
+      <div class="lmap panel" id="homemap" aria-label="Map of VTS sites"></div>
       <div class="stack">
-        <div class="chips" id="mapchips" role="group" aria-label="Filter by system"></div>
         <div id="mapcounts"></div>
-        <p class="small muted">Counts come from the project’s draft site file (18 sites, November 2026). They will change as the inventory grows.</p>
+        <fieldset id="maplayers"><legend>Map layers</legend>
+          <label class="check"><input type="checkbox" data-l="ws"> Sub-watersheds (CalWater)</label>
+          <label class="check"><input type="checkbox" data-l="riv"> Rivers and creeks</label>
+        </fieldset>
+        <p class="small muted">Draft site list, November 2026. It will change as the inventory grows.</p>
         <div class="row"><a class="btn ghost" href="#request">Add my system to the map</a></div>
       </div>
     </div>
@@ -268,7 +273,9 @@
   <button class="btn" type="button" id="phSend" style="width:100%;margin-top:.5rem">Send visit to the Site History</button>
 </div></dialog>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="geo.js"></script>
+<script src="sites.js"></script>
 <script src="data.js"></script>
 <script src="app.js"></script>
 </body>
