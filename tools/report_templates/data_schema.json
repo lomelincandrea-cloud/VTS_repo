@@ -465,9 +465,47 @@
               },
               "type": {
                 "$ref": "#/$defs/visit_type"
+              },
+              "id": {
+                "type": "string"
+              },
+              "tasks": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Task IDs chosen for this visit. Missing = all tasks the manual suggests for this visit type."
+              },
+              "extra_tasks": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "task": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "text": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "description": "Tasks added to this visit beyond the suggestion: a manual task ID or free text."
               }
             }
           }
+        },
+        "id": {
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "draft",
+            "approved"
+          ],
+          "description": "An approved plan is changed only with a reason (edit history)."
         }
       }
     },
@@ -660,6 +698,13 @@
             }
           },
           "description": "F06 'Supervisor initials'"
+        },
+        "planned_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The planned visit of the Annual Plan this visit fulfils."
         }
       }
     },

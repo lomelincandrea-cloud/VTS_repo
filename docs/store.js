@@ -15,9 +15,17 @@ window.VTSStore = (function () {
     let saved = null;
     try { saved = JSON.parse(localStorage.getItem(KEY) || "null"); } catch (e) { saved = null; }
     data = saved && saved.meta ? saved : clone(base);
+    normalize();
     return data;
   }
-  function reset() { data = clone(base); try { localStorage.removeItem(KEY); } catch (e) {} return data; }
+  /* plans get stable ids; planned visits get ids. tasks === undefined means "as suggested by the manual". */
+  function normalize() {
+    (data.annual_plans || []).forEach(p => {
+      p.id = p.id || `P-${p.site}-${p.year}`; p.status = p.status || "approved";
+      p.planned_visits.forEach((v, i) => { v.id = v.id || `${p.id}-${i + 1}`; v.extra_tasks = v.extra_tasks || []; });
+    });
+  }
+  function reset() { data = clone(base); normalize(); try { localStorage.removeItem(KEY); } catch (e) {} return data; }
   function edited() { try { return !!localStorage.getItem(KEY); } catch (e) { return false; } }
 
   /* session: demo only, no password */
@@ -46,7 +54,20 @@ window.VTSStore = (function () {
     persist(); return rec;
   }
   function add(collection, record) { data[collection].push(clone(record)); persist(); return record; }
+  /* put: replace or insert WITHOUT edit history. Only for records that are not submitted yet (draft visits, draft plans). */
+  function put(collection, record) {
+    const i = data[collection].findIndex(r => r.id === record.id);
+    if (i >= 0) { const st = data[collection][i].status; if (st === "closed" || st === "approved") throw new Error("Submitted records are corrected with a reason, not replaced."); data[collection][i] = clone(record); }
+    else data[collection].push(clone(record));
+    persist(); return record;
+  }
+  function remove(collection, id) {
+    const r = data[collection].find(x => x.id === id);
+    if (r && (r.status === "closed" || r.status === "approved")) throw new Error("Submitted records are not deleted.");
+    data[collection] = data[collection].filter(x => x.id !== id); persist();
+  }
+  const visit = id => data.visits.find(v => v.id === id);
   function nextId(collection, prefix) { let n = data[collection].length + 1; while (data[collection].some(r => r.id === prefix + n)) n++; return prefix + n; }
 
-  return {load, reset, edited, session, signIn, signOut, sites, site, visitsOf, planOf, revisionsOf, update, add, nextId, get data() { return data; }};
+  return {load, reset, edited, session, signIn, signOut, sites, site, visitsOf, planOf, revisionsOf, update, add, put, remove, visit, nextId, persist, get data() { return data; }};
 })();
