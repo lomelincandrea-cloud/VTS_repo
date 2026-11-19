@@ -11,7 +11,8 @@ const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&g
 
 /* routing */
 const ROUTES=["home","start","maintain","request","learn","tool"];
-function route(){const h=(location.hash||"#home").slice(1);const r=ROUTES.includes(h)?h:"home";
+function route(){const parts=(location.hash||"#home").slice(1).split("/");const r=ROUTES.includes(parts[0])?parts[0]:"home";
+  if(r==="learn"&&window.learnRoute)window.learnRoute(parts.slice(1));
   $$("section.view").forEach(v=>v.classList.toggle("on",v.id==="v-"+r));
   $$("nav.main a").forEach(a=>{const on=a.dataset.r===r||(r==="request"&&a.dataset.r==="maintain");on?a.setAttribute("aria-current","page"):a.removeAttribute("aria-current")});
   window.scrollTo(0,0);
@@ -58,7 +59,7 @@ function homeMap(){const box=$("#homemap"),G=window.VTS_GEO||{},feats=((G.points
     if(mapLy.riv&&G.rivers)L.geoJSON(G.rivers,{style:{color:"#4AA3DF",weight:1.2,opacity:.8},onEachFeature:(f,l)=>f.properties.GNIS_NAME&&l.bindTooltip(esc(f.properties.GNIS_NAME))}).addTo(lmapLay.riv);
     feats.forEach(f=>{const p=f.properties,c=SCOL[p.system]||"#888";
       const m=L.circleMarker([f.geometry.coordinates[1],f.geometry.coordinates[0]],{radius:9,color:"#fff",weight:2,fillColor:c,fillOpacity:.95}).addTo(lmapLay.sites);
-      m.bindPopup(`<strong>${esc(p.name)}</strong><br>${esc(SYS[p.system]?SYS[p.system].n:p.system)}<br><small>${esc([p.ws,p.ha].filter(x=>x&&x!=="undefined").join(" · "))}</small><br><a href="#learn">How to maintain it</a>`);lmapMk[p.id]=m;});}
+      m.bindPopup(`<strong>${esc(p.name)}</strong><br>${esc(SYS[p.system]?SYS[p.system].n:p.system)}<br><small>${esc([p.ws,p.ha].filter(x=>x&&x!=="undefined").join(" · "))}</small><br><a href="#learn/manual/${p.system}">How to maintain it</a>`);lmapMk[p.id]=m;});}
   let h="";ORDER.forEach(k=>{if(mapF!=="ALL"&&mapF!==k)return;const n=feats.filter(f=>f.properties.system===k).length;h+=`<div class="count"><b>${n}</b><span><span class="sdot" style="background:${SCOL[k]}"></span>${esc(SYS[k].n)}${n===1?"":SYS[k].n.endsWith("ch")?"es":"s"}</span></div>`});
   h+=`<div class="sitelist" role="list">${feats.map(f=>`<button type="button" role="listitem" data-id="${f.properties.id}"><span class="sdot" style="background:${SCOL[f.properties.system]}"></span><span>${esc(f.properties.name)}<small>${esc(SYS[f.properties.system].n)}</small></span></button>`).join("")}</div>`;
   $("#mapcounts").innerHTML=h;
@@ -73,7 +74,7 @@ function startGrid(){const s=SYS[stSys];const diy=s.who.startsWith("Do");
   <div class="panel stack"><h3>When it fits</h3><p>${esc(s.fit)}</p><p class="small muted">${esc(s.what)}</p></div>
   <div class="panel stack"><h3>${diy?"Build it yourself":"Who builds it"}</h3><ul class="plain">${diy?"<li>[IMPLEMENTATION GUIDE]</li><li>[SIZING SHEET, ONE PAGE]</li><li>[PERMITS TO CHECK]</li>":"<li>[FACT SHEET]</li><li>[PRACTITIONERS AND CONTRACTORS]</li><li>[PERMITS TO CHECK]</li>"}</ul></div>
   <div class="panel stack"><h3>What it costs</h3><p>Build: [RANGE]</p><p>Yearly maintenance: [RANGE]</p><p class="small muted">Ranges will come from project reports and the Site History records.</p></div>
-  <div class="panel stack"><h3>What it takes to maintain</h3><p>${esc(s.upkeep)}</p><a href="#learn">See the checklists and manual</a></div>
+  <div class="panel stack"><h3>What it takes to maintain</h3><p>${esc(s.upkeep)}</p><a href="#learn/manual/${stSys}">See the checklists and manual</a></div>
   <div class="panel stack"><h3>Examples near you</h3><p>See which watersheds already have a ${esc(s.n.toLowerCase())}.</p><a href="#home">Open the map</a></div>
   <div class="panel stack"><h3>Who can help</h3><ul class="plain"><li>[TECHNICAL ASSISTANCE CONTACT]</li><li>[FUNDING PROGRAMS]</li></ul></div>`;}
 const LAYERS=["Surface water limits (TMDL areas)","Groundwater nitrate risk (draft model)","Systems already in place","Distance to drainage infrastructure","Conservation land and easements"];

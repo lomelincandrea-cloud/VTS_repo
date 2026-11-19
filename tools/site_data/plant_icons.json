@@ -1,0 +1,42 @@
+{
+ "_source": "Extracted once from the first prototype (docs/v0/data.js, built 2026-11-02 from the plant catalogue notebook). SVG inner markup for plant form, leaf and stem icons, keyed '<group>_<code>', and flower colors.",
+ "icons": {
+  "form_T": "<rect x=\"10.8\" y=\"12\" width=\"2.6\" height=\"10\" fill=\"#8a6a3b\"/><circle cx=\"12\" cy=\"9\" r=\"7\" fill=\"#3C9D5B\"/>",
+  "form_S": "<rect x=\"11.2\" y=\"16\" width=\"1.6\" height=\"6\" fill=\"#8a6a3b\"/><circle cx=\"7.5\" cy=\"14\" r=\"4.8\" fill=\"#3C9D5B\"/><circle cx=\"16.5\" cy=\"14\" r=\"4.8\" fill=\"#2F8F4E\"/><circle cx=\"12\" cy=\"9\" r=\"4.8\" fill=\"#3C9D5B\"/>",
+  "form_G": "<g stroke=\"#3C9D5B\" stroke-width=\"2\" fill=\"none\" stroke-linecap=\"round\"><path d=\"M12 22 C11 14 7 9 4 5\"/><path d=\"M12 22 V3\"/><path d=\"M12 22 C13 14 17 9 20 5\"/></g>",
+  "form_R": "<g stroke=\"#3C9D5B\" stroke-width=\"2\" stroke-linecap=\"round\"><path d=\"M7 22 V7\"/><path d=\"M12 22 V4\"/><path d=\"M17 22 V8\"/></g><ellipse cx=\"12\" cy=\"4\" rx=\"1.8\" ry=\"2.6\" fill=\"#8a6a3b\"/><ellipse cx=\"7\" cy=\"7\" rx=\"1.5\" ry=\"2.2\" fill=\"#8a6a3b\"/>",
+  "form_F": "<path d=\"M12 22 V10\" stroke=\"#3C9D5B\" stroke-width=\"2\"/><circle cx=\"12\" cy=\"7\" r=\"4.6\" fill=\"#F6B800\"/><circle cx=\"12\" cy=\"7\" r=\"1.8\" fill=\"#8a6a3b\"/><path d=\"M12 18 C7 18 5 15 5 13 C9 13 12 14 12 18Z\" fill=\"#3C9D5B\"/>",
+  "form_AF": "<path d=\"M2 16 q3 -3 6 0 t6 0 t6 0\" stroke=\"#2B7BBF\" stroke-width=\"2\" fill=\"none\"/><circle cx=\"7\" cy=\"12.5\" r=\"2.4\" fill=\"#3C9D5B\"/><circle cx=\"12.5\" cy=\"11\" r=\"2.4\" fill=\"#3C9D5B\"/><circle cx=\"17.5\" cy=\"12.5\" r=\"2.4\" fill=\"#3C9D5B\"/>",
+  "form_AS": "<path d=\"M2 5 q3 -3 6 0 t6 0 t6 0\" stroke=\"#2B7BBF\" stroke-width=\"2\" fill=\"none\"/><path d=\"M12 22 V9 M12 12 l-5 -2 M12 12 l5 -2 M12 16 l-5 -2 M12 16 l5 -2\" stroke=\"#3C9D5B\" stroke-width=\"1.7\" fill=\"none\"/>",
+  "form_M": "<g stroke=\"#3C9D5B\" stroke-width=\"2\" fill=\"none\" stroke-linecap=\"round\"><path d=\"M4 21 C6 13 9 13 8 6\"/><path d=\"M10 22 C12 14 15 13 13 5\"/><path d=\"M17 21 C19 14 20 12 20 7\"/></g>",
+  "form_C": "<g stroke=\"#8a6a3b\" stroke-width=\"2\"><path d=\"M9 22 V5\"/><path d=\"M15 22 V7\"/><path d=\"M9 11 H15 M9 16 H15\" stroke-width=\"1.2\"/></g><path d=\"M5 5 q4 -4 7 0 q4 -4 7 2 q-7 3 -14 -2Z\" fill=\"#c9b08a\"/>",
+  "form_V": "<path d=\"M3 21 C8 15 8 10 12 9 C16 8 16 5 21 4\" stroke=\"#3C9D5B\" stroke-width=\"2\" fill=\"none\"/><path d=\"M8 15 l-5 -1 l4 -4Z M14 8 l4 3 l1 -5Z\" fill=\"#2F8F4E\"/>",
+  "leaf_BL": "<path d=\"M3 21 C6 10 13 5 21 3 C18 11 11 17 3 21Z\" fill=\"#3C9D5B\"/>",
+  "leaf_RS": "<rect x=\"9.5\" y=\"2\" width=\"5\" height=\"20\" rx=\"2.5\" fill=\"#3C9D5B\"/>",
+  "leaf_LA": "<path d=\"M12 2 C19 8 19 16 12 22 C5 16 5 8 12 2Z\" fill=\"#3C9D5B\"/><path d=\"M12 5 V19\" stroke=\"#fff\" stroke-width=\"1.2\"/>",
+  "leaf_OV": "<ellipse cx=\"12\" cy=\"12\" rx=\"8\" ry=\"10\" fill=\"#3C9D5B\"/><path d=\"M12 3 V21\" stroke=\"#fff\" stroke-width=\"1.2\"/>",
+  "leaf_LO": "<path d=\"M12 2 l3 4 l5 -1 l-2 5 l4 3 l-5 2 l1 5 l-5 -2 l-3 3 l-3 -3 l-5 2 l1 -5 l-5 -2 l4 -3 l-2 -5 l5 1Z\" fill=\"#3C9D5B\"/>",
+  "leaf_CP": "<path d=\"M12 3 V21\" stroke=\"#2F8F4E\" stroke-width=\"1.5\"/><g fill=\"#3C9D5B\"><ellipse cx=\"7.5\" cy=\"6.5\" rx=\"3.6\" ry=\"1.8\"/><ellipse cx=\"16.5\" cy=\"6.5\" rx=\"3.6\" ry=\"1.8\"/><ellipse cx=\"7\" cy=\"12\" rx=\"3.8\" ry=\"1.8\"/><ellipse cx=\"17\" cy=\"12\" rx=\"3.8\" ry=\"1.8\"/><ellipse cx=\"7.5\" cy=\"17.5\" rx=\"3.4\" ry=\"1.7\"/><ellipse cx=\"16.5\" cy=\"17.5\" rx=\"3.4\" ry=\"1.7\"/></g>",
+  "leaf_FE": "<path d=\"M12 3 V21 M12 7 l-7 -3 M12 7 l7 -3 M12 12 l-8 -3 M12 12 l8 -3 M12 17 l-7 -3 M12 17 l7 -3\" stroke=\"#3C9D5B\" stroke-width=\"1.7\" fill=\"none\" stroke-linecap=\"round\"/>",
+  "leaf_TI": "<circle cx=\"7\" cy=\"12\" r=\"3.4\" fill=\"#3C9D5B\"/><circle cx=\"16\" cy=\"8\" r=\"3.4\" fill=\"#3C9D5B\"/><circle cx=\"15\" cy=\"16.5\" r=\"3.4\" fill=\"#3C9D5B\"/>",
+  "stem_WO": "<rect x=\"8\" y=\"2\" width=\"8\" height=\"20\" fill=\"#8a6a3b\"/><path d=\"M10.5 4 V20 M13.5 5 V19\" stroke=\"#5e4424\" stroke-width=\"1\"/>",
+  "stem_HC": "<circle cx=\"12\" cy=\"12\" r=\"9\" fill=\"#c9b08a\"/><circle cx=\"12\" cy=\"12\" r=\"5\" fill=\"#fff\"/>",
+  "stem_TR": "<path d=\"M12 3 L21.5 20 H2.5Z\" fill=\"#3C9D5B\"/>",
+  "stem_RO": "<circle cx=\"12\" cy=\"12\" r=\"9\" fill=\"#3C9D5B\"/>",
+  "stem_HB": "<path d=\"M12 3 V21\" stroke=\"#3C9D5B\" stroke-width=\"3.4\"/><path d=\"M12 9 l7 -3 M12 15 l-7 -3\" stroke=\"#3C9D5B\" stroke-width=\"2.2\"/>",
+  "stem_FL": "<path d=\"M2 14 q3 -3 6 0 t6 0 t6 0\" stroke=\"#2B7BBF\" stroke-width=\"2.4\" fill=\"none\"/>"
+ },
+ "flowerHex": {
+  "white": "#f3f3ee",
+  "yellow": "#F6B800",
+  "orange": "#F28C28",
+  "red": "#D6342C",
+  "pink": "#E87AA6",
+  "magenta": "#C2308A",
+  "blue-violet": "#6B5BD2",
+  "blue-purple": "#7A4FC0",
+  "cream": "#F1E6C3",
+  "red-orange": "#E4572E",
+  "red-yellow": "#E0702B"
+ }
+}
