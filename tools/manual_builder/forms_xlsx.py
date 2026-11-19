@@ -62,8 +62,8 @@ def write_forms_xlsx(path, docs, tasks, forms, sys_name, freq_order, blue="03467
         for t in ts:
             ms = parse_months(t["months"]); vals = [t["primary"], f'{t["id"]} {t["name"]}', t["component"]]
             for c, v in enumerate(vals, 1): x = ws.cell(row=r, column=c, value=v); x.border = B; x.alignment = Alignment(wrap_text=True, vertical="top")
-            if t["primary"] == "Routine" or not ms:
-                ws.merge_cells(start_row=r, start_column=4, end_row=r, end_column=15); x = ws.cell(row=r, column=4, value="at every scheduled visit" if t["primary"] == "Routine" else "as needed"); x.alignment = Alignment(horizontal="center"); x.font = Font(italic=True, color="566A7F")
+            if t["primary"] == "Routine visit" or not ms:
+                ws.merge_cells(start_row=r, start_column=4, end_row=r, end_column=15); x = ws.cell(row=r, column=4, value="at every scheduled visit" if t["primary"] == "Routine visit" else "as needed"); x.alignment = Alignment(horizontal="center"); x.font = Font(italic=True, color="566A7F")
                 for c in range(4, 16): ws.cell(row=r, column=c).border = B
             else:
                 for i in range(12): x = ws.cell(row=r, column=4 + i, value="x" if i in ms else ""); x.border = B; x.alignment = Alignment(horizontal="center")
@@ -76,7 +76,7 @@ def write_forms_xlsx(path, docs, tasks, forms, sys_name, freq_order, blue="03467
         for c, w in zip(["A", "B", "C"], (22, 44, 18)): ws.column_dimensions[c].width = w
         for i in range(12): ws.column_dimensions[get_column_letter(4 + i)].width = 5
         ws.column_dimensions[get_column_letter(n)].width = 60; ws.freeze_panes = "D8"; setup(ws)
-    for code, ttl in (("VTS_F05", "Corrective Maintenance Log"), ("VTS_F06", "Maintenance Log")):
+    for code, ttl in (("VTS_F05", "Corrective Maintenance Log"), ("VTS_F06", "Site History")):
         cols = [(c, w) for f, o, c, w in forms if f == code]; ws = wb.create_sheet(code); title(ws, code, ttl, len(cols))
         keys(ws, 4, [("VTS name", ""), ("VTS type", ""), ("Supervisor", "")], len(cols))
         for r in range(4, 7): ws.merge_cells(start_row=r, start_column=2, end_row=r, end_column=len(cols))
@@ -86,4 +86,14 @@ def write_forms_xlsx(path, docs, tasks, forms, sys_name, freq_order, blue="03467
             for c in range(1, len(cols) + 1): x = ws.cell(row=r, column=c); x.border = B; x.alignment = Alignment(wrap_text=True, vertical="top")
         for i, (c, w) in enumerate(cols, 1): ws.column_dimensions[get_column_letter(i)].width = max(w * 4.2, 12)
         ws.freeze_panes = "A9"; setup(ws)
+    # VTS_F07 Site Card: una página que se queda con los site partners
+    ws = wb.create_sheet("VTS_F07"); title(ws, "VTS_F07", "Site Card", 2)
+    rows_ = [("System name and type", ""), ("What it does", "Cleans the water that leaves the fields before it reaches creeks, sloughs, and the bay."),
+             ("Please do not", "☐ spray it   ☐ disk or grade it   ☐ dump soil, weeds, or crop waste in it   ☐ drive through it   ☐ move fences or markers"),
+             ("Please tell us if", "water is not reaching it, a pump stops, a berm breaks, or you plan work next to it."), ("Who to call (name, phone)", ""), ("Pump: owner and contact", ""),
+             ("Access and food safety rules for visitors", ""), ("Planned visits this year", ""), ("Site partners (who to keep informed)", "")]
+    for i, (k, v) in enumerate(rows_, 4):
+        a = ws.cell(row=i, column=1, value=k); b = ws.cell(row=i, column=2, value=v); ws.row_dimensions[i].height = 42
+        a.font = Font(bold=True); a.border = B; b.border = B; a.alignment = Alignment(wrap_text=True, vertical="top"); b.alignment = Alignment(wrap_text=True, vertical="top")
+    ws.column_dimensions["A"].width = 34; ws.column_dimensions["B"].width = 100; setup(ws)
     wb.save(path); return path

@@ -9,3 +9,6 @@ output/
 # Kept local for now (not public): internal handoffs and review files
 dev/
 review/
+
+# Private notes split out of the public Excel files (interviewee codes, open questions)
+private/

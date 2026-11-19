@@ -42,7 +42,7 @@ def write_checklist_xlsx(system, items, sys_name, sys_color, tasks, site_params,
             for c in range(1, 13): ws.cell(row=rr, column=c).border = B
         HR = 9 + len(site_params) + 1
     # encabezado de tabla
-    heads = ["#", "Item", "OK", "Abn.", "N/A", "R", "A", "S", "If abnormal", "Go to task", "Photo", "Notes"]
+    heads = ["#", "Item", "OK", "Abn.", "N/A", "R", "A", "P", "If abnormal", "Go to task", "Photo", "Notes"]
     for c, h in enumerate(heads, 1):
         cell = ws.cell(row=HR, column=c, value=h); cell.font = Font(name=FH, bold=True, size=10, color="FFFFFF"); cell.fill = fill(blue); cell.border = B
         cell.alignment = Alignment(horizontal="left" if c in (2, 9, 10, 12) else "center", vertical="center")
@@ -59,7 +59,7 @@ def write_checklist_xlsx(system, items, sys_name, sys_color, tasks, site_params,
         look = it["look"] + (f"\nNormal: {it['normal']}" if it["normal"] else "")
         ws.cell(row=r, column=2).value = CellRichText(TextBlock(InlineFont(rFont=FN, b=True, sz=10), it["question"]), "\n", TextBlock(InlineFont(rFont=FN, sz=8.5, color="566A7F"), look))
         for c in (3, 4, 5): ws.cell(row=r, column=c, value=BOX)
-        for c, (code, v) in zip((6, 7, 8), (("R", "Routine"), ("A", "After storm"), ("S", "Seasonal"))):
+        for c, (code, v) in zip((6, 7, 8), (("R", "Routine"), ("A", "After storm"), ("P", "Pre-storm"))):
             cell = ws.cell(row=r, column=c)
             if v in it["visits"]: cell.value = code; cell.fill = fill(blue); cell.font = Font(name=FH, bold=True, color="FFFFFF", size=10)
             else: cell.value = "·"; cell.font = Font(color="B9C8D8")
@@ -84,15 +84,15 @@ def write_checklist_xlsx(system, items, sys_name, sys_color, tasks, site_params,
         ws.cell(row=r, column=3).font = Font(name="Segoe UI Symbol", size=13, color=blue); ws.cell(row=r, column=3).alignment = Alignment(horizontal="center"); r += 1
     last = r - 1
     ws.merge_cells(start_row=r + 1, start_column=1, end_row=r + 1, end_column=12)
-    ws.cell(row=r + 1, column=1, value="Visit: R = Routine · A = After storm · S = Seasonal. Observe and document; do only the small actions listed. DRAFT: what \"normal\" looks like and the site-specific values are still to be confirmed.").font = Font(name=FN, italic=True, size=8.5, color="566A7F")
+    ws.cell(row=r + 1, column=1, value="Visit: R = Routine · A = After storm · P = Pre-storm (August). Observe and document; do only the small actions listed.").font = Font(name=FN, italic=True, size=8.5, color="566A7F")
     # validaciones y formato condicional
     dv = DataValidation(type="list", formula1=f'"{BOX},{OFF}"', allow_blank=False); ws.add_data_validation(dv)
     dv.add(f"C{first}:E{last}"); dv.add(f"K{first}:K{last}")
-    dvv = DataValidation(type="list", formula1='"Routine,After storm,Seasonal"', allow_blank=True); ws.add_data_validation(dvv); dvv.add("J5")
+    dvv = DataValidation(type="list", formula1='"Routine,After storm,Pre-storm"', allow_blank=True); ws.add_data_validation(dvv); dvv.add("J5")
     rng = f"A{first}:L{last}"
     ws.conditional_formatting.add(rng, FormulaRule(formula=[f'$D{first}="{OFF}"'], fill=fill("F8D3CC")))
     ws.conditional_formatting.add(rng, FormulaRule(formula=[f'$C{first}="{OFF}"'], fill=fill("D9EFDD")))
-    ws.conditional_formatting.add(f"B{first}:E{last}", FormulaRule(formula=[f'AND($J$5<>"",OR(AND($J$5="Routine",$F{first}<>"R"),AND($J$5="After storm",$G{first}<>"A"),AND($J$5="Seasonal",$H{first}<>"S")),$F{first}<>"")'], font=Font(color="A0A0A0")))
+    ws.conditional_formatting.add(f"B{first}:E{last}", FormulaRule(formula=[f'AND($J$5<>"",OR(AND($J$5="Routine",$F{first}<>"R"),AND($J$5="After storm",$G{first}<>"A"),AND($J$5="Pre-storm",$H{first}<>"P")),$F{first}<>"")'], font=Font(color="A0A0A0")))
     item_rng = f"C{first}:E{close0 - 2}"
     ws["A7"] = (f'="Answered: "&COUNTIF({item_rng},"{OFF}")&"     Abnormal: "&COUNTIF(D{first}:D{close0 - 2},"{OFF}")&"     Abnormal without photo: "&SUMPRODUCT((D{first}:D{close0 - 2}="{OFF}")*(K{first}:K{close0 - 2}<>"{OFF}"))')
     ws.freeze_panes = f"A{HR + 1}"; ws.page_setup.orientation = "landscape"; ws.page_setup.fitToWidth = 1; ws.page_setup.fitToHeight = 0; ws.sheet_properties.pageSetUpPr.fitToPage = True

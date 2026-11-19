@@ -22,11 +22,11 @@ def parse_flow(spec):
         assert a in nodes and b in nodes, f"nodo sin definir: {a} / {b}"
     return nodes, edges
 
-def to_dot(nodes, edges, width=30):
-    L = ['digraph G {', f'graph [rankdir=TB, nodesep=0.28, ranksep=0.24, pad=0.08, bgcolor="transparent", splines=spline];',
+def to_dot(nodes, edges, width=34):
+    L = ['digraph G {', f'graph [rankdir=TB, nodesep=0.22, ranksep=0.2, pad=0.08, bgcolor="transparent", splines=spline];',
          f'node [fontname="{FONT}", fontsize=10.5, margin="0.11,0.05"]; edge [fontname="{FONT}", fontsize=9, arrowsize=0.7, color="{BLUE}", penwidth=1.3];']
     for k, (kind, label) in nodes.items():
-        lab = "\\n".join(textwrap.wrap(label, 19 if kind == "decision" else width)).replace('"', "'")
+        lab = "\\n".join(textwrap.wrap(label, 23 if kind == "decision" else width)).replace('"', "'")
         if kind in ("start", "end"): L.append(f'{k} [label="{lab}", shape=box, style="rounded,filled", fillcolor="{BLUE}", color="{BLUE}", fontcolor="white", fontname="{FONT} Bold"];')
         elif kind == "decision": L.append(f'{k} [label="{lab}", shape=diamond, style=filled, fillcolor="{YELLOW}", color="#B88A00", fontcolor="#3A2A00", margin="0.02,0.02"];')
         elif kind == "notify": L.append(f'{k} [label="{lab}", shape=box, style="rounded,filled", fillcolor="{RED_L}", color="{RED}", fontcolor="#7A1F10", penwidth=1.4];')
@@ -34,6 +34,15 @@ def to_dot(nodes, edges, width=30):
     for a, b, lab in edges:
         col = "#2F8F4E" if lab == "YES" else RED if lab == "NO" else BLUE
         L.append(f'{a} -> {b} [' + (f'label=<<B> {lab} </B>>, fontcolor="{col}", color="{col}"' if lab else '') + '];')
+    # ramas cortas al lado de la decisión (misma fila): el diagrama queda más bajo y la letra más grande
+    succ = {}
+    for a, b, _ in edges: succ.setdefault(a, []).append(b)
+    used = set()
+    for k, (kind, _) in nodes.items():
+        if kind != "decision" or len(succ.get(k, [])) != 2: continue
+        x, y = succ[k]
+        side = x if y in succ.get(x, []) else y if x in succ.get(y, []) else None
+        if side and side not in used and nodes[side][0] != "decision": L.append(f"{{rank=same; {k}; {side};}}"); used.add(side)
     L.append("}"); return "\n".join(L)
 
 def render_flow(spec, out_base, formats=("svg", "png")):
