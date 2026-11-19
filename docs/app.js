@@ -10,10 +10,11 @@ const el=(t,a={},h="")=>{const e=document.createElement(t);for(const k in a)e.se
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
 /* routing */
-const ROUTES=["home","start","maintain","request","learn","tool"];
+const ROUTES=["home","start","maintain","request","learn","tool","phone"];
 function route(){const parts=(location.hash||"#home").slice(1).split("/");const r=ROUTES.includes(parts[0])?parts[0]:"home";
   if(r==="learn"&&window.learnRoute)window.learnRoute(parts.slice(1));
   if(r==="tool"&&window.toolRoute)window.toolRoute(parts.slice(1));
+  if(r==="phone"&&window.ToolPlan)window.ToolPlan.phone(parts.slice(1).join("/"));
   $$("section.view").forEach(v=>v.classList.toggle("on",v.id==="v-"+r));
   $$("nav.main a").forEach(a=>{const on=a.dataset.r===r||(r==="request"&&a.dataset.r==="maintain");on?a.setAttribute("aria-current","page"):a.removeAttribute("aria-current")});
   window.scrollTo(0,0);

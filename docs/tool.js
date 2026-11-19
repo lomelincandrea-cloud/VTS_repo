@@ -39,7 +39,7 @@
     else if (which === "vts") myVts();
     else if (which === "plan" && window.ToolPlan) window.ToolPlan.plan(a, parts[2]);
     else if (which === "visit" && window.ToolPlan) { qa("#toolTabs a").forEach(x => x.dataset.t === "plan" ? x.setAttribute("aria-current", "page") : 0); window.ToolPlan.visit(a); }
-    else if (which === "visits") later("Next visits", "The scheduled visits with their tasks, each linked to the manual, and the checklist sent to the operator's phone.", "4c");
+    else if (which === "visits" && window.ToolPlan) window.ToolPlan.next(a);
     else if (which === "dashboard") later("Dashboard and reports", "One card per indicator of the Monitoring framework, and the Food Safety Record and Water Quality and Maintenance Summary exports.", "4d");
   };
   function gate() {
@@ -172,7 +172,7 @@
   }
 
   /* shared with tool_plan.js */
-  window.ToolKit = {q, qa, esc, COLOR, NAME, view, today, openDlg: (...a) => openDlg(...a), reasonDlg: (...a) => reasonDlg(...a), bar: () => bar(St.session()), lastVisit, nextPlanned};
+  window.ToolKit = {q, qa, esc, COLOR, NAME, view, today, openDlg: (...a) => openDlg(...a), reasonDlg: (...a) => reasonDlg(...a), bar: () => bar(St.session()), lastVisit, nextPlanned, paramValue};
 
   /* ---------- dialogs ---------- */
   const dlg = () => q("#toolDlg");

@@ -335,3 +335,11 @@ th{font-stretch:normal}
 .t-item-q .t-seg{margin:.35rem 0}
 .t-req{border-color:var(--alert)}
 #vf fieldset p{margin:.4rem 0 .2rem}
+
+/* Tool 4c: next visits, send to phone, phone page */
+.t-nv{display:grid;grid-template-columns:minmax(0,1fr);gap:.4rem}
+.t-nvd{font-family:var(--head);font-size:1.15rem;color:var(--water)}
+.t-qr{display:flex;justify-content:center;padding:.5rem;background:#fff;border-radius:12px;margin:.5rem 0}
+.t-qr img,.t-qr canvas{max-width:100%;height:auto}
+.t-done{border:2px solid var(--field);margin-bottom:1rem}
+#v-phone .wrap{max-width:720px;padding-top:1rem}

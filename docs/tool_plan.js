@@ -126,15 +126,20 @@ window.ToolPlan = (function () {
     if (!v) { K().view().innerHTML = `<p>Visit not found. <a href="#tool/plan">Back to the plan</a></p>`; return; }
     const s = St.site(v.site);
     if (v.status === "closed") return closedView(s, v);
+    renderForm(s, v, {mode: "tool", box: () => K().view(), save: () => St.put("visits", v), again: () => visit(id)});
+  }
+  /* The Visit Sheet form. o.mode "tool" (supervisor, store) or "phone" (field page, saved on the phone). */
+  function renderForm(s, v, o) {
+    const id = v.id, phone = o.mode === "phone";
     const f = v.form = v.form || {items: {}, water: {kit: "strip-n"}};
     const chkType = v.type === "Spring" ? "Routine" : v.type;
     const items = L.checklist.filter(i => i.sys === s.type && i.vis.includes(chkType));
     const nitrate = nitrateSys(s.type), kit = KITS[f.water.kit || "strip-n"], pp = (s.params || {}).photo_points;
     const mowTask = v.tasks_planned.some(t => /_T03$/.test(t) && /Vegetation Maintenance/.test((taskBy(t) || {}).name || ""));
     let sec = "";
-    K().view().innerHTML = `
-      <p><a href="#tool/plan/${s.id}/${v.date.slice(0, 4)}">← Yearly plan</a></p>
-      <div class="t-card"><div class="t-band" style="background:${K().COLOR[s.type]}"><span>Visit Sheet · ${esc(s.type)}_F04</span><span class="l-sp"></span><span class="l-chip y">Draft</span></div>
+    o.box().innerHTML = `
+      ${phone ? "" : `<p><a href="#tool/plan/${s.id}/${v.date.slice(0, 4)}">← Yearly plan</a> · <a href="#tool/visits">← Next visits</a></p>`}
+      <div class="t-card"><div class="t-band" style="background:${K().COLOR[s.type]}"><span>Visit Sheet · ${esc(s.type)}_F04</span><span class="l-sp"></span><span class="l-chip y">${phone ? "On this phone" : "Draft"}</span></div>
       <form id="vf" class="t-head stack" novalidate>
         <h2 class="l-title" style="margin:0">${esc(s.name)}</h2>
         <div class="grid3"><div class="f"><label>Date</label><input type="date" name="date" value="${v.date}"></div>
@@ -171,16 +176,21 @@ window.ToolPlan = (function () {
           <div class="grid3"><div class="f"><label>Crew size</label><input type="number" min="1" name="crew" value="${v.crew_size ?? ""}"></div><div class="f"><label>Hours on site</label><input type="number" min="0" step="0.25" name="hours" value="${v.hours_on_site ?? ""}"></div></div>
           <div class="f"><label>What was done; observations</label><textarea name="notes">${esc(v.notes || "")}</textarea></div></fieldset>
         <div id="vMissing"></div>
-        <div class="row"><button class="btn" type="button" id="vClose">Close the visit</button><button class="btn ghost" type="button" id="vDel">Delete this draft</button><span class="l-src">Saved as you go (draft).</span></div>
+        ${phone ? `<div class="row"><button class="btn" type="button" id="vClose">Finish and send back</button><span class="l-src">Saved on this phone as you go.</span></div>`
+                : `<div class="row"><button class="btn" type="button" id="vClose">Close the visit</button><button class="btn ghost" type="button" id="vSend">Send to phone</button><label class="btn ghost" for="vImp">Import results from the phone</label><input type="file" id="vImp" accept=".json,application/json" hidden><button class="btn ghost" type="button" id="vDel">Delete this draft</button></div><p class="l-src">Saved as you go (draft).</p><div id="vImpMsg"></div>`}
       </form></div>`;
-    const form = q("#vf");
-    const save = () => { readForm(v, form); St.put("visits", v); };
-    form.addEventListener("change", e => { save(); if (e.target.name === "type" || e.target.name === "kit") visit(id); });
+    const root = o.box(), form = q("#vf", root), Q = sel => q(sel, root);
+    const save = () => { readForm(v, form); o.save(); };
+    form.addEventListener("change", e => { if (e.target.id === "vImp") return; save(); if (e.target.name === "type" || e.target.name === "kit") o.again(); });
     form.addEventListener("input", e => { if (e.target.matches("input[type=text],input:not([type]),textarea,input[type=number]")) save(); });
-    qa("[data-ans]", form).forEach(b => b.onclick = () => { const it = b.closest("[data-item]").dataset.item; f.items[it] = {...(f.items[it] || {}), a: b.dataset.ans}; save(); visit(id); });
-    qa("[data-yn]", form).forEach(b => b.onclick = () => { const k = b.dataset.yn, val = b.dataset.v === "yes"; setYn(v, k, val); St.put("visits", v); visit(id); });
-    q("#vDel").onclick = () => { if (confirm("Delete this draft visit?")) { St.remove("visits", id); location.hash = `#tool/plan/${s.id}/${v.date.slice(0, 4)}`; } };
-    q("#vClose").onclick = () => { save(); const miss = missing(s, v); if (miss.length) { q("#vMissing").innerHTML = `<div class="l-warn"><b>Before closing, complete:</b><ul>${miss.map(m => `<li>${esc(m)}</li>`).join("")}</ul></div>`; q("#vMissing").scrollIntoView({block: "center"}); return; } closeVisit(s, v); visit(id); };
+    qa("[data-ans]", form).forEach(b => b.onclick = () => { const it = b.closest("[data-item]").dataset.item; f.items[it] = {...(f.items[it] || {}), a: b.dataset.ans}; save(); o.again(); });
+    qa("[data-yn]", form).forEach(b => b.onclick = () => { const k = b.dataset.yn, val = b.dataset.v === "yes"; setYn(v, k, val); o.save(); o.again(); });
+    const miss = () => { const m = missing(s, v); if (!m.length) return false; Q("#vMissing").innerHTML = `<div class="l-warn"><b>Before ${phone ? "sending" : "closing"}, complete:</b><ul>${m.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>`; Q("#vMissing").scrollIntoView({block: "center"}); return true; };
+    if (phone) { Q("#vClose").onclick = () => { save(); if (!miss()) o.finish(); }; return; }
+    Q("#vDel").onclick = () => { if (confirm("Delete this draft visit?")) { St.remove("visits", id); location.hash = `#tool/plan/${s.id}/${v.date.slice(0, 4)}`; } };
+    Q("#vClose").onclick = () => { save(); if (miss()) return; closeVisit(s, v); visit(id); };
+    Q("#vSend").onclick = () => sendDlg(s, v);
+    Q("#vImp").onchange = e => importResults(s, v, e.target.files[0]);
   }
   const yn = (k, val) => `<span class="t-seg" role="group">${[["yes", "Yes"], ["no", "No"]].map(([x, n]) => `<button type="button" data-yn="${k}" data-v="${x}" aria-pressed="${val === (x === "yes")}">${n}</button>`).join("")}</span>`;
   function setYn(v, k, val) {
@@ -320,5 +330,105 @@ window.ToolPlan = (function () {
       q("#toolDlg").close(); visit(v.id);
     };
   }
-  return {plan, visit};
+  /* ================= Next visits ================= */
+  function upcoming() {
+    const t = K().today(), y = +t.slice(0, 4), horizon = new Date(Date.now() + 120 * 864e5).toISOString().slice(0, 10), out = [];
+    St.sites().filter(s => s.status !== "decommissioned").forEach(s => St.data.annual_plans.filter(p => p.site === s.id && (p.year === y || p.year === y + 1)).forEach(p => p.planned_visits.forEach(pv => {
+      const rec = St.visitsOf(s.id).find(v => v.planned_id === pv.id || (v.date === pv.date && v.type === pv.type) || v.date === pv.date);
+      if (rec && rec.status === "closed") return;
+      const status = rec ? "In progress" : pv.date < t ? "Overdue" : "Planned";
+      if (status === "Planned" && pv.date > horizon) return;
+      if (status === "Overdue" && pv.date.slice(0, 4) !== String(y)) return;
+      out.push({s, p, pv, rec, status});
+    })));
+    return out.sort((a, b) => a.pv.date.localeCompare(b.pv.date));
+  }
+  function next(filter) {
+    const list = upcoming().filter(x => !filter || x.s.id === filter);
+    const sites = St.sites().filter(s => s.status !== "decommissioned");
+    K().view().innerHTML = `<div class="l-row"><h2 style="margin:0">Next visits</h2><span class="l-sp"></span>
+        <label class="l-lab">VTS <select id="nSite"><option value="">All</option>${sites.map(s => `<option value="${s.id}"${s.id === filter ? " selected" : ""}>${esc(s.name)}</option>`).join("")}</select></label></div>
+      <p class="muted">Visits of the approved and draft yearly plans for the next four months, and any planned visit not recorded yet. Each task links to the manual.</p>
+      ${list.length ? list.map(x => { const tasks = [...chosen(x.s.type, x.pv), ...x.pv.extra_tasks.map(e => e.task || "+" + e.text)], d = new Date(x.pv.date + "T12:00:00");
+        return `<div class="panel t-nv"><div class="l-row"><b class="t-nvd">${d.toLocaleDateString("en-US", {weekday: "short", month: "short", day: "numeric", year: "numeric"})}</b>
+          <span class="l-chip ${x.status === "Overdue" ? "r" : x.status === "In progress" ? "y" : "g"}">${x.status}</span><span class="l-sp"></span><span class="sdot" style="background:${K().COLOR[x.s.type]}"></span><a href="#tool/vts/${x.s.id}">${esc(x.s.name)}</a></div>
+          <p><b>${esc(x.pv.type)}</b> visit${x.p.status === "draft" ? ' <span class="l-src">(plan still a draft)</span>' : ""}</p>
+          <ul class="t-tasks">${tasks.map(t => `<li>${t[0] === "+" ? `<span class="l-chip y">Extra</span> ${esc(t.slice(1))}` : taskLink(t)}</li>`).join("") || "<li class='l-src'>No tasks chosen.</li>"}</ul>
+          <div class="row"><button class="btn sm" type="button" data-open="${x.pv.id}" data-site="${x.s.id}">${x.rec ? "Continue the Visit Sheet" : "Open the Visit Sheet"}</button><button class="btn ghost sm" type="button" data-send="${x.pv.id}" data-site="${x.s.id}">Send to phone</button></div></div>`; }).join("")
+        : `<div class="panel"><p>No visits in the next four months.</p><p class="l-src">Plan next year in the <a href="#tool/plan">Yearly plan</a>.</p></div>`}`;
+    q("#nSite").onchange = e => next(e.target.value);
+    const find = b => list.find(x => x.pv.id === b.dataset.open || x.pv.id === b.dataset.send);
+    qa("[data-open]").forEach(b => b.onclick = () => { const x = find(b); const v = x.rec || startVisit(x.s, x.pv); location.hash = "#tool/visit/" + v.id; });
+    qa("[data-send]").forEach(b => b.onclick = () => { const x = find(b); sendDlg(x.s, {date: x.pv.date, type: x.pv.type, planned_id: x.pv.id, tasks_planned: [...chosen(x.s.type, x.pv), ...x.pv.extra_tasks.map(e => e.task || "+" + e.text)]}); });
+  }
+
+  /* ================= Send to phone (no server: the visit travels inside the link) ================= */
+  const b64e = s => btoa(unescape(encodeURIComponent(s))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  const b64d = s => decodeURIComponent(escape(atob(s.replace(/-/g, "+").replace(/_/g, "/"))));
+  function payload(s, v) {
+    return {v: 1, org: St.data.organization.name, s: {id: s.id, name: s.name, type: s.type, params: s.params || {}}, d: v.date, vt: v.type, pid: v.planned_id || null, tasks: v.tasks_planned || []};
+  }
+  function linkFor(s, v) { return location.href.split("#")[0] + "#phone/" + b64e(JSON.stringify(payload(s, v))); }
+  function sendDlg(s, v) {
+    const url = linkFor(s, v);
+    K().openDlg(`<h3>Send to phone</h3><p>${esc(s.name)} · ${esc(v.type)} visit · ${esc(v.date)}</p>
+      <div class="t-qr" id="sQr" aria-label="QR code with the link"></div>
+      <div class="f"><label for="sUrl">Link for the operator's phone</label><input id="sUrl" readonly value="${esc(url)}"></div>
+      <div class="row"><button class="btn sm" type="button" id="sCopy">Copy link</button>${navigator.share ? `<button class="btn ghost sm" type="button" id="sShare">Share…</button>` : ""}<a class="btn ghost sm" href="${esc(url)}" target="_blank" rel="noopener">Open it here</a></div>
+      <p class="l-src">The phone opens the Visit Sheet with the tasks and Site Conditions already filled in. The link carries this visit's checklist (no exact location), so share it only with the crew.
+        Answers stay on that phone until the operator taps "Finish and send back" and sends you the results file; then use "Import results from the phone" on this Visit Sheet.</p>`);
+    q("#sUrl").onfocus = e => e.target.select();
+    q("#sCopy").onclick = async () => { try { await navigator.clipboard.writeText(url); q("#sCopy").textContent = "Copied"; } catch (e) { q("#sUrl").select(); document.execCommand("copy"); q("#sCopy").textContent = "Copied"; } };
+    if (q("#sShare")) q("#sShare").onclick = () => navigator.share({title: `Visit Sheet: ${s.name}`, text: `${v.type} visit on ${v.date}`, url}).catch(() => {});
+    qr(q("#sQr"), url);
+  }
+  function qr(box, url) {
+    const draw = () => { try { box.innerHTML = ""; new window.QRCode(box, {text: url, width: 220, height: 220, correctLevel: window.QRCode.CorrectLevel.L}); } catch (e) { box.innerHTML = '<p class="l-src">The link is too long for a QR code. Copy or share it instead.</p>'; } };
+    if (window.QRCode) return draw();
+    const sc = document.createElement("script"); sc.src = "https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js";
+    sc.onload = draw; sc.onerror = () => { box.innerHTML = '<p class="l-src">The QR code could not load. Copy or share the link instead.</p>'; }; document.head.appendChild(sc);
+  }
+
+  /* ================= Phone page (#phone/<payload>) ================= */
+  function phone(code) {
+    const box = q("#phoneView");
+    let p;
+    try { p = JSON.parse(b64d(code || "")); } catch (e) { box.innerHTML = `<div class="panel"><h2>This link is not complete</h2><p>Ask the supervisor to send the visit again.</p></div>`; return; }
+    const key = "vts_phone_" + (p.pid || p.s.id + "_" + p.d);
+    let v; try { v = JSON.parse(localStorage.getItem(key) || "null"); } catch (e) { v = null; }
+    v = v || {id: "PHONE-" + (p.pid || p.d), site: p.s.id, date: p.d, type: p.vt, status: "draft", planned_id: p.pid, tasks_planned: p.tasks, tasks_done: [], mowing: null, photos: [], all_photo_points_taken: null,
+              crew_size: null, hours_on_site: null, hours_crew_total: null, last_rain: null, notes: "", form: {items: {}, water: {kit: "strip-n"}, water_at_inlet: null}};
+    const store = () => { try { localStorage.setItem(key, JSON.stringify(v)); } catch (e) {} };
+    const s = p.s, conds = (L.siteParams && L.siteParams[s.type] || []).map(f => [f.field, K().paramValue(s.params, f.field)]).filter(([, x]) => x && x !== "see Design");
+    const again = () => { renderForm(s, v, {mode: "phone", box: () => q("#phoneView #phoneForm"), save: store, again, finish}); };
+    function finish() {
+      const out = {kind: "vts-visit-results", version: 1, exported_at: new Date().toISOString().slice(0, 19), ref: {site: s.id, site_name: s.name, planned_id: p.pid, date: v.date, type: v.type},
+                   visit: {date: v.date, type: v.type, last_rain: v.last_rain, tasks_done: v.tasks_done, mowing: v.mowing, all_photo_points_taken: v.all_photo_points_taken, crew_size: v.crew_size, hours_on_site: v.hours_on_site, notes: v.notes, form: v.form}};
+      const name = `visit_${s.id}_${v.date}.json`, blob = new Blob([JSON.stringify(out, null, 1)], {type: "application/json"}), file = new File([blob], name, {type: "application/json"});
+      q("#phoneView #phoneForm").insertAdjacentHTML("afterbegin", `<div class="panel stack t-done"><h3>Ready to send back</h3><p>Send this results file to your supervisor. They import it into the Visit Sheet and close the visit.</p>
+        <div class="row">${navigator.canShare && navigator.canShare({files: [file]}) ? `<button class="btn" type="button" id="phShare">Share the results</button>` : ""}<a class="btn ghost" id="phDl" download="${name}">Download the results file</a></div>
+        <p class="l-src">Your answers stay on this phone, so you can send them again.</p></div>`);
+      q("#phoneView #phDl").href = URL.createObjectURL(blob);
+      if (q("#phoneView #phShare")) q("#phoneView #phShare").onclick = () => navigator.share({files: [file], title: `Visit results: ${s.name}`}).catch(() => {});
+      window.scrollTo(0, 0);
+    }
+    box.innerHTML = `<div class="stack"><p class="l-src">${esc(p.org || "")} · Visit Sheet for the field</p>
+      ${conds.length ? `<details class="panel"><summary><b>Site Conditions</b> (from the supervisor)</summary><table class="t-kv">${conds.map(([k, x]) => `<tr><th>${esc(k)}</th><td>${esc(x)}</td></tr>`).join("")}</table></details>` : ""}
+      <div id="phoneForm"></div></div>`;
+    again();
+  }
+  async function importResults(s, v, file) {
+    const msg = q("#toolView #vImpMsg");
+    try {
+      const r = JSON.parse(await file.text());
+      if (r.kind !== "vts-visit-results") throw new Error("This is not a results file from the Visit Sheet.");
+      if (r.ref.site !== s.id) throw new Error(`These results are for ${r.ref.site_name || r.ref.site}, not for ${s.name}.`);
+      const w = r.visit;
+      Object.assign(v, {date: w.date, type: w.type, last_rain: w.last_rain, tasks_done: w.tasks_done || [], mowing: w.mowing, all_photo_points_taken: w.all_photo_points_taken, crew_size: w.crew_size, hours_on_site: w.hours_on_site,
+                        hours_crew_total: w.crew_size && w.hours_on_site ? Math.round(w.crew_size * w.hours_on_site * 100) / 100 : null, notes: w.notes || "", form: w.form || v.form});
+      St.put("visits", v); visit(v.id);
+      q("#toolView #vImpMsg").innerHTML = `<p class="l-banner">Imported ${Object.keys((w.form || {}).items || {}).length} checklist answers from the phone (sent ${esc(r.exported_at.replace("T", " "))}). Check them, then close the visit.</p>`;
+    } catch (e) { msg.innerHTML = `<p class="l-warn">${esc(e.message || "The file could not be read.")}</p>`; }
+  }
+  return {plan, visit, next, phone};
 })();
