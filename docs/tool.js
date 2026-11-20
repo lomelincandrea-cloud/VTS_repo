@@ -20,7 +20,7 @@
   const DECOM = ["Replaced", "Removed", "Land use changed", "Agreement ended", "Other"];
   const view = () => q("#toolView");
   let map = null;
-  const today = () => new Date().toISOString().slice(0, 10);
+  const today = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };   /* local date */
 
   /* ---------- routing and session ---------- */
   window.toolRoute = async function (parts) {
@@ -42,7 +42,7 @@
     else if (which === "visit" && window.ToolPlan) { qa("#toolTabs a").forEach(x => x.dataset.t === "plan" ? x.setAttribute("aria-current", "page") : 0); window.ToolPlan.visit(a); }
     else if (which === "visits" && window.ToolPlan) window.ToolPlan.next(a);
     else if (which === "corrective" && window.ToolPlan) window.ToolPlan.corrective(a);
-    else if (which === "dashboard") later("Dashboard and reports", "One card per indicator of the Monitoring framework, and the Food Safety Record and Water Quality and Maintenance Summary exports.", "4d");
+    else if (which === "dashboard" && window.ToolDash) window.ToolDash.render(a);
   };
   function gate() {
     q("#toolGate").innerHTML = `<div class="panel stack t-gate"><h2>Sign in</h2>
@@ -57,9 +57,7 @@
     q("#tOut").onclick = () => { St.signOut(); window.toolRoute([]); };
     q("#tReset").onclick = () => { if (confirm("Go back to the original sample data? Your changes in this browser will be lost.")) { St.reset(); window.toolRoute(location.hash.slice(1).split("/").slice(1)); } };
   }
-  function later(title, what, step) {
-    view().innerHTML = `<div class="panel stack"><h2>${esc(title)}</h2><p>${esc(what)}</p><p class="small muted">Coming in step ${step} of the Tool. Until then, the <a href="#tool/old">earlier demo</a> shows a first version.</p></div>`;
-  }
+
 
   /* ---------- helpers ---------- */
   const lastVisit = id => { const v = St.visitsOf(id).filter(x => x.type !== "January review"); return v[v.length - 1] || null; };

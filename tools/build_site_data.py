@@ -7,6 +7,7 @@ Writes  docs/learn_data.js      window.VTS_LEARN = {...}   (the Tool keeps its o
         docs/img/manual/*        figures used by the topics
         docs/downloads/*         latest draft PDFs and Excel forms (marked DRAFT on the site)
         docs/tool/*.json         sample records and indicators for the Tool (copied from tools/report_templates)
+        docs/tool/templates, docs/tool/fonts   report templates and fonts, so the Tool prints the same reports
 
 Run from the repo root with the conda environment "vts" (Graphviz 'dot' must be on the PATH for the flow diagrams):
     python tools/build_site_data.py
@@ -181,6 +182,10 @@ for code, title, f, kind, what in (
 (DOCS / "tool").mkdir(exist_ok=True)
 shutil.copy(ROOT / "tools" / "report_templates" / "sample_data.json", DOCS / "tool" / "sample_data.json")
 shutil.copy(ROOT / "tools" / "report_templates" / "indicators.json", DOCS / "tool" / "indicators.json")
+# report templates and their fonts, so the Tool prints the same reports in the browser (rendered with Nunjucks)
+for sub, src, pat in (("templates", ROOT / "tools" / "report_templates", "*.html"), ("fonts", MB / "fonts", "*.ttf")):
+    (DOCS / "tool" / sub).mkdir(exist_ok=True)
+    for f in sorted(src.glob(pat)): shutil.copy(f, DOCS / "tool" / sub / f.name)
 
 data = {"built": date.today().isoformat(), "visits": VISIT_ORDER, "systems": SYS_NAME, "tasks": tasks, "groups": groups, "topics": topics,
         "checklist": checklist, "siteParams": site_params, "plants": plants, "watch": watch, "plantSources": plant_sources,

@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Report rules check</title>
+<style>body{font:15px/1.5 system-ui,sans-serif;margin:1rem;color:#1F2D3D;background:#fff}pre{white-space:pre-wrap;background:#F4F8FC;padding:1rem;border-radius:8px}</style></head>
+<body>
+<h1>Report rules: Python and browser give the same reports</h1>
+<p>Compares the reports made in the browser (report_model.js) with the ones made by report_model.py on the same sample data. Run by <code>tools/report_templates/check_js_port.py</code>. The "generated" date is left out.</p>
+<pre id="result">Running…</pre>
+<script src="../learn_data.js"></script>
+<script src="report_model.js"></script>
+<script>
+(async function () {
+  const out = document.getElementById("result");
+  try {
+    const [data, indicators, expected] = await Promise.all(["sample_data.json", "indicators.json", "crosscheck_expected.json"].map(f => fetch(f, {cache: "no-cache"}).then(r => r.json())));
+    const items = VTSReport.itemsFrom(window.VTS_LEARN.checklist);
+    const diffs = [];
+    const same = (a, b, path) => {
+      if (a === undefined) a = null; if (b === undefined) b = null;
+      if (typeof a === "number" && typeof b === "number") { if (a !== b && Math.abs(a - b) > 1e-9 * Math.max(1, Math.abs(a))) diffs.push(`${path}: python ${a} | js ${b}`); return; }
+      if (a === null || b === null || typeof a !== "object" || typeof b !== "object") { if (a !== b) diffs.push(`${path}: python ${JSON.stringify(a)} | js ${JSON.stringify(b)}`); return; }
+      if (Array.isArray(a) !== Array.isArray(b)) { diffs.push(`${path}: list vs object`); return; }
+      if (Array.isArray(a)) { if (a.length !== b.length) diffs.push(`${path}: python ${a.length} items | js ${b.length}`); for (let i = 0; i < Math.min(a.length, b.length); i++) same(a[i], b[i], `${path}[${i}]`); return; }
+      new Set([...Object.keys(a), ...Object.keys(b)]).forEach(k => same(a[k], b[k], `${path}.${k}`));
+    };
+    expected.forEach(e => {
+      const d = JSON.parse(JSON.stringify(data)); d.meta.generated_for_period = e.period;
+      const m = e.report === "food_safety" ? VTSReport.foodSafety(d, indicators, items, e.site, true) : VTSReport.waterSummary(d, indicators, items, e.site);
+      delete m.generated;
+      same(e.model, JSON.parse(JSON.stringify(m)), `${e.site} ${e.report} ${e.period.start}..${e.period.end}`);
+    });
+    out.textContent = diffs.length ? `FAIL ${diffs.length} differences in ${expected.length} reports\n` + diffs.slice(0, 40).join("\n") : `PASS ${expected.length} reports (5 sites x 2 reports x 2 periods) are identical`;
+  } catch (err) { out.textContent = "FAIL " + err.message; }
+})();
+</script>
+</body></html>

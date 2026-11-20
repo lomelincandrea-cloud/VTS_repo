@@ -21,6 +21,7 @@ The names are neutral and may change.
 | `report_model.py` | All the rules: nitrate units and evidence levels, strip ranges, same-method comparisons, targets, charts. The templates only print. |
 | `food_safety_record.html`, `water_summary.html`, `_style.html` | Templates (Jinja syntax that Nunjucks can also read, so the Tool can use the same files in the browser). A4, the manual's palette and fonts. |
 | `render_reports.py` | Renders HTML and PDF for each site and runs the checks. |
+| `check_js_port.py` | Checks that the Tool's copy of the rules (`docs/tool/report_model.js`) gives the same reports as `report_model.py`: every sample site, both reports, two periods. Runs the page `docs/tool/crosscheck.html` in headless Edge or Chrome. |
 | `report_coverage.md` | Every field in both reports, its source, and whether it is captured. |
 
 ## Render
@@ -49,4 +50,14 @@ Output goes to `output/` (not committed). The script ends with `ALL CHECKS PASSE
 - **Charts.** Points with dates, no smoothed or joined lines. Each method is its own series; laboratory and field checks are separate charts.
 - **Load.** A load or removal block appears only when laboratory results and flow for the same time exist.
 - **Privacy.** Shared exports never show the exact location (HUC-12 instead) or, by default, the project owner. The wildlife section of the Food Safety Record appears only if the project owner chooses. No crew names.
+- **Only closed visits** count. A Visit Sheet still being filled in is not a record yet.
+- **Status** of an indicator (Meets target, Below target, Not due yet, Field check only, Does not apply) comes only from the target written for it. No target: "Target not set". Nothing recorded: "No data recorded".
 - **Sample data** is labelled on every page.
+
+## The same rules in the Tool
+
+The Tool (Dashboard and reports) runs these rules in the browser with `docs/tool/report_model.js` and prints the same templates (copied to `docs/tool/templates` by `tools/build_site_data.py`, rendered with Nunjucks). Change a rule in **both** `report_model.py` and `report_model.js`, then run:
+
+```
+python check_js_port.py      # ends with PASS, or lists the differences
+```

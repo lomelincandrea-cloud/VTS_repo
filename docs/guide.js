@@ -49,7 +49,7 @@ window.VTSGuide = (function () {
       {icon: "sheet", title: "Next visits", text: "The visits coming up. Open the Visit Sheet to record a visit, or send it to the crew's phone.", href: "#tool/visits"},
       {icon: "phone", title: "Send to phone", text: "The crew opens the link or QR code, fills in the checklist in the field, and sends back a results file you import.", href: "#tool/visits"},
       {icon: "wrench", title: "Corrective log", text: "Every problem found. Schedule the repair into the plan, then record what was done and when.", href: "#tool/corrective"},
-      {icon: "chart", title: "Dashboard and reports", text: "How each system is doing, and the Food Safety Record and Water Quality and Maintenance Summary.", href: "#tool/dashboard", soon: true}],
+      {icon: "chart", title: "Dashboard and reports", text: "Every indicator against its target, for one VTS or all of them. Print the Food Safety Record and the Water Quality and Maintenance Summary, or download the change history.", href: "#tool/dashboard"}],
       "Tip: a draft saves as you go. Once a plan is approved or a visit is closed, every change asks for a reason and goes into the change history.");
   }
   return {learn, tool, render};

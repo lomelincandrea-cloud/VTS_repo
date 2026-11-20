@@ -9,6 +9,9 @@ Rules (COWORK 2026-11-19, Part 3):
 - Inlet minus outlet only between the SAME method at the SAME visit, labelled a rough comparison. Never a % removal.
 - No laboratory result for the year -> "No laboratory result recorded this year". Strips never stand in for it.
 - Anything not recorded prints "No data recorded".
+- Only closed visits count. A visit still being filled in (draft) is not a record yet.
+- Indicator status comes only from the target written for it (see STATUS); no target -> "Target not set".
+The Tool runs the same rules in the browser (docs/tool/report_model.js); check_js_port.py compares both.
 """
 import json, math
 from collections import defaultdict
@@ -22,6 +25,8 @@ EVIDENCE = {"test strip": "Field screening", "portable photometer": "Field measu
 SYS_NAME = {"SB": "Sediment basin", "TW": "Treatment wetland", "VD": "Vegetated ditch", "WB": "Woodchip bioreactor"}
 CONVERSION_NOTE = ("Nitrate as NO3 and nitrate-nitrogen as NO3-N are the same measurement in two units. NO3 = NO3-N x 4.43. "
                    "Values are shown as mg/L as NO3-N, with the NO3 equivalent in brackets.")
+STATUS = {"met": "Meets target", "not_met": "Below target", "target_not_set": "Target not set", "no_data": NO_DATA,
+          "not_due": "Not due yet", "not_rated": "Field check only", "not_applicable": "Does not apply"}
 BLUE, YELLOW, GREEN, RED, MUTED, LINE = "#03467E", "#F6B800", "#2F8F4E", "#B4361F", "#5B6E83", "#DBE5EF"
 
 
@@ -99,7 +104,7 @@ class Records:
         self.ind = {i["id"]: i for i in indicators}
         self.site = next(s for s in data["sites"] if s["id"] == site_id)
         p = data["meta"]["generated_for_period"]; self.start, self.end = p["start"], p["end"]; self.year = int(self.end[:4])
-        self.visits_all = sorted([v for v in data["visits"] if v["site"] == site_id], key=lambda v: v["date"])
+        self.visits_all = sorted([v for v in data["visits"] if v["site"] == site_id and v.get("status", "closed") == "closed"], key=lambda v: v["date"])
         self.visits = [v for v in self.visits_all if self.start <= v["date"] <= self.end]
         self.vid = {v["id"]: v for v in self.visits_all}
         self.meas_all = [m for m in data["measurements"] if m["visit"] in self.vid]
@@ -303,42 +308,53 @@ def water_summary(data, indicators, items, site_id, years=3):
     lab = lab_block(R, Y)
     rows = []
 
-    def add(iid, target, result, when, method, trend):
-        rows.append({"id": iid, "goal": R.ind[iid]["goal"], "indicator": R.ind[iid]["indicator"], "target": target, "result": result, "date": when, "method": method, "trend": trend})
+    def add(iid, target, result, when, method, trend, status):
+        rows.append({"id": iid, "goal": R.ind[iid]["goal"], "indicator": R.ind[iid]["indicator"], "target": target, "result": result, "date": when, "method": method, "trend": trend,
+                     "status": status, "status_text": STATUS[status]})
+    met = lambda ok: "met" if ok else "not_met"
 
     w = R.meas(ind="IND-01", year=Y)
     add("IND-01", "Water at the inlet and no shortcuts at every visit", f'{round(100 * sum(m["value_as_entered"] == "yes" for m in w) / len(w))} % of {len(w)} visits' if w else NO_DATA,
         R.mdate(w[-1]) if w else NO_DATA, "Visual check at each visit",
-        " · ".join(f'{y}: {round(100 * sum(m["value_as_entered"] == "yes" for m in R.meas(ind="IND-01", year=y)) / len(R.meas(ind="IND-01", year=y)))} %' for y in yrs if R.meas(ind="IND-01", year=y)) or NO_DATA)
+        " · ".join(f'{y}: {round(100 * sum(m["value_as_entered"] == "yes" for m in R.meas(ind="IND-01", year=y)) / len(R.meas(ind="IND-01", year=y)))} %' for y in yrs if R.meas(ind="IND-01", year=y)) or NO_DATA,
+        met(all(m["value_as_entered"] == "yes" for m in w)) if w else "no_data")
     sed = R.meas(ind="IND-02", year=Y); cl = p.get("cleanout_level_sediment")
     add("IND-02", f'Below the cleanout level ({cl["value"]} {cl["unit"]})' if cl else "Target not set",
         "; ".join(f'{m["point"]}: {m["value_as_entered"]} {m["unit_as_entered"]}' for m in sed) or NO_DATA, R.mdate(sed[0]) if sed else NO_DATA, "Marked rod at the reference points",
-        " · ".join(f'{y}: max {max(float(m["value_as_entered"]) for m in R.meas(ind="IND-02", year=y))} in' for y in yrs if R.meas(ind="IND-02", year=y)) or NO_DATA)
+        " · ".join(f'{y}: max {max(float(m["value_as_entered"]) for m in R.meas(ind="IND-02", year=y))} in' for y in yrs if R.meas(ind="IND-02", year=y)) or NO_DATA,
+        "target_not_set" if not cl else "no_data" if not sed else met(all(float(m["value_as_entered"]) < cl["value"] for m in sed)))
     jar = R.meas(ind="IND-03")
     add("IND-03", "Outlet jar clearer (yes)", next((m["value_as_entered"] for m in jar if R.mdate(m)[:4] == str(Y)), NO_DATA),
-        next((R.mdate(m) for m in jar if R.mdate(m)[:4] == str(Y)), NO_DATA), "Jars side by side, photographed", " · ".join(f'{R.mdate(m)[:4]}: {m["value_as_entered"]}' for m in jar) or NO_DATA)
+        next((R.mdate(m) for m in jar if R.mdate(m)[:4] == str(Y)), NO_DATA), "Jars side by side, photographed", " · ".join(f'{R.mdate(m)[:4]}: {m["value_as_entered"]}' for m in jar) or NO_DATA,
+        next((met(m["value_as_entered"] == "yes") for m in jar if R.mdate(m)[:4] == str(Y)), "no_data"))
     fs = R.meas(ind="IND-04", par="nitrate", year=Y); fc = comparisons(R, fs)
     add("IND-04", "Lower at the outlet (field check only)", "; ".join(f'{c["evidence"]}: {c["text"]}' for c in fc) or (NO_DATA if s["type"] != "SB" else "Not measured (a sediment basin is not built to remove nitrate)"),
-        R.mdate(fs[0]) if fs else NO_DATA, "; ".join(sorted({EVIDENCE[m["method"]] + " (" + m["method"] + ")" for m in fs})) or NO_DATA, "see field checks chart")
+        R.mdate(fs[0]) if fs else NO_DATA, "; ".join(sorted({EVIDENCE[m["method"]] + " (" + m["method"] + ")" for m in fs})) or NO_DATA, "see field checks chart",
+        "not_applicable" if s["type"] == "SB" else "not_rated" if fc else "no_data")
     add("IND-05", lab["target"], lab["verdict"] if not lab["comparisons"] else f'{lab["comparisons"][-1]["text"]}. {lab["verdict"]}',
-        lab["rows"][0]["date"] if lab["rows"] else NO_DATA, "Laboratory", " · ".join(f'{y}: {c["text"].split(" (")[0]}' for y in yrs for c in comparisons(R, R.meas(ind="IND-05", par="nitrate", year=y, method="laboratory"))) or NO_DATA)
+        lab["rows"][0]["date"] if lab["rows"] else NO_DATA, "Laboratory", " · ".join(f'{y}: {c["text"].split(" (")[0]}' for y in yrs for c in comparisons(R, R.meas(ind="IND-05", par="nitrate", year=y, method="laboratory"))) or NO_DATA,
+        "not_applicable" if s["type"] == "SB" else {"Inside the target": "met", "Outside the target": "not_met", "Target not set": "target_not_set"}.get(lab["verdict"], "no_data"))
     veg = {m["parameter"]: m for m in R.meas(ind="IND-06", year=Y)}; vt = p.get("vegetation_cover_target")
     add("IND-06", f'Cover at least {vt["min_percent"]} %' if vt else "Target not set",
         (f'{veg["vegetation_cover"]["value_as_entered"]} % cover (estimate); {veg["invasive_species_count"]["value_as_entered"]} invasive species' if veg else NO_DATA),
         R.mdate(veg["vegetation_cover"]) if veg else NO_DATA, "Vegetation survey with the Field Guide",
-        " · ".join(f'{y}: {m["value_as_entered"]} %' for y in yrs for m in R.meas(ind="IND-06", par="vegetation_cover", year=y)) or NO_DATA)
+        " · ".join(f'{y}: {m["value_as_entered"]} %' for y in yrs for m in R.meas(ind="IND-06", par="vegetation_cover", year=y)) or NO_DATA,
+        "target_not_set" if not vt else "no_data" if "vegetation_cover" not in veg else met(float(veg["vegetation_cover"]["value_as_entered"]) >= vt["min_percent"]))
     struct = food_safety(data, indicators, items, site_id)["structures"]
     add("IND-07", "All findings repaired before October 1", f'{struct["findings"]} findings; {struct["fixed_before_oct1"]} repaired before October 1' if struct["visit"] != NO_DATA else NO_DATA,
-        struct["visit"], "Condition check", NO_DATA)
+        struct["visit"], "Condition check", NO_DATA,
+        "no_data" if struct["visit"] == NO_DATA else "met" if struct["fixed_before_oct1"] == struct["findings"] else "not_due" if R.end < f"{Y}-10-01" else "not_met")
     opened = len(cor); closed = sum(1 for c in cor if c["status"] == "resolved")
     prev_items = {o["item"] for o in R.obs_all if R.vid[o["visit"]]["date"][:4] == str(Y - 1) and o["answer"] == "abnormal"}
     back = sorted({o["item"] for o in R.obs(lambda o: o["answer"] == "abnormal") if o["item"] in prev_items})
-    add("IND-08", "Target not set", f'{opened} opened, {closed} closed; came back from {Y-1}: {", ".join(back) or "none"}', R.end, "Corrective Maintenance Log", NO_DATA)
+    add("IND-08", "Target not set", f'{opened} opened, {closed} closed; came back from {Y-1}: {", ".join(back) or "none"}', R.end, "Corrective Maintenance Log", NO_DATA, "target_not_set")
     done = sum(1 for x in planned if any(v["date"] == x["date"] for v in R.visits))
-    add("IND-09", "All planned visits done", f'{round(100 * done / len(planned))} % ({done} of {len(planned)})' if planned else NO_DATA, R.end, "Annual Plan against the Site History", NO_DATA)
+    add("IND-09", "All planned visits done", f'{round(100 * done / len(planned))} % ({done} of {len(planned)})' if planned else NO_DATA, R.end, "Annual Plan against the Site History", NO_DATA,
+        met(done == len(planned)) if planned else "no_data")
     req = [v for v in on_site if v["type"] in ("Routine", "After storm", "Pre-storm")]
     add("IND-10", "Photos from all photo points at every Routine, After storm and Pre-storm visit",
-        f'{sum(1 for v in req if v.get("all_photo_points_taken"))} of {len(req)} visits' if req else NO_DATA, req[-1]["date"] if req else NO_DATA, "Photo points", NO_DATA)
+        f'{sum(1 for v in req if v.get("all_photo_points_taken"))} of {len(req)} visits' if req else NO_DATA, req[-1]["date"] if req else NO_DATA, "Photo points", NO_DATA,
+        met(all(v.get("all_photo_points_taken") for v in req)) if req else "no_data")
 
     # charts: laboratory and field checks are separate charts; every method its own series; points only
     lab_series = []

@@ -1,0 +1,41 @@
+<style>
+@font-face{font-family:"Public Sans";src:url("{{ font_dir }}/PublicSans-VF.ttf");font-weight:100 900}
+@font-face{font-family:"Public Sans";src:url("{{ font_dir }}/PublicSans-Italic-VF.ttf");font-style:italic;font-weight:100 900}
+@font-face{font-family:"Barlow Condensed";src:url("{{ font_dir }}/BarlowCondensed-SemiBold.ttf");font-weight:600}
+@font-face{font-family:"Barlow Condensed";src:url("{{ font_dir }}/BarlowCondensed-Bold.ttf");font-weight:700}
+@page{size:A4;margin:18mm 15mm 20mm;
+  @bottom-left{content:"{{ r.report }} · {{ r.site_name }} · {{ r.period_start }} to {{ r.period_end }}{% if r.sample %} · Sample data{% endif %}";font:8pt "Public Sans";color:#5B6E83}
+  @bottom-right{content:"Page " counter(page) " of " counter(pages);font:8pt "Public Sans";color:#5B6E83}
+  {% if r.sample %}@top-right{content:"SAMPLE DATA";font:700 9pt "Barlow Condensed";color:#B4361F;letter-spacing:.08em}{% endif %}}
+*{box-sizing:border-box}
+body{font:9.5pt/1.45 "Public Sans",Arial,sans-serif;color:#1F2D3D;margin:0}
+h1,h2,h3{font-family:"Barlow Condensed","Arial Narrow",sans-serif;color:#03467E;margin:0;font-weight:700}
+h1{font-size:26pt;text-transform:uppercase;line-height:1.05}
+h2{font-size:15pt;margin:14pt 0 5pt;border-bottom:2.5pt solid #03467E;padding-bottom:2pt;break-after:avoid}
+h3{font-size:11.5pt;margin:9pt 0 3pt;break-after:avoid}
+p{margin:0 0 5pt}
+.eyebrow{display:inline-block;background:#03467E;color:#fff;font:700 8.5pt "Barlow Condensed";letter-spacing:.1em;padding:2pt 8pt;text-transform:uppercase}
+.sample-banner{background:#FBE3DD;border-left:5pt solid #B4361F;padding:6pt 9pt;margin:8pt 0;font-weight:600}
+.kv{width:100%;border-collapse:collapse;margin:6pt 0}
+.kv td{border:.6pt solid #C4D3E2;padding:3pt 6pt;vertical-align:top}
+.kv td.k{background:#E6F0F9;color:#03467E;font-weight:700;width:32%}
+table.t{width:100%;border-collapse:collapse;margin:4pt 0 6pt;font-size:8.5pt;break-inside:auto}
+table.t th{background:#03467E;color:#fff;text-align:left;padding:3pt 5pt;font-family:"Barlow Condensed";font-size:9.5pt;font-weight:600}
+table.t td{border-bottom:.6pt solid #DBE5EF;padding:3pt 5pt;vertical-align:top}
+table.t tr{break-inside:avoid}
+table.t tr:first-child,table.t tr:nth-child(2){break-after:avoid}
+h3+table.t,h3+p+table.t{break-before:avoid}
+.ev{display:inline-block;font-size:7.5pt;font-weight:700;padding:0 5pt;border-radius:6pt;white-space:nowrap}
+.ev-Laboratory{background:#03467E;color:#fff}.ev-Field-screening{background:#FFF0C2;color:#3A2A00}.ev-Field-measurement{background:#E3F2E8;color:#1F5C33}.ev-Visual-check{background:#E6F0F9;color:#03467E}
+.note{font-size:8pt;color:#5B6E83;margin:2pt 0 8pt}
+.conv{font-size:8pt;color:#1F2D3D;background:#F4F8FC;border-left:3pt solid #F6B800;padding:4pt 7pt;margin:3pt 0 9pt}
+.nodata{color:#5B6E83;font-style:italic}
+.tiles{display:flex;gap:6pt;margin:6pt 0}
+.tile{flex:1;border:.8pt solid #DBE5EF;border-radius:6pt;padding:6pt 8pt}
+.tile b{display:block;font:700 18pt "Barlow Condensed";color:#03467E}
+.withheld{border:1pt dashed #5B6E83;padding:6pt 9pt;color:#5B6E83}
+.cover{border-top:8pt solid #03467E;padding-top:10pt;margin-bottom:8pt}
+.small{font-size:8pt}
+.pb{break-before:page}
+figure{margin:4pt 0 8pt;break-inside:avoid}figcaption{font-size:8pt;color:#5B6E83}
+</style>
