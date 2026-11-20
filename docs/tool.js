@@ -35,7 +35,7 @@
     qa("#toolTabs a").forEach(x => x.dataset.t === which ? x.setAttribute("aria-current", "page") : x.removeAttribute("aria-current"));
     q("#toolOld").hidden = which !== "old"; view().hidden = which === "old";
     if (map) { map.remove(); map = null; }
-    if (which === "vts" && a) card(a);
+    if (which === "vts" && a) card(a, parts[2], parts[3]);
     else if (which === "vts") myVts();
     else if (which === "plan" && window.ToolPlan) window.ToolPlan.plan(a, parts[2]);
     else if (which === "visit" && window.ToolPlan) { qa("#toolTabs a").forEach(x => x.dataset.t === "plan" ? x.setAttribute("aria-current", "page") : 0); window.ToolPlan.visit(a); }
@@ -109,7 +109,7 @@
   const legend = () => Object.entries(NAME).map(([k, n]) => `<span class="sdot" style="background:${COLOR[k]}"></span>${n}`).join(" &nbsp; ");
 
   /* ---------- one VTS card ---------- */
-  function card(id) {
+  function card(id, sub, yr) {
     const s = St.site(id);
     if (!s) { view().innerHTML = `<p>VTS not found. <a href="#tool/vts">Back to My VTS</a></p>`; return; }
     const lv = lastVisit(id), pv = lastPhotoVisit(id), np = nextPlanned(id), p = s.params || {}, off = s.status === "decommissioned";
@@ -120,8 +120,9 @@
       <div class="t-card${off ? " off" : ""}">
         <div class="t-band" style="background:${off ? "#7A8896" : COLOR[s.type]}"><span>${esc(NAME[s.type])}</span><span class="l-sp"></span>${statusChip(s)}</div>
         <div class="t-head"><h2 class="l-title" style="margin:0">${esc(s.name)}</h2><p class="muted">Project owner: ${esc(s.project_owner)} · ${s.huc12 ? esc(s.huc12.name) : "Sub-watershed not set"}</p>
-          ${off ? `<p class="l-warn"><b>Decommissioned on ${esc(s.decommissioned.date)} (${esc(s.decommissioned.category)}).</b> ${esc(s.decommissioned.reason)}</p>` : ""}</div>
-        <div class="l-two">
+          ${off ? `<p class="l-warn"><b>Decommissioned on ${esc(s.decommissioned.date)} (${esc(s.decommissioned.category)}).</b> ${esc(s.decommissioned.reason)}</p>` : ""}
+          <nav class="l-pills t-ctabs" aria-label="This VTS"><a class="l-pill" href="#tool/vts/${id}"${sub !== "history" ? ' aria-current="page"' : ""}>Overview</a><a class="l-pill" href="#tool/vts/${id}/history"${sub === "history" ? ' aria-current="page"' : ""}>Site History</a>${off ? "" : `<a class="l-pill" href="#tool/plan/${id}">Yearly plan</a>`}<a class="l-pill" href="#tool/corrective/${id}">Corrective log</a></nav></div>
+        ${sub === "history" && window.ToolHistory ? `<div class="t-hist">${window.ToolHistory.render(id, yr)}</div>` : `<div class="l-two">
           <div class="stack">
             <figure class="t-fig">${photoSvg(s, pv)}<figcaption class="l-src">Latest visit photo. Real photos will come from the Visit Sheet once accounts and storage exist.</figcaption></figure>
             <div class="l-box"><b>Design</b><div><table class="t-kv">${[["Year built", s.year_built || "Not recorded"], ["Drainage area", s.drainage_area ? s.drainage_area.value + " " + s.drainage_area.unit : "Not recorded"], ...(s.design || []).map(d => [d.label, d.value])].map(([k, v]) => `<tr><th>${esc(k)}</th><td>${esc(v)}</td></tr>`).join("")}</table></div></div>
@@ -133,15 +134,16 @@
               ${["location", "documents", "status"].map(k => shareRow(s, k)).join("")}
               <p class="l-src">In this prototype nothing is published: your choice is only saved in this browser.</p></div></div>
             <div class="l-box"><b>Visits</b><div><table class="t-kv"><tr><th>Last visit</th><td>${lv ? esc(lv.date + " · " + lv.type) : "None yet"}</td></tr><tr><th>Next planned</th><td>${off ? "None (decommissioned)" : np ? esc(np.date + " · " + np.type) : "Not planned"}</td></tr>
-              <tr><th>Visits recorded</th><td>${St.visitsOf(id).length}</td></tr></table><p><a href="#learn/manual/${s.type}">The tasks of a ${esc(NAME[s.type].toLowerCase())} in the manual</a></p></div></div>
+              <tr><th>Visits recorded</th><td>${St.visitsOf(id).length}</td></tr></table><p><a href="#tool/vts/${id}/history">Site History: every visit, repair and change</a></p><p><a href="#learn/manual/${s.type}">The tasks of a ${esc(NAME[s.type].toLowerCase())} in the manual</a></p></div></div>
             <div class="l-box ${off ? "" : "warn"}"><b>${off ? "Bring it back" : "Take it out of service"}</b><div>${off
               ? `<p>If the system is working again, reactivate it. The record and its history stay.</p><button class="btn ghost sm" type="button" id="tReact">Reactivate</button>`
               : `<p>Decommission a VTS that is removed, replaced, or no longer maintained. It stays on the map, greyed out, with its record and the reason.</p><button class="btn ghost sm" type="button" id="tDecom">Decommission…</button>`}</div></div>
             <div class="l-box"><b>Change history</b><div>${hist.length ? `<table class="t-kv">${hist.map(h => `<tr><th>${esc(h.when.slice(0, 16).replace("T", " "))}</th><td>${esc(h.field)}: ${esc(short(h.old_value))} → ${esc(short(h.new_value))}<br><span class="l-src">${esc(h.reason)}${h.category ? " (" + esc(h.category) + ")" : ""} · ${esc(h.who_role)}</span></td></tr>`).join("")}</table>` : '<p class="muted">No changes recorded.</p>'}</div></div>
           </div>
-        </div>
+        </div>`}
       </div>`;
     bar(St.session());
+    if (sub === "history" && window.ToolHistory) { window.ToolHistory.wire(id, () => card(id, sub, yr)); return; }
     qa(".t-seg button").forEach(b => b.onclick = () => {
       const item = b.closest(".t-seg").dataset.item, level = b.dataset.l;
       if ((s.privacy || {})[item] === level) return;

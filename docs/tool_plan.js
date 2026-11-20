@@ -63,7 +63,7 @@ window.ToolPlan = (function () {
     const p = St.planOf(s.id, year);
     const head = `<div class="l-row"><h2 style="margin:0">Yearly plan</h2><span class="l-sp"></span>
         <label class="l-lab">VTS <select id="pSite">${active.map(x => `<option value="${x.id}"${x.id === s.id ? " selected" : ""}>${esc(x.name)}</option>`).join("")}</select></label>
-        <label class="l-lab">Year <select id="pYear">${years.map(y => `<option${y === year ? " selected" : ""}>${y}</option>`).join("")}</select></label></div>`;
+        <label class="l-lab">Year <select id="pYear">${years.map(y => `<option${y === year ? " selected" : ""}>${y}</option>`).join("")}</select></label><a class="btn ghost sm" href="#tool/vts/${s.id}/history/${year}">Site History</a></div>`;
     if (!p) {
       K().view().innerHTML = head + `<div class="panel stack"><p>No plan for ${year} yet.</p><div class="row"><button class="btn" type="button" id="pNew">Create the ${year} plan</button></div>
         <p class="small muted">It starts with the visits the manual fixes: the January review, the spring visit in April and the pre-storm visit in August, with their tasks. Routine tasks are done at every visit. Add the other visits you need on the chart.</p></div>`;
