@@ -25,6 +25,7 @@ function route(){const parts=(location.hash||"#home").slice(1).split("/");const 
      but bring the page's tab bar back into view if it is above the screen */
   if(top){window.scrollTo(0,0);const h=$("section.view.on h1");if(h&&first===false){h.setAttribute("tabindex","-1");h.focus({preventScroll:true})}}
   else if(!navClick)setTimeout(()=>{const bar=$("section.view.on .l-tabs");if(!bar)return;const hd=($("header.top")||{}).offsetHeight||0,y=bar.getBoundingClientRect().top;if(y<hd)window.scrollBy(0,y-hd-8)},0);
+  if(r==="start")setTimeout(drawLinks,0);
   if(r==="home")setTimeout(()=>{placeRibbon();lmap?lmap.invalidateSize():homeMap()},0);}
 addEventListener("hashchange",()=>{first=false;route()});
 /* skip link: the site uses the hash for pages, so move focus by hand */
@@ -102,15 +103,42 @@ function mapLayers(){$$("#maplayers input").forEach(i=>{i.checked=mapLy[i.datase
 function mapChips(){chips($("#mapchips"),[["ALL","All systems"],...ORDER.map(k=>[k,SYS[k].n])],mapF,k=>{mapF=k;homeMap()})}
 
 /* start */
-let stSys="SB";
-function startGrid(){const s=SYS[stSys];const diy=s.who.startsWith("Do");
-  $("#startgrid").innerHTML=`
-  <div class="panel stack"><h3>When it fits</h3><p>${esc(s.fit)}</p><p class="small muted">${esc(s.what)}</p></div>
-  <div class="panel stack"><h3>${diy?"Build it yourself":"Who builds it"}</h3><ul class="plain">${diy?"<li>[IMPLEMENTATION GUIDE]</li><li>[SIZING SHEET, ONE PAGE]</li><li>[PERMITS TO CHECK]</li>":"<li>[FACT SHEET]</li><li>[PRACTITIONERS AND CONTRACTORS]</li><li>[PERMITS TO CHECK]</li>"}</ul></div>
-  <div class="panel stack"><h3>What it costs</h3><p>Build: [RANGE]</p><p>Yearly maintenance: [RANGE]</p><p class="small muted">Ranges will come from project reports and the Site History records.</p></div>
-  <div class="panel stack"><h3>What it takes to maintain</h3><p>${esc(s.upkeep)}</p><a href="#learn/manual/${stSys}">See the checklists and manual</a></div>
-  <div class="panel stack"><h3>Examples near you</h3><p>See which watersheds already have a ${esc(s.n.toLowerCase())}.</p><a href="#home">Open the map</a></div>
-  <div class="panel stack"><h3>Who can help</h3><ul class="plain"><li>[TECHNICAL ASSISTANCE CONTACT]</li><li>[FUNDING PROGRAMS]</li></ul></div>`;}
+let stSys="SB",stBr="fit";
+/* Start, step 1: a mind map. The system in the centre, six round branches joined by curved connectors; a branch fills the panel below. */
+const IP='<span class="l-chip y">In progress</span>';
+const todo=(t,x)=>`<li><b>${t}</b> ${IP}<br><span class="muted">${x}</span></li>`;
+const BR=[["fit","When it fits","L"],["build",null,"L"],["cost","What it costs","L"],["keep","What it takes to maintain","R"],["near","Examples near you","R"],["help","Who can help","R"]];
+function brText(k){const s=SYS[stSys],diy=s.who.startsWith("Do");
+  return {fit:[`When it fits`,`<p>${esc(s.fit)}</p><p class="muted">${esc(s.what)}</p>`],
+    build:[diy?"Build it yourself":"Who builds it",diy?`<ul class="plain s-todo">${todo("Implementation guide","How to build it yourself, step by step.")}${todo("Sizing sheet, one page","How big it needs to be for your field.")}${todo("Permits to check","The permits to check before you build.")}</ul>`
+      :`<p>${esc(s.n)}s are installed by practitioners.</p><ul class="plain s-todo">${todo("Fact sheet","One page on what the system is and does.")}${todo("Practitioners and contractors","People and firms who build these systems.")}${todo("Permits to check","The permits to check before you build.")}</ul>`],
+    cost:["What it costs",`<ul class="plain s-todo">${todo("Building it","A typical cost range.")}${todo("Yearly maintenance","A typical cost range per year.")}</ul><p class="small muted">Ranges will come from project reports and the Site History records. Nothing is estimated here until then.</p>`],
+    keep:["What it takes to maintain",`<p>${esc(s.upkeep)}</p><p><a href="#learn/manual/${stSys}">See the checklists and manual →</a></p>`],
+    near:["Examples near you",`<p>See where there is already a ${esc(s.n.toLowerCase())} on the public map.</p><div class="row"><button class="btn ghost" type="button" id="sNear">Open the map with only ${esc(s.n.toLowerCase())}s</button></div>`],
+    help:["Who can help",`<ul class="plain s-todo">${todo("Technical assistance contact","Who to call for advice on a site.")}${todo("Funding programs","Programs that can help pay for a system.")}</ul>`]}[k];}
+function startGrid(){
+  const box=$("#smap"),node=(k,side)=>{const t=brText(k);return `<button type="button" class="s-node s-${side}" data-br="${k}" aria-pressed="${k===stBr}" aria-controls="sdetail">${esc(t[0])}</button>`};
+  box.innerHTML=`<svg class="s-lines" aria-hidden="true"><defs><marker id="sArr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10z" fill="var(--water)"/></marker></defs></svg>
+    <div class="s-col">${BR.filter(b=>b[2]==="L").map(b=>node(b[0],"l")).join("")}</div>
+    <div class="s-centre" aria-hidden="true">${esc(SYS[stSys].n)}</div>
+    <div class="s-col">${BR.filter(b=>b[2]==="R").map(b=>node(b[0],"r")).join("")}</div>`;
+  $$("#smap .s-node").forEach(b=>b.onclick=()=>{stBr=b.dataset.br;$$("#smap .s-node").forEach(x=>x.setAttribute("aria-pressed",x===b));detail()});
+  detail();drawLinks();}
+function detail(){const t=brText(stBr),d=$("#sdetail");d.classList.remove("h-in");void d.offsetWidth;d.classList.add("h-in");
+  d.innerHTML=`<h3>${esc(SYS[stSys].n)}: ${esc(t[0])}</h3>${t[1]}`;
+  if($("#sNear"))$("#sNear").onclick=()=>{mapF=stSys;mapChips();location.hash="#home";setTimeout(()=>{homeMap();const m=$("#homemap");if(m)m.scrollIntoView({block:"center"})},150)};}
+/* curved connectors with small arrowheads, drawn from the node positions; redrawn when the size changes */
+function drawLinks(){const box=$("#smap"),svg=box&&box.querySelector(".s-lines");if(!svg||!box.offsetWidth)return;
+  const B=box.getBoundingClientRect(),c=box.querySelector(".s-centre").getBoundingClientRect(),cx=c.left+c.width/2-B.left,cy=c.top+c.height/2-B.top,r=c.width/2;
+  svg.setAttribute("viewBox",`0 0 ${B.width} ${B.height}`);svg.setAttribute("width",B.width);svg.setAttribute("height",B.height);
+  let h=svg.querySelector("defs").outerHTML;
+  $$("#smap .s-node").forEach(n=>{const R=n.getBoundingClientRect(),left=n.classList.contains("s-l"),nx=(left?R.right:R.left)-B.left,ny=R.top+R.height/2-B.top;
+    const sx=cx+(left?-r:r),sy=cy,mx=(sx+nx)/2;
+    h+=`<path d="M${sx.toFixed(1)},${sy.toFixed(1)} C${mx.toFixed(1)},${sy.toFixed(1)} ${mx.toFixed(1)},${ny.toFixed(1)} ${(nx+(left?6:-6)).toFixed(1)},${ny.toFixed(1)}" fill="none" stroke="var(--water)" stroke-width="2.5" marker-end="url(#sArr)"/>`;});
+  svg.innerHTML=h;}
+if(window.ResizeObserver){const ro=new ResizeObserver(()=>drawLinks());setTimeout(()=>{const m=$("#smap");if(m)ro.observe(m)},0);}
+/* Next buttons on the Start path */
+$$("[data-next]").forEach(b=>b.onclick=()=>{const t=$(`.s-path button[data-t="${b.dataset.next}"]`);t.click();t.focus({preventScroll:true});const p=$(".s-path");const y=p.getBoundingClientRect().top;if(y<0)p.scrollIntoView({block:"start"});setTimeout(drawLinks,0)});
 const LAYERS=["Surface water limits (TMDL areas)","Groundwater nitrate risk (draft model)","Systems already in place","Distance to drainage infrastructure","Conservation land and easements"];
 let layerOn=new Set();
 function whereMap(){drawMap($("#whereMap"),{plain:true,shade:w=>layerOn.size?((parseInt(w.id.slice(-3))*7+layerOn.size*13)%10)/14+.15:0})}
@@ -147,6 +175,6 @@ function learn(){$("#learnBody").innerHTML=MAT.filter(m=>(lAud==="all"||m[2].inc
 
 stations();mapChips();mapLayers();homeMap();fadeIn();
 {const n=((window.VTS_GEO||{}).points||{}).features;if(n&&$("#siteCount"))$("#siteCount").textContent=n.length;}
-chips($("#startchips"),ORDER.map(k=>[k,SYS[k].n]),stSys,k=>{stSys=k;startGrid()});startGrid();layers();whereMap();
+{const pick=()=>{$("#startchips").innerHTML=ORDER.map(k=>`<button type="button" data-k="${k}" aria-pressed="${k===stSys}">${esc(SYS[k].n)}</button>`).join("");$$("#startchips button").forEach(b=>b.onclick=()=>{stSys=b.dataset.k;pick();startGrid()})};pick();}startGrid();layers();whereMap();
 chips($("#audchips"),AUD,lAud,k=>{lAud=k;learn()});chips($("#lsyschips"),[["ALL","All systems"],...ORDER.map(k=>[k,SYS[k].n])],lSys,k=>{lSys=k;learn()});learn();
 route();

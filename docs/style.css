@@ -574,3 +574,24 @@ dialog.t-side::backdrop{background:rgba(18,38,26,.35)}
 .h-band ol.flow li+li::after{content:"\203A";position:absolute;left:-.6rem;top:30px;font:700 2.2rem/1 var(--body);color:var(--water)}
 .h-band ol.flow li>span:last-child{color:var(--ink2)}
 @media (max-width:760px){.h-band ol.flow li{background:transparent}.h-band ol.flow li+li::after{left:50%;top:-1.6rem;transform:translateX(-50%) rotate(90deg)}}
+
+/* R3 Start: ordered path of three questions, and the mind map */
+.s-path{border:0;gap:.4rem;align-items:center}
+.s-path button{display:inline-flex;align-items:center;gap:.5rem;min-height:48px;padding:.35rem 1.1rem .35rem .4rem;border:2px solid var(--water);border-radius:999px;background:var(--surface);color:var(--water);margin:0;font-size:1.02rem}
+.s-path button+button{margin-left:1.6rem;position:relative}
+.s-path button+button::before{content:"\203A";position:absolute;left:-1.35rem;top:50%;transform:translateY(-52%);color:var(--water);font:700 1.6rem/1 var(--body)}
+.s-path button[aria-selected="true"]{background:var(--water);color:#fff;border-color:var(--water)}
+.s-n{display:inline-flex;align-items:center;justify-content:center;width:1.9rem;height:1.9rem;border-radius:50%;background:var(--water-soft);color:var(--water);font-weight:800}
+.s-path button[aria-selected="true"] .s-n{background:#fff}
+.s-map{position:relative;display:grid;grid-template-columns:1fr minmax(180px,220px) 1fr;gap:1rem 3.5rem;align-items:center;padding:.5rem 0;max-width:900px;width:100%;margin:0 auto}
+.s-lines{position:absolute;inset:0;pointer-events:none;overflow:visible}
+.s-col{display:flex;flex-direction:column;gap:1.1rem;position:relative;z-index:1}
+.s-map>.s-col:nth-of-type(1){align-items:flex-end}.s-map>.s-col:nth-of-type(3){align-items:flex-start}
+.s-centre{position:relative;z-index:1;aspect-ratio:1;border-radius:50%;background:var(--water);color:#fff;display:flex;align-items:center;justify-content:center;text-align:center;padding:1rem;font:700 clamp(1.3rem,2.2vw,1.7rem)/1.1 var(--head)}
+.s-node{width:132px;height:132px;border-radius:50%;border:2px solid var(--water);background:var(--surface);color:var(--water);font:700 .98rem/1.2 var(--body);padding:.6rem;cursor:pointer;display:flex;align-items:center;justify-content:center;text-align:center}
+.s-node:hover{background:var(--water-soft)}
+.s-node[aria-pressed="true"]{background:var(--yel);color:var(--yel-ink)}
+.s-detail h3{margin-bottom:.4rem}
+.s-todo{list-style:none;padding:0;gap:.6rem}
+@media (max-width:760px){.s-map{display:flex;flex-direction:column;align-items:stretch;gap:.5rem}.s-lines{display:none}.s-centre{aspect-ratio:auto;border-radius:14px;order:-1}.s-col{align-items:stretch!important;gap:.5rem}.s-node{width:auto;height:auto;min-height:48px;border-radius:12px}
+  .s-path button+button{margin-left:0}.s-path button+button::before{display:none}}

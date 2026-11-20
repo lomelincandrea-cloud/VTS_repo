@@ -102,14 +102,16 @@
 <section class="view" id="v-start"><div class="wrap stack lg">
   <div class="stack"><h1>Start a project</h1><p class="lede">Three questions most people ask before they put in a treatment system.</p></div>
   <div>
-    <div class="tabs" role="tablist" data-tabs="start">
-      <button role="tab" aria-selected="true" data-t="choose">Which system fits?</button>
-      <button role="tab" aria-selected="false" data-t="where">Where should it go?</button>
-      <button role="tab" aria-selected="false" data-t="food">What about food safety?</button>
+    <div class="tabs s-path" role="tablist" data-tabs="start" aria-label="Three questions, in order">
+      <button role="tab" aria-selected="true" data-t="choose"><span class="s-n" aria-hidden="true">1</span>Which system fits?</button>
+      <button role="tab" aria-selected="false" data-t="where"><span class="s-n" aria-hidden="true">2</span>Where should it go?</button>
+      <button role="tab" aria-selected="false" data-t="food"><span class="s-n" aria-hidden="true">3</span>What about food safety?</button>
     </div>
     <div class="tabpanel on" data-p="choose"><div class="stack">
-      <div class="chips" id="startchips" role="group" aria-label="System"></div>
-      <div class="grid3" id="startgrid"></div>
+      <div class="h-pick" id="startchips" role="group" aria-label="System"></div>
+      <div class="s-map" id="smap"></div>
+      <div class="panel s-detail" id="sdetail" aria-live="polite"></div>
+      <div class="row"><button class="btn" type="button" data-next="where">Next: Where should it go?</button></div>
     </div></div>
     <div class="tabpanel" data-p="where"><div class="grid2">
       <div class="stack">
@@ -132,13 +134,14 @@
         </form>
         <div id="siteDone"></div>
       </div>
-    </div></div>
+    </div>
+    <div class="row" style="margin-top:1.25rem"><button class="btn" type="button" data-next="food">Next: What about food safety?</button></div></div>
     <div class="tabpanel" data-p="food"><div class="stack">
       <h2>We know food safety comes first</h2>
       <p class="muted">Two worries come up again and again: animals near the crop, and losing ground to buffers. Here is what the research says and what you can show an auditor.</p>
       <div class="grid3">
-        <div class="panel stack"><h3>Research</h3><ul class="plain"><li>[STUDY SUMMARY 1]</li><li>[STUDY SUMMARY 2]</li><li>[STUDY SUMMARY 3]</li></ul><p class="small muted">To be filled with CMSF’s food safety work so the two efforts don’t repeat each other.</p></div>
-        <div class="panel stack"><h3>One-page sheets and videos</h3><ul class="plain"><li>[SHEET] What to tell your auditor about a vegetated ditch</li><li>[SHEET] Buffers and treatment systems: what applies</li><li>[VIDEO] A grower walks through their system</li></ul></div>
+        <div class="panel stack"><h3>Research</h3><p><span class="l-chip y">In progress</span></p><p>Short summaries of the food safety studies. They will come from CMSF’s food safety work, so the two efforts don’t repeat each other.</p></div>
+        <div class="panel stack"><h3>One-page sheets and videos</h3><p><span class="l-chip y">In progress</span></p><ul class="plain"><li>Sheet: what to tell your auditor about a vegetated ditch</li><li>Sheet: buffers and treatment systems, what applies</li><li>Video: a grower walks through their system</li></ul><p class="small muted">Planned; not made yet.</p></div>
         <div class="panel stack"><h3>How maintenance helps</h3><p>A system that is mowed, checked and logged on a schedule is easier to defend than one nobody visits. The maintenance tool gives you a dated record you can print.</p>
           <p><a class="btn" href="downloads/Sample_Food_Safety_Record_vegetated_ditch.pdf" download>Download a sample Food Safety Record (PDF)</a></p>
           <p class="small muted">Made-up records for a vegetated ditch, to show what the record looks like.</p>
@@ -194,7 +197,7 @@
     <div class="stack">
       <div id="reqDone"></div>
       <div class="panel stack"><h3>What happens next</h3><ol class="steps"><li>We call you to understand the system and agree on access.</li><li>A first visit to look at the system with you.</li><li>You get a proposed yearly plan and decide what you want.</li></ol></div>
-      <div class="panel stack"><h3>What we ask before a crew can come</h3><ul class="plain"><li>Permission from the landowner.</li><li>A contact on the ranch who knows the crew is coming.</li><li>Any food safety or biosecurity rules the crew must follow.</li></ul><p class="small muted">Liability and insurance terms: [TO BE DEFINED WITH THE HOST].</p></div>
+      <div class="panel stack"><h3>What we ask before a crew can come</h3><ul class="plain"><li>Permission from the landowner.</li><li>A contact on the ranch who knows the crew is coming.</li><li>Any food safety or biosecurity rules the crew must follow.</li></ul><p class="small muted"><span class="l-chip y">In progress</span> Liability and insurance terms will be set with the host organization, which has not been chosen yet.</p></div>
     </div>
   </div>
 </div></section>
