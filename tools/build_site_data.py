@@ -3,9 +3,9 @@
 Reads   tools/manual_builder/data/VTS_manual_content.xlsx        (manual: tasks, steps, flows, topics, checklist, site conditions)
         tools/plant_catalogue_builder/data/VTS_plant_catalogue.xlsx (Field Guide: plants, watchlist, icons, sources)
         tools/site_data/plant_icons.json                          (plant icon drawings)
-Writes  docs/learn_data.js      window.VTS_LEARN = {...}   (the Tool keeps its own docs/data.js)
+Writes  docs/learn_data.js      window.VTS_LEARN = {...}
         docs/img/manual/*        figures used by the topics
-        docs/downloads/*         latest draft PDFs and Excel forms (marked DRAFT on the site)
+        docs/downloads/*         latest draft PDFs and Excel forms (marked DRAFT on the site), and the sample Food Safety Record
         docs/tool/*.json         sample records and indicators for the Tool (copied from tools/report_templates)
         docs/tool/templates, docs/tool/fonts   report templates and fonts, so the Tool prints the same reports
 
@@ -177,6 +177,10 @@ for code, title, f, kind, what in (
         print(f"  download missing (build it first): {code}"); continue
     shutil.copy(f, DL / f.name)
     docs.append({"code": code, "title": title, "file": f"downloads/{f.name}", "kind": kind, "size_kb": round(f.stat().st_size / 1024), "what": what, "status": "Draft"})
+# sample Food Safety Record for the Start page (made-up records; run tools/report_templates/render_reports.py first)
+fsr = ROOT / "tools" / "report_templates" / "output" / "S-VD_food_safety_record.pdf"
+if fsr.exists(): shutil.copy(fsr, DL / "Sample_Food_Safety_Record_vegetated_ditch.pdf")
+else: print("  sample Food Safety Record missing (run render_reports.py first)")
 
 # ---------------- Tool sample records (same file the report templates use)
 (DOCS / "tool").mkdir(exist_ok=True)
