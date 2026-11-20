@@ -1,4 +1,4 @@
-/* Visual "how to use" guides for Learn and the Tool. Each step is a link to the part it explains.
+/* Visual "how to use" guide for Learn (the Tool has its own "?" panel in tool.js). Each step is a link to the part it explains.
    Hidden with "Got it" (remembered only in this browser); "How to use" brings it back. */
 window.VTSGuide = (function () {
   "use strict";
@@ -42,17 +42,7 @@ window.VTSGuide = (function () {
       {icon: "download", title: "Download the forms", text: "The manual, the Field Guide, the Visit Sheets and the forms, in PDF or Excel. They are drafts for review.", href: "#learn/downloads"}],
       "Tip: the Read first box on each system page has safety, waste, and the basics that apply to every system.");
   }
-  function tool() {
-    render(document.getElementById("toolGuide"), "tool", "the Tool", "Plan the year, record every visit, and keep track of repairs. It works with sample data: try anything, then use Reset sample data.", [
-      {icon: "pin", title: "My VTS", text: "Your systems on a map. Open a card to see its design, Site Conditions, documents, who can see them, and its Site History. Register or decommission a system here.", href: "#tool/vts"},
-      {icon: "gantt", title: "Yearly plan", text: "A chart of tasks by month. Press Edit, click a month and pick the day. Use + to add a task. Routine tasks happen at every visit.", href: "#tool/plan"},
-      {icon: "sheet", title: "Next visits", text: "The visits coming up. Open the Visit Sheet to record a visit, or send it to the crew's phone.", href: "#tool/visits"},
-      {icon: "phone", title: "Send to phone", text: "The crew opens the link or QR code, fills in the checklist in the field, and sends back a results file you import.", href: "#tool/visits"},
-      {icon: "wrench", title: "Corrective log", text: "Every problem found. Schedule the repair into the plan, then record what was done and when.", href: "#tool/corrective"},
-      {icon: "chart", title: "Dashboard and reports", text: "Every indicator against its target, for one VTS or all of them. Print the Food Safety Record and the Water Quality and Maintenance Summary, or download the change history.", href: "#tool/dashboard"}],
-      "Tip: a draft saves as you go. Once a plan is approved or a visit is closed, every change asks for a reason and goes into the change history.");
-  }
-  return {learn, tool, render};
+  return {learn, render};
 })();
 
-window.VTSGuide.learn(); window.VTSGuide.tool();
+window.VTSGuide.learn();

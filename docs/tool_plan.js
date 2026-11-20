@@ -1,5 +1,6 @@
-/* Tool 4b: Yearly plan (editable, suggested from the manual) and the Visit Sheet (F04) form.
-   Routes: #tool/plan, #tool/plan/<site>/<year>, #tool/visit/<visit id>. Uses window.ToolKit (tool.js), VTSStore (store.js), VTS_LEARN (learn_data.js).
+/* Tool: Yearly plan (overview grid of all VTS, and the editable plan of one VTS), the Visit Sheet (F04) form,
+   the list of Visit Sheets, Next visits (calendar and table), Send to phone and the Corrective log.
+   Routes: #tool/plan (overview), #tool/plan/all/<year>, #tool/plan/<site>/<year> (edit one VTS), #tool/visit/<visit id>, #tool/sheets, #tool/visits. Uses window.ToolKit (tool.js), VTSStore (store.js), VTS_LEARN (learn_data.js).
    Rules: a draft is saved freely; an approved plan or a closed visit is changed only with a reason (edit history). */
 window.ToolPlan = (function () {
   "use strict";
@@ -38,6 +39,9 @@ window.ToolPlan = (function () {
   const keyOf = x => x.task || "+" + x.text;
   const label = k => k[0] === "+" ? esc(k.slice(1)) : `${esc((taskBy(k) || {}).name || k)} <span class="l-src">${k}</span>`;
   let editMode = false;
+  /* after: how to redraw the page that is open (overview grid or one VTS's plan). openRec: the visit record shown under the grid. */
+  let after = null, openRec = null;
+  const redraw = (s, year) => after ? after() : plan(s.id, year);
   const money = n => n === null || n === undefined || isNaN(n) ? "—" : "$" + Math.round(n).toLocaleString("en-US");
   const rate = () => (St.data.organization || {}).labor_rate ?? null;
   function estCost(pv) {
@@ -55,13 +59,15 @@ window.ToolPlan = (function () {
   const doneVisit = (s, pv) => St.visitsOf(s.id).find(v => v.status === "closed" && (v.planned_id === pv.id || v.date === pv.date));
 
   function plan(siteId, yearArg) {
+    if (!siteId || siteId === "all") return overview(yearArg);
+    after = null;
     const active = St.sites().filter(s => s.status !== "decommissioned");
     const s = St.site(siteId) || active[0];
     if (!s) { K().view().innerHTML = `<div class="panel">Add a VTS first in <a href="#tool/vts">My VTS</a>.</div>`; return; }
     const years = [...new Set([...St.data.annual_plans.filter(p => p.site === s.id).map(p => p.year), yearNow(), yearNow() + 1])].sort();
     const year = +yearArg || yearNow();
     const p = St.planOf(s.id, year);
-    const head = `<div class="l-row"><h2 style="margin:0">Yearly plan</h2><span class="l-sp"></span>
+    const head = `<p><a href="#tool/plan/all/${year}">← All VTS in ${year}</a></p><div class="l-row"><h2 style="margin:0">Plan of one VTS</h2><span class="l-sp"></span>
         <label class="l-lab">VTS <select id="pSite">${active.map(x => `<option value="${x.id}"${x.id === s.id ? " selected" : ""}>${esc(x.name)}</option>`).join("")}</select></label>
         <label class="l-lab">Year <select id="pYear">${years.map(y => `<option${y === year ? " selected" : ""}>${y}</option>`).join("")}</select></label><a class="btn ghost sm" href="#tool/vts/${s.id}/history/${year}">Site History</a></div>`;
     if (!p) {
@@ -99,16 +105,13 @@ window.ToolPlan = (function () {
             ${L.tasks.filter(t => (t.sys === s.type || t.sys === "COR") && !rows.includes(t.id) && !routine.includes(t.id)).map(t => `<option value="${t.id}">${esc(t.id + " " + t.name)}</option>`).join("")}<option value="+">Another task (write it)</option></select>
             <input id="gAddTxt" placeholder="Describe the task" hidden><button class="btn ghost sm" type="button" id="gAdd">Add</button></div></th></tr>
         </tbody></table></div>
-      <p class="l-src">✕ planned · ✓ done (from the Site History) · – visit closed but the task was not marked done · the number is the day of the month · ● routine tasks, done at every visit.</p>
-      <h3>Visits, materials and cost</h3>
-      <div class="t-bar"><label class="l-lab">Labor rate <input type="number" min="0" step="1" id="pRate" value="${rate() ?? ""}" placeholder="$ per person-hour" style="width:9rem"></label>
-        <span class="l-src">Set by the supervisor. Crews do not record costs.</span><span class="l-sp"></span><b>Estimated for ${year}: ${money(pvs.reduce((a, pv) => a + estCost(pv).total, 0))}</b></div>
-      <div class="stack">${pvs.map(pv => visitRow(s, p, pv)).join("")}</div>
+      <p class="l-src">✕ planned · ✓ done (from the Site History) · – visit closed but the task was not marked done · the number is the day of the month · ● routine tasks, done at every visit. Select a visit date in the Visits row to open its record.</p>
+      <p class="l-src">Estimated for ${year}: <b>${money(pvs.reduce((a, pv) => a + estCost(pv).total, 0))}</b>${rate() ? "" : ` (materials only; <a href="#tool/plan/all/${year}">set a labor rate</a> to add labor)`}</p>
+      <div id="pRec">${openRec && pvs.some(pv => pv.id === openRec) ? recordHtml(s, p, pvs.find(pv => pv.id === openRec)) : ""}</div>
       ${histOf([p.id])}`;
     wire();
     q("#pEdit").onclick = () => { editMode = !editMode; plan(s.id, year); };
     if (q("#pApprove")) q("#pApprove").onclick = () => { p.status = "approved"; p.approved = K().today(); St.persist(); plan(s.id, year); };
-    q("#pRate").onchange = e => { St.data.organization.labor_rate = e.target.value === "" ? null : +e.target.value; St.persist(); plan(s.id, year); };
     q("#gAddSel").onchange = e => { q("#gAddTxt").hidden = e.target.value !== "+"; };
     q("#gAdd").onclick = () => {
       const v = q("#gAddSel").value, txt = q("#gAddTxt").value.trim(), k = v === "+" ? (txt ? "+" + txt : "") : v;
@@ -124,7 +127,7 @@ window.ToolPlan = (function () {
       }, null, true);
     });
     qa("td.g-c").forEach(td => td.onclick = () => { if (editMode) cellDlg(s, p, td.dataset.k, +td.dataset.m, year); });
-    qa("[data-pv].g-v").forEach(b => b.onclick = () => { const el = q(`[data-pvrow="${b.dataset.pv}"]`); if (el) { el.open = true; el.scrollIntoView({block: "center"}); } });
+    qa("[data-pv].g-v").forEach(b => b.onclick = () => { openRec = b.dataset.pv; showRec(q("#pRec"), s, p, p.planned_visits.find(pv => pv.id === openRec), year); });
     qa("[data-pvrow]").forEach(det => wireVisitRow(s, p, det, year));
   }
   function wire() {
@@ -137,8 +140,8 @@ window.ToolPlan = (function () {
   }
   /* save a change. Draft: direct. Approved, or a removal: asks a reason (edit history). */
   function changePlan(s, p, next, what, needReason) {
-    if (p.status !== "approved" && !needReason) { p.planned_visits = next; St.persist(); plan(s.id, p.year); return; }
-    reasonCat(`${p.status === "approved" ? "Change the approved plan" : "Change the plan"}: ${what}`, (reason, cat) => { St.update("annual_plans", p.id, {planned_visits: next}, `${what}. ${reason}`, cat); plan(s.id, p.year); }, () => plan(s.id, p.year), needReason);
+    if (p.status !== "approved" && !needReason) { p.planned_visits = next; St.persist(); redraw(s, p.year); return; }
+    reasonCat(`${p.status === "approved" ? "Change the approved plan" : "Change the plan"}: ${what}`, (reason, cat) => { St.update("annual_plans", p.id, {planned_visits: next}, `${what}. ${reason}`, cat); redraw(s, p.year); }, () => redraw(s, p.year), needReason);
   }
   const clone = o => JSON.parse(JSON.stringify(o));
   function typeFor(k, month) {
@@ -180,36 +183,97 @@ window.ToolPlan = (function () {
     return list.map(pv => { if (!ids.includes(pv.id)) return pv; pv.tasks = chosen(s.type, pv).filter(t => t !== k); pv.extra_tasks = pv.extra_tasks.filter(x => keyOf(x) !== k); return pv; })
                .filter(pv => FIXED.some(f => f[2] === pv.type) || pv.type === "Routine" || pv.type === "After storm" || chosen(s.type, pv).length || pv.extra_tasks.length);
   }
-  /* one planned visit: tasks, materials, hours, cost, record */
-  function visitRow(s, p, pv) {
+  /* the record of one planned visit: tasks, crew and hours, materials, estimated cost, and the two actions */
+  function recordHtml(s, p, pv) {
     const dv = St.visitsOf(s.id).find(v => v.planned_id === pv.id || v.date === pv.date), c = estCost(pv), tasks = [...chosen(s.type, pv), ...pv.extra_tasks.map(keyOf)];
-    return `<details class="panel t-pvrow" data-pvrow="${pv.id}"><summary><b>${esc(pv.date)}</b> · ${esc(pv.type)} · ${tasks.length} task(s) · est. ${money(c.total)}
-        ${dv ? `<span class="l-chip ${dv.status === "closed" ? "g" : "y"}">${dv.status === "closed" ? "Done" : "In progress"}</span>` : ""}</summary>
-      <div class="stack">
-        <div class="l-row"><label class="l-lab">Date <input type="date" data-f="date" value="${pv.date}"></label><label class="l-lab">Type <select data-f="type">${TYPES.map(t => `<option${t === pv.type ? " selected" : ""}>${t}</option>`).join("")}</select></label>
-          <span class="l-sp"></span>${dv ? `<a class="btn ghost sm" href="#tool/visit/${dv.id}">Open the Visit Sheet</a>` : `<button class="btn sm" type="button" data-rec>Record this visit</button><button class="btn ghost sm" type="button" data-sendpv>Send to phone</button><button class="btn ghost sm" type="button" data-rmv>Remove the visit</button>`}</div>
-        <p class="l-src">Tasks: ${tasks.map(t => t[0] === "+" ? esc(t.slice(1)) : `<a href="#learn/task/${t}">${esc(t)}</a>`).join(", ") || "none"}</p>
-        <div class="grid3"><label class="l-lab">Crew (people) <input type="number" min="0" data-f="est_crew" value="${pv.est_crew ?? ""}" style="width:5rem"></label><label class="l-lab">Hours on site <input type="number" min="0" step="0.5" data-f="est_hours" value="${pv.est_hours ?? ""}" style="width:5rem"></label>
-          <span class="l-src">Labor ${rate() ? money(c.lab) : "(set a labor rate)"} · materials ${money(c.mat)}</span></div>
-        <div class="scroll"><table class="t-mat"><thead><tr><th>Material</th><th>Quantity</th><th>Unit</th><th>Unit cost ($)</th><th>Cost</th><th></th></tr></thead><tbody>
-          ${(pv.materials || []).map((m, i) => `<tr><td>${esc(m.item)}</td><td>${esc(m.qty)}</td><td>${esc(m.unit || "")}</td><td>${esc(m.unit_cost)}</td><td>${money((+m.qty || 0) * (+m.unit_cost || 0))}</td><td><button class="btn ghost sm" type="button" data-rmm="${i}">Remove</button></td></tr>`).join("")}
-          <tr><td><input data-mi="item" placeholder="For example: native seed"></td><td><input data-mi="qty" type="number" min="0" step="any" style="width:5rem"></td><td><input data-mi="unit" placeholder="lb" style="width:5rem"></td><td><input data-mi="unit_cost" type="number" min="0" step="any" style="width:6rem"></td><td></td><td><button class="btn ghost sm" type="button" data-addm>Add</button></td></tr></tbody></table></div>
-      </div></details>`;
+    const st = vStatus(s, pv);
+    return `<section class="panel t-rec" data-pvrow="${pv.id}" aria-label="Visit record">
+      <div class="l-row"><h3 style="margin:0">${esc(s.name)} · ${esc(pv.type)} visit · ${esc(pv.date)}</h3><span class="l-sp"></span>${chipOf(st)}<button class="btn ghost sm" type="button" data-recclose>Close the record</button></div>
+      <div class="l-row"><label class="l-lab">Date <input type="date" data-f="date" value="${pv.date}"></label><label class="l-lab">Type <select data-f="type">${TYPES.map(t => `<option${t === pv.type ? " selected" : ""}>${t}</option>`).join("")}</select></label></div>
+      <div><b>Tasks</b><ul class="t-tasks">${tasks.map(t => `<li>${t[0] === "+" ? `<span class="l-chip y">Extra</span> ${esc(t.slice(1))}` : taskLink(t)}</li>`).join("") || "<li class='l-src'>No tasks chosen.</li>"}</ul></div>
+      <div class="grid3"><label class="l-lab">Crew (people) <input type="number" min="0" data-f="est_crew" value="${pv.est_crew ?? ""}" style="width:5rem"></label><label class="l-lab">Hours on site <input type="number" min="0" step="0.5" data-f="est_hours" value="${pv.est_hours ?? ""}" style="width:5rem"></label>
+        <span class="l-src">Labor ${rate() ? money(c.lab) : "(set a labor rate)"} · materials ${money(c.mat)} · <b>estimated ${money(c.total)}</b></span></div>
+      <div class="scroll"><table class="t-mat"><thead><tr><th>Material</th><th>Quantity</th><th>Unit</th><th>Unit cost ($)</th><th>Cost</th><th></th></tr></thead><tbody>
+        ${(pv.materials || []).map((m, i) => `<tr><td>${esc(m.item)}</td><td>${esc(m.qty)}</td><td>${esc(m.unit || "")}</td><td>${esc(m.unit_cost)}</td><td>${money((+m.qty || 0) * (+m.unit_cost || 0))}</td><td><button class="btn ghost sm" type="button" data-rmm="${i}">Remove</button></td></tr>`).join("")}
+        <tr><td><input data-mi="item" placeholder="For example: native seed" aria-label="Material"></td><td><input data-mi="qty" type="number" min="0" step="any" style="width:5rem" aria-label="Quantity"></td><td><input data-mi="unit" placeholder="lb" style="width:5rem" aria-label="Unit"></td><td><input data-mi="unit_cost" type="number" min="0" step="any" style="width:6rem" aria-label="Unit cost"></td><td></td><td><button class="btn ghost sm" type="button" data-addm>Add</button></td></tr></tbody></table></div>
+      <p class="l-src">Materials and the labor rate are set by the supervisor. Crews do not record costs.</p>
+      <div class="row">${dv ? `<a class="btn" href="#tool/visit/${dv.id}">Open the Visit Sheet</a>` : `<button class="btn" type="button" data-rec>Open the Visit Sheet</button>`}<button class="btn ghost" type="button" data-sendpv>Send to phone</button>
+        ${after ? `<a href="#tool/plan/${s.id}/${p.year}">Edit this VTS's plan →</a>` : dv ? "" : `<button class="btn ghost sm" type="button" data-rmv>Remove the visit</button>`}</div>
+    </section>`;
+  }
+  /* show a record in a box without redrawing the page; scroll only to bring it into view */
+  function showRec(box, s, p, pv, year) {
+    if (!box || !pv) return;
+    box.innerHTML = recordHtml(s, p, pv);
+    wireVisitRow(s, p, q("[data-pvrow]", box), year);
+    const r = box.getBoundingClientRect();
+    if (r.top < 0 || r.top > window.innerHeight - 80) box.scrollIntoView({block: "nearest", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"});
   }
   function wireVisitRow(s, p, det, year) {
-    const id = det.dataset.pvrow, edit = (fn, what, need) => changePlan(s, p, clone(p.planned_visits).map(v => v.id === id ? fn(v) : v), what, need);
+    const id = det.dataset.pvrow, edit = (fn, what, need) => { openRec = id; changePlan(s, p, clone(p.planned_visits).map(v => v.id === id ? fn(v) : v), what, need); };
+    const re = () => { openRec = id; redraw(s, year); };
     q("[data-f=date]", det).onchange = e => edit(v => (v.date = e.target.value, v), "Visit date changed");
     q("[data-f=type]", det).onchange = e => edit(v => (v.type = e.target.value, v), "Visit type changed");
-    ["est_crew", "est_hours"].forEach(f => q(`[data-f=${f}]`, det).onchange = e => { const pv = p.planned_visits.find(v => v.id === id); pv[f] = e.target.value === "" ? null : +e.target.value; St.persist(); plan(s.id, year); setTimeout(() => { const d = q(`[data-pvrow="${id}"]`); if (d) d.open = true; }, 0); });
+    ["est_crew", "est_hours"].forEach(f => q(`[data-f=${f}]`, det).onchange = e => { const pv = p.planned_visits.find(v => v.id === id); pv[f] = e.target.value === "" ? null : +e.target.value; St.persist(); re(); });
     q("[data-addm]", det).onclick = () => {
       const g = n => q(`[data-mi=${n}]`, det).value.trim(); if (!g("item")) return;
-      const pv = p.planned_visits.find(v => v.id === id); pv.materials = [...(pv.materials || []), {item: g("item"), qty: +g("qty") || 0, unit: g("unit"), unit_cost: +g("unit_cost") || 0}]; St.persist(); plan(s.id, year);
-      setTimeout(() => { const d = q(`[data-pvrow="${id}"]`); if (d) d.open = true; }, 0);
+      const pv = p.planned_visits.find(v => v.id === id); pv.materials = [...(pv.materials || []), {item: g("item"), qty: +g("qty") || 0, unit: g("unit"), unit_cost: +g("unit_cost") || 0}]; St.persist(); re();
     };
-    qa("[data-rmm]", det).forEach(b => b.onclick = () => { const pv = p.planned_visits.find(v => v.id === id); pv.materials.splice(+b.dataset.rmm, 1); St.persist(); plan(s.id, year); setTimeout(() => { const d = q(`[data-pvrow="${id}"]`); if (d) d.open = true; }, 0); });
+    qa("[data-rmm]", det).forEach(b => b.onclick = () => { const pv = p.planned_visits.find(v => v.id === id); pv.materials.splice(+b.dataset.rmm, 1); St.persist(); re(); });
     const rec = q("[data-rec]", det); if (rec) rec.onclick = () => { const v = startVisit(s, p.planned_visits.find(x => x.id === id)); location.hash = "#tool/visit/" + v.id; };
     const snd = q("[data-sendpv]", det); if (snd) snd.onclick = () => { const pv = p.planned_visits.find(x => x.id === id); sendDlg(s, {date: pv.date, type: pv.type, planned_id: pv.id, tasks_planned: [...chosen(s.type, pv), ...pv.extra_tasks.map(keyOf)]}); };
-    const rm = q("[data-rmv]", det); if (rm) rm.onclick = () => changePlan(s, p, clone(p.planned_visits).filter(v => v.id !== id), "Visit removed", true);
+    const rm = q("[data-rmv]", det); if (rm) rm.onclick = () => { openRec = null; changePlan(s, p, clone(p.planned_visits).filter(v => v.id !== id), "Visit removed", true); };
+    const cl = q("[data-recclose]", det); if (cl) cl.onclick = () => { openRec = null; det.parentElement.innerHTML = ""; };
+  }
+
+  /* ================= Yearly plan: overview of all VTS (rows) by month ================= */
+  const SYM = {done: "✓", plan: "○", late: "!"}, WORD = {done: "Done", plan: "Planned", late: "Overdue"};
+  function vStatus(s, pv) { return doneVisit(s, pv) ? "done" : pv.date < K().today() ? "late" : "plan"; }
+  const chipOf = st => `<span class="o-key o-${st}"><span aria-hidden="true">${SYM[st]}</span> ${WORD[st]}</span>`;
+  const shortDate = d => new Date(d + "T12:00:00").toLocaleDateString("en-US", {month: "short", day: "numeric"});
+  function overview(yearArg) {
+    const year = +yearArg || yearNow();
+    after = () => overview(year);
+    const sites = St.sites().filter(x => x.status !== "decommissioned" || (x.decommissioned && x.decommissioned.date.slice(0, 4) >= String(year)));
+    const years = [...new Set([...St.data.annual_plans.map(x => x.year), yearNow(), yearNow() + 1])].sort();
+    const monthCost = Array(12).fill(0), count = {done: 0, plan: 0, late: 0};
+    let rowsHtml = "";
+    sites.forEach(s => {
+      const p = St.planOf(s.id, year), pvs = p ? p.planned_visits.slice().sort((a, b) => a.date.localeCompare(b.date)) : [];
+      const extra = St.visitsOf(s.id).filter(v => v.status === "closed" && v.date.slice(0, 4) === String(year) && !pvs.some(pv => pv.id === v.planned_id || pv.date === v.date));
+      const cells = Array.from({length: 12}, () => []);
+      pvs.forEach(pv => {
+        const st = vStatus(s, pv), c = estCost(pv), n = [...chosen(s.type, pv), ...pv.extra_tasks].length, m = +pv.date.slice(5, 7) - 1;
+        count[st]++; monthCost[m] += c.total;
+        const sum = `${pv.type} visit · ${shortDate(pv.date)} · ${n} task${n === 1 ? "" : "s"} · ${rate() ? "estimated " + money(c.total) : "Set a labor rate to see the cost"}`;
+        cells[m].push(`<button type="button" class="o-chip o-${st}" data-site="${s.id}" data-pv="${pv.id}" aria-label="${esc(WORD[st] + ": " + sum)}"><span aria-hidden="true">${SYM[st]} ${+pv.date.slice(8)}</span><span class="o-tip" aria-hidden="true">${esc(WORD[st])} · ${esc(sum)}</span></button>`);
+      });
+      extra.forEach(v => { count.done++; cells[+v.date.slice(5, 7) - 1].push(`<a class="o-chip o-done o-extra" href="#tool/visit/${v.id}" aria-label="${esc(`Done: ${v.type} visit · ${shortDate(v.date)} · not in the plan`)}"><span aria-hidden="true">✓ ${+v.date.slice(8)}</span><span class="o-tip" aria-hidden="true">Done · ${esc(v.type)} visit · ${esc(shortDate(v.date))} · not in the plan</span></a>`); });
+      rowsHtml += `<tr><th class="g-t" scope="row"><span class="sdot" style="background:${K().COLOR[s.type]}"></span><a href="#tool/vts/${s.id}">${esc(s.name)}</a><br><span class="l-src">${esc(K().NAME[s.type])}${p ? (p.status === "approved" ? " · approved" : " · draft") : ""}</span>
+          ${p ? "" : `<br><a class="l-src" href="#tool/plan/${s.id}/${year}">No plan for ${year}. Create it →</a>`}</th>${cells.map(c => `<td class="o-c">${c.join("")}</td>`).join("")}</tr>`;
+    });
+    K().view().innerHTML = `<div class="l-row"><h2 style="margin:0">Yearly plan</h2><span class="l-sp"></span>
+        <label class="l-lab">Year <select id="oYear">${years.map(y => `<option${y === year ? " selected" : ""}>${y}</option>`).join("")}</select></label>
+        <label class="l-lab">Labor rate <input type="number" min="0" step="1" id="pRate" value="${rate() ?? ""}" placeholder="$ per person-hour" style="width:9rem"></label></div>
+      <p class="l-src">All your VTS in ${year}: ${count.done} done, ${count.plan} planned, ${count.late} overdue. Status uses today's date (${esc(K().today())}). Point at a visit for a summary; select it to open its record below.</p>
+      <div class="scroll g-wrap"><table class="g-tab o-grid"><caption class="vh">Visits of every VTS by month in ${year}</caption>
+        <thead><tr><th class="g-t" scope="col">VTS</th>${MONTHS.map(m => `<th scope="col">${m}</th>`).join("")}</tr></thead>
+        <tbody>${rowsHtml || `<tr><td colspan="13">No VTS yet. <a href="#tool/vts/new">Register a system</a>.</td></tr>`}
+          <tr class="o-cost"><th class="g-t" scope="row">Estimated cost <span class="l-chip r">Sample data</span>${rate() ? "" : `<br><span class="l-src">Materials only: set a labor rate</span>`}</th>${monthCost.map(c => `<td>${c ? money(c) : ""}</td>`).join("")}</tr></tbody></table></div>
+      <p class="d-legend">${["done", "plan", "late"].map(chipOf).join(" ")} <span class="l-src">The number is the day of the month.</span></p>
+      <div id="oRec">${openRec ? (() => { const f = findPv(openRec); return f ? recordHtml(f.s, f.p, f.pv) : ""; })() : ""}</div>`;
+    q("#oYear").onchange = e => { openRec = null; location.hash = `#tool/plan/all/${e.target.value}`; };
+    q("#pRate").onchange = e => { St.data.organization.labor_rate = e.target.value === "" ? null : +e.target.value; St.persist(); overview(year); };
+    qa(".o-chip[data-pv]").forEach(b => {
+      b.onclick = () => { const f = findPv(b.dataset.pv); if (!f) return; openRec = f.pv.id; showRec(q("#oRec"), f.s, f.p, f.pv, year); };
+      b.onkeydown = e => { if (e.key === "Escape") b.classList.add("o-hide"); };
+      b.onblur = () => b.classList.remove("o-hide");
+    });
+    const box = q("#oRec [data-pvrow]"); if (box) { const f = findPv(openRec); wireVisitRow(f.s, f.p, box, year); }
+  }
+  function findPv(id) {
+    for (const p of St.data.annual_plans) { const pv = p.planned_visits.find(x => x.id === id); if (pv) return {s: St.site(p.site), p, pv}; }
+    return null;
   }
 
   /* ================= Visit Sheet ================= */
@@ -429,36 +493,103 @@ window.ToolPlan = (function () {
       q("#toolDlg").close(); visit(v.id);
     };
   }
-  /* ================= Next visits ================= */
-  function upcoming() {
-    const t = K().today(), y = +t.slice(0, 4), horizon = new Date(Date.now() + 120 * 864e5).toISOString().slice(0, 10), out = [];
-    St.sites().filter(s => s.status !== "decommissioned").forEach(s => St.data.annual_plans.filter(p => p.site === s.id && (p.year === y || p.year === y + 1)).forEach(p => p.planned_visits.forEach(pv => {
+  /* ================= Next visits: calendar and table ================= */
+  function openPlanned() {
+    const t = K().today(), y = +t.slice(0, 4), out = [];
+    St.sites().filter(s => s.status !== "decommissioned").forEach(s => St.data.annual_plans.filter(p => p.site === s.id).forEach(p => p.planned_visits.forEach(pv => {
       const rec = St.visitsOf(s.id).find(v => v.planned_id === pv.id || (v.date === pv.date && v.type === pv.type) || v.date === pv.date);
       if (rec && rec.status === "closed") return;
       const status = rec ? "In progress" : pv.date < t ? "Overdue" : "Planned";
-      if (status === "Planned" && pv.date > horizon) return;
       if (status === "Overdue" && pv.date.slice(0, 4) !== String(y)) return;
       out.push({s, p, pv, rec, status});
     })));
     return out.sort((a, b) => a.pv.date.localeCompare(b.pv.date));
   }
+  function upcoming() {
+    const horizon = new Date(Date.now() + 120 * 864e5).toISOString().slice(0, 10);
+    return openPlanned().filter(x => x.status !== "Planned" || x.pv.date <= horizon);
+  }
+  const cal = {y: null, m: null, day: null, site: ""};
+  const pad = n => String(n).padStart(2, "0");
   function next(filter) {
-    const list = upcoming().filter(x => !filter || x.s.id === filter);
+    if (filter !== undefined) cal.site = filter || "";
+    const t = K().today();
+    if (cal.y === null) { cal.y = +t.slice(0, 4); cal.m = +t.slice(5, 7) - 1; }
+    const all = openPlanned().filter(x => !cal.site || x.s.id === cal.site);
+    const list = cal.day ? all.filter(x => x.pv.date === cal.day) : upcoming().filter(x => !cal.site || x.s.id === cal.site);
     const sites = St.sites().filter(s => s.status !== "decommissioned");
+    const perDay = {}; all.forEach(x => { perDay[x.pv.date] = (perDay[x.pv.date] || 0) + 1; });
+    const first = new Date(cal.y, cal.m, 1), days = new Date(cal.y, cal.m + 1, 0).getDate(), lead = (first.getDay() + 6) % 7;   /* weeks start on Monday */
+    const focusDay = cal.day && cal.day.slice(0, 7) === `${cal.y}-${pad(cal.m + 1)}` ? cal.day : t.slice(0, 7) === `${cal.y}-${pad(cal.m + 1)}` ? t : `${cal.y}-${pad(cal.m + 1)}-01`;
+    let cells = Array(lead).fill(`<td role="gridcell"></td>`);
+    for (let d = 1; d <= days; d++) {
+      const iso = `${cal.y}-${pad(cal.m + 1)}-${pad(d)}`, n = perDay[iso] || 0, late = all.some(x => x.pv.date === iso && x.status === "Overdue");
+      cells.push(`<td role="gridcell"><button type="button" class="c-day${n ? " has" : ""}${late ? " late" : ""}${iso === t ? " today" : ""}" data-day="${iso}" aria-pressed="${iso === cal.day}" tabindex="${iso === focusDay ? 0 : -1}"
+        aria-label="${new Date(iso + "T12:00:00").toLocaleDateString("en-US", {weekday: "long", month: "long", day: "numeric"})}${n ? `, ${n} visit${n > 1 ? "s" : ""}` : ", no visits"}${iso === t ? ", today" : ""}">${d}${n ? `<span class="c-n" aria-hidden="true">${n}</span>` : ""}</button></td>`);
+    }
+    while (cells.length % 7) cells.push(`<td role="gridcell"></td>`);
+    const weeks = []; for (let i = 0; i < cells.length; i += 7) weeks.push(`<tr role="row">${cells.slice(i, i + 7).join("")}</tr>`);
+    const monthName = first.toLocaleDateString("en-US", {month: "long", year: "numeric"});
     K().view().innerHTML = `<div class="l-row"><h2 style="margin:0">Next visits</h2><span class="l-sp"></span>
-        <label class="l-lab">VTS <select id="nSite"><option value="">All</option>${sites.map(s => `<option value="${s.id}"${s.id === filter ? " selected" : ""}>${esc(s.name)}</option>`).join("")}</select></label></div>
-      <p class="muted">Visits of the approved and draft yearly plans for the next four months, and any planned visit not recorded yet. Each task links to the manual.</p>
-      ${list.length ? list.map(x => { const tasks = [...chosen(x.s.type, x.pv), ...x.pv.extra_tasks.map(e => e.task || "+" + e.text)], d = new Date(x.pv.date + "T12:00:00");
-        return `<div class="panel t-nv"><div class="l-row"><b class="t-nvd">${d.toLocaleDateString("en-US", {weekday: "short", month: "short", day: "numeric", year: "numeric"})}</b>
-          <span class="l-chip ${x.status === "Overdue" ? "r" : x.status === "In progress" ? "y" : "g"}">${x.status}</span><span class="l-sp"></span><span class="sdot" style="background:${K().COLOR[x.s.type]}"></span><a href="#tool/vts/${x.s.id}">${esc(x.s.name)}</a></div>
-          <p><b>${esc(x.pv.type)}</b> visit${x.p.status === "draft" ? ' <span class="l-src">(plan still a draft)</span>' : ""}</p>
-          <ul class="t-tasks">${tasks.map(t => `<li>${t[0] === "+" ? `<span class="l-chip y">Extra</span> ${esc(t.slice(1))}` : taskLink(t)}</li>`).join("") || "<li class='l-src'>No tasks chosen.</li>"}</ul>
-          <div class="row"><button class="btn sm" type="button" data-open="${x.pv.id}" data-site="${x.s.id}">${x.rec ? "Continue the Visit Sheet" : "Open the Visit Sheet"}</button><button class="btn ghost sm" type="button" data-send="${x.pv.id}" data-site="${x.s.id}">Send to phone</button></div></div>`; }).join("")
-        : `<div class="panel"><p>No visits in the next four months.</p><p class="l-src">Plan next year in the <a href="#tool/plan">Yearly plan</a>.</p></div>`}`;
-    q("#nSite").onchange = e => next(e.target.value);
+        <label class="l-lab">VTS <select id="nSite"><option value="">All</option>${sites.map(s => `<option value="${s.id}"${s.id === cal.site ? " selected" : ""}>${esc(s.name)}</option>`).join("")}</select></label></div>
+      <div class="c-wrap">
+        <div class="c-cal panel"><div class="l-row c-head"><button class="btn ghost sm" type="button" id="cPrev" aria-label="Previous month">‹</button><b id="cTitle" aria-live="polite">${esc(monthName)}</b><button class="btn ghost sm" type="button" id="cNext" aria-label="Next month">›</button></div>
+          <table role="grid" class="c-grid" aria-labelledby="cTitle"><thead><tr role="row">${["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(d => `<th role="columnheader" scope="col">${d}</th>`).join("")}</tr></thead><tbody>${weeks.join("")}</tbody></table>
+          <p class="l-src">A number marks the visits that day; a red edge, an overdue one. Arrow keys move between days.</p></div>
+        <div class="stack">
+          <p class="muted">${cal.day ? `Visits on ${esc(new Date(cal.day + "T12:00:00").toLocaleDateString("en-US", {weekday: "long", month: "long", day: "numeric", year: "numeric"}))}. <button class="rg-jump" type="button" id="cAll">Show the next four months</button>` : "Planned visits for the next four months, and any planned visit not recorded yet."}</p>
+          <div class="scroll"><table class="c-tab"><thead><tr><th>Date</th><th>VTS</th><th>Visit</th><th>Tasks</th><th>Who</th><th>Status</th><th><span class="vh">Actions</span></th></tr></thead><tbody>
+            ${list.map(x => { const tasks = [...chosen(x.s.type, x.pv), ...x.pv.extra_tasks.map(e => e.task || "+" + e.text)];
+              return `<tr><td>${esc(shortDate(x.pv.date))}<br><span class="l-src">${esc(x.pv.date.slice(0, 4))}</span></td><td><span class="sdot" style="background:${K().COLOR[x.s.type]}"></span><a href="#tool/vts/${x.s.id}">${esc(x.s.name)}</a></td>
+                <td>${esc(x.pv.type)}${x.p.status === "draft" ? '<br><span class="l-src">plan still a draft</span>' : ""}</td>
+                <td><details><summary>${tasks.length} task${tasks.length === 1 ? "" : "s"}</summary><ul class="t-tasks">${tasks.map(k => `<li>${k[0] === "+" ? esc(k.slice(1)) : taskLink(k)}</li>`).join("")}</ul></details></td>
+                <td><span class="l-src">Not assigned</span></td>
+                <td><span class="o-key ${x.status === "Overdue" ? "o-late" : x.status === "In progress" ? "o-prog" : "o-plan"}">${x.status === "Overdue" ? '<span aria-hidden="true">!</span> ' : ""}${x.status}</span></td>
+                <td><div class="row" style="gap:.4rem"><button class="btn sm" type="button" data-open="${x.pv.id}">${x.rec ? "Continue the Visit Sheet" : "Open the Visit Sheet"}</button><button class="btn ghost sm" type="button" data-send="${x.pv.id}">Send to phone</button></div></td></tr>`; }).join("")
+              || `<tr><td colspan="7">${cal.day ? "No open visits that day." : "No visits in the next four months."} <a href="#tool/plan">See the yearly plan</a>.</td></tr>`}
+          </tbody></table></div>
+          <p class="l-src">"Who" stays empty until visits can be assigned to a person or crew.</p></div></div>`;
+    q("#nSite").onchange = e => { cal.day = null; next(e.target.value); };
+    q("#cPrev").onclick = () => { moveMonth(-1); next(); q("#cPrev").focus(); };
+    q("#cNext").onclick = () => { moveMonth(1); next(); q("#cNext").focus(); };
+    if (q("#cAll")) q("#cAll").onclick = () => { cal.day = null; next(); };
+    qa(".c-day").forEach(b => {
+      b.onclick = () => { cal.day = cal.day === b.dataset.day ? null : b.dataset.day; next(); const f = q(`.c-day[data-day="${b.dataset.day}"]`); if (f) f.focus(); };
+      b.onkeydown = e => {
+        const step = {ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7, Home: null, End: null}[e.key];
+        if (step === undefined) return;
+        e.preventDefault();
+        const d = new Date(b.dataset.day + "T12:00:00");
+        if (e.key === "Home") d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); else if (e.key === "End") d.setDate(d.getDate() + 6 - ((d.getDay() + 6) % 7)); else d.setDate(d.getDate() + step);
+        const iso = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+        if (d.getMonth() !== cal.m || d.getFullYear() !== cal.y) { cal.y = d.getFullYear(); cal.m = d.getMonth(); next(); }
+        qa(".c-day").forEach(x => x.tabIndex = -1); const f = q(`.c-day[data-day="${iso}"]`); if (f) { f.tabIndex = 0; f.focus(); }
+      };
+    });
     const find = b => list.find(x => x.pv.id === b.dataset.open || x.pv.id === b.dataset.send);
     qa("[data-open]").forEach(b => b.onclick = () => { const x = find(b); const v = x.rec || startVisit(x.s, x.pv); location.hash = "#tool/visit/" + v.id; });
     qa("[data-send]").forEach(b => b.onclick = () => { const x = find(b); sendDlg(x.s, {date: x.pv.date, type: x.pv.type, planned_id: x.pv.id, tasks_planned: [...chosen(x.s.type, x.pv), ...x.pv.extra_tasks.map(e => e.task || "+" + e.text)]}); });
+  }
+  function moveMonth(dir) { cal.m += dir; if (cal.m < 0) { cal.m = 11; cal.y--; } if (cal.m > 11) { cal.m = 0; cal.y++; } }
+
+  /* ================= Visit Sheets: every visit record, open ones first ================= */
+  let sheetSite = "";
+  function sheets(filter) {
+    if (filter !== undefined) sheetSite = filter || "";
+    const all = St.data.visits.filter(v => !sheetSite || v.site === sheetSite).slice()
+      .sort((a, b) => (a.status === "closed") - (b.status === "closed") || b.date.localeCompare(a.date));
+    const open = all.filter(v => v.status !== "closed").length;
+    K().view().innerHTML = `<div class="l-row"><h2 style="margin:0">Visit Sheets</h2><span class="l-sp"></span>
+        <label class="l-lab">VTS <select id="vsSite"><option value="">All</option>${St.sites().map(s => `<option value="${s.id}"${s.id === sheetSite ? " selected" : ""}>${esc(s.name)}</option>`).join("")}</select></label></div>
+      <p class="muted">${open} open, ${all.length - open} closed. Only closed visits count in the reports. Start a new Visit Sheet from Next visits or from a visit in the Yearly plan.</p>
+      <div class="scroll"><table><thead><tr><th>Date</th><th>VTS</th><th>Visit</th><th>Tasks done</th><th>Status</th><th><span class="vh">Open</span></th></tr></thead><tbody>
+        ${all.map(v => { const s = St.site(v.site) || {name: v.site, type: "SB"}, closed = v.status === "closed";
+          return `<tr><td>${esc(v.date)}</td><td><span class="sdot" style="background:${K().COLOR[s.type]}"></span>${esc(s.name)}</td><td>${esc(v.type)}</td>
+            <td>${(v.tasks_done || []).length} of ${(v.tasks_planned || []).length || "—"}</td>
+            <td>${closed ? `<span class="o-key o-done"><span aria-hidden="true">✓</span> Closed</span>` : `<span class="o-key o-prog">Open</span>`}</td>
+            <td><a href="#tool/visit/${v.id}">${closed ? "See the Visit Sheet" : "Continue the Visit Sheet"} →</a></td></tr>`; }).join("") || `<tr><td colspan="6">No Visit Sheets yet.</td></tr>`}
+      </tbody></table></div>`;
+    q("#vsSite").onchange = e => sheets(e.target.value);
   }
 
   /* ================= Send to phone (no server: the visit travels inside the link) ================= */
@@ -624,5 +755,5 @@ window.ToolPlan = (function () {
       q("#toolDlg").close(); corFilter.status = "active"; corrective();
     };
   }
-  return {plan, visit, next, phone, corrective, newPlan};
+  return {plan, visit, next, sheets, phone, corrective, newPlan};
 })();

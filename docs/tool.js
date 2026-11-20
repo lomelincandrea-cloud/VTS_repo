@@ -1,5 +1,5 @@
-/* Maintenance tool (prototype). Sections: My VTS (4a), Yearly plan (4b), Next visits (4c), Dashboard and reports (4d).
-   Data through window.VTSStore (store.js). Routes: #tool, #tool/vts, #tool/vts/<site id>, #tool/plan, #tool/visits, #tool/dashboard.
+/* Maintenance tool (prototype). Six steps: 1 My VTS, 2 Yearly plan, 3 Next visits, 4 Visit Sheets, 5 Corrective log, 6 Dashboard and reports.
+   Data through window.VTSStore (store.js). Routes: #tool, #tool/vts, #tool/vts/<site id>, #tool/plan, #tool/visits, #tool/sheets, #tool/visit/<id>, #tool/corrective, #tool/dashboard.
    app.js calls window.toolRoute(parts). */
 (function () {
   "use strict";
@@ -31,14 +31,16 @@
     if (!s) { gate(); return; }
     bar(s);
     const [v, a] = parts;
-    const which = v || "vts";
-    qa("#toolTabs a").forEach(x => x.dataset.t === which ? x.setAttribute("aria-current", "page") : x.removeAttribute("aria-current"));
+    const which = v || "vts", step = which === "visit" ? "sheets" : which;
+    qa("#toolTabs a").forEach(x => x.dataset.t === step ? x.setAttribute("aria-current", "step") : x.removeAttribute("aria-current"));
+    const hint = HINT[step]; q("#toolHint").textContent = hint ? `Step ${hint[0]} of 6 · ${hint[1]}` : "";
     if (map) { map.remove(); map = null; }
     if (which === "vts" && a === "new" && window.ToolRegister) window.ToolRegister.page();
     else if (which === "vts" && a) card(a, parts[2], parts[3]);
     else if (which === "vts") myVts();
     else if (which === "plan" && window.ToolPlan) window.ToolPlan.plan(a, parts[2]);
-    else if (which === "visit" && window.ToolPlan) { qa("#toolTabs a").forEach(x => x.dataset.t === "plan" ? x.setAttribute("aria-current", "page") : 0); window.ToolPlan.visit(a); }
+    else if (which === "visit" && window.ToolPlan) window.ToolPlan.visit(a);
+    else if (which === "sheets" && window.ToolPlan) window.ToolPlan.sheets(a);
     else if (which === "visits" && window.ToolPlan) window.ToolPlan.next(a);
     else if (which === "corrective" && window.ToolPlan) window.ToolPlan.corrective(a);
     else if (which === "dashboard" && window.ToolDash) window.ToolDash.render(a);
@@ -48,8 +50,39 @@
       <p>This prototype has no accounts yet. Enter as a demo user to see what a supervisor of a maintenance organization would see. All records are <b>sample data</b>.</p>
       <div class="row"><button class="btn" type="button" id="tEnter">Enter as demo</button></div>
       <p class="small muted">What you change is saved only in this browser. You can go back to the original sample data at any time.</p></div>`;
-    q("#tEnter").onclick = () => { St.signIn(); window.toolRoute((location.hash.slice(1).split("/")).slice(1)); };
+    q("#tEnter").onclick = async () => {
+      St.signIn(); await window.toolRoute((location.hash.slice(1).split("/")).slice(1));
+      let seen = null; try { seen = localStorage.getItem("vts_tool_help_seen"); localStorage.setItem("vts_tool_help_seen", "1"); } catch (e) {}
+      if (!seen) openHelp();   /* the first time a person signs in */
+    };
   }
+
+  /* ---------- the six steps: help line under the tabs, and the "?" side panel ---------- */
+  const HINT = {
+    vts: [1, "Your systems on a map. Open one to see its card, Site History and who can see what."],
+    plan: [2, "See the year at a glance. Select a visit to open its record."],
+    visits: [3, "Pick a day on the calendar to see its visits. Open the Visit Sheet or send it to a phone."],
+    sheets: [4, "Every Visit Sheet, open ones first. Only closed visits count in the reports."],
+    corrective: [5, "Every repair the inspections found. Schedule it, then record what was done."],
+    dashboard: [6, "Each indicator against its target. Print the Food Safety Record or the Water Summary."]};
+  const HELP = [
+    ["My VTS", "Your systems on a map. Open a card to see its design, Site Conditions, documents, who can see them, and its Site History. Register or decommission a system here."],
+    ["Yearly plan", "Every VTS by month. ✓ done, ○ planned, ! overdue. Select a visit to see its tasks, materials and estimated cost, open its Visit Sheet or send it to a phone. \"Edit this VTS's plan\" opens the chart of tasks by month."],
+    ["Next visits", "A calendar and the list of visits coming up. Pick a day to see only that day."],
+    ["Visit Sheets", "Every Visit Sheet, open ones first. Close a visit when it is complete; after that, changes ask for a reason."],
+    ["Corrective log", "Every problem found. Schedule the repair into the plan, then record what was done and when."],
+    ["Dashboard and reports", "Every indicator against its target, for one VTS or all of them. Print the Food Safety Record and the Water Quality and Maintenance Summary, or download the change history."]];
+  function openHelp() {
+    const d = q("#toolHelp"); if (!d) return;
+    d.innerHTML = `<div class="t-sidein"><div class="l-row"><h2 id="thTitle" style="margin:0">How the Tool works</h2><span class="l-sp"></span><button class="btn ghost sm" type="button" data-close>Close</button></div>
+      <p>Plan the year, record every visit, and keep track of repairs. It works with sample data: try anything, then use Reset sample data.</p>
+      <ol class="t-helpl">${HELP.map(([t, x]) => `<li><b>${esc(t)}</b><span>${esc(x)}</span></li>`).join("")}</ol>
+      <p class="l-banner">A draft saves as you go. Once a plan is approved or a visit is closed, every change asks for a reason and goes into the change history.</p></div>`;
+    q("[data-close]", d).onclick = () => d.close();
+    d.onclick = e => { if (e.target === d) d.close(); };   /* a click on the backdrop closes it */
+    d.showModal();
+  }
+  if (q("#toolHelpBtn")) q("#toolHelpBtn").onclick = openHelp;
   function bar(s) {
     q("#toolGate").innerHTML = `<div class="t-bar"><span><b>${esc(s.user)}</b> · ${esc(s.role)} · ${esc(s.org)} <span class="l-chip r">Sample data</span>${St.edited() ? ' <span class="l-chip y">Changed in this browser</span>' : ""}</span>
       <span class="l-sp"></span><button class="btn ghost sm" type="button" id="tReset">Reset sample data</button><button class="btn ghost sm" type="button" id="tOut">Sign out</button></div>`;

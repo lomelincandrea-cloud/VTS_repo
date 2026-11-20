@@ -218,11 +218,10 @@
 <section class="view" id="v-tool"><div class="wrap stack lg">
   <div class="stack"><h1>Maintenance tool</h1><p class="lede">Plan the year, keep the record of every visit, and see how each system is doing. Prototype with sample data.</p></div>
   <div id="toolGate"></div>
-  <div id="toolGuide"></div>
   <div id="toolApp" class="stack" hidden>
-    <nav class="l-pills l-tabs" id="toolTabs" aria-label="Tool sections">
-      <a class="l-pill" data-t="vts" href="#tool/vts">My VTS</a><a class="l-pill" data-t="plan" href="#tool/plan">Yearly plan</a><a class="l-pill" data-t="visits" href="#tool/visits">Next visits</a><a class="l-pill" data-t="corrective" href="#tool/corrective">Corrective log</a><a class="l-pill" data-t="dashboard" href="#tool/dashboard">Dashboard and reports</a>
-    </nav>
+    <div class="t-stepbar l-tabs"><nav id="toolTabs" aria-label="Tool steps"><ol class="t-steps"><li><a class="t-step" data-t="vts" href="#tool/vts"><span class="t-num" aria-hidden="true">1</span><span class="vh">Step 1: </span>My VTS</a></li><li><a class="t-step" data-t="plan" href="#tool/plan"><span class="t-num" aria-hidden="true">2</span><span class="vh">Step 2: </span>Yearly plan</a></li><li><a class="t-step" data-t="visits" href="#tool/visits"><span class="t-num" aria-hidden="true">3</span><span class="vh">Step 3: </span>Next visits</a></li><li><a class="t-step" data-t="sheets" href="#tool/sheets"><span class="t-num" aria-hidden="true">4</span><span class="vh">Step 4: </span>Visit Sheets</a></li><li><a class="t-step" data-t="corrective" href="#tool/corrective"><span class="t-num" aria-hidden="true">5</span><span class="vh">Step 5: </span>Corrective log</a></li><li><a class="t-step" data-t="dashboard" href="#tool/dashboard"><span class="t-num" aria-hidden="true">6</span><span class="vh">Step 6: </span>Dashboard and reports</a></li></ol></nav>
+      <button class="t-help" type="button" id="toolHelpBtn" aria-haspopup="dialog" aria-label="How the Tool works">?</button></div>
+    <p class="t-hint" id="toolHint"></p>
     <div id="toolView" class="stack"></div>
   </div>
 </div></section>
@@ -234,6 +233,7 @@
 
 <dialog id="learnDlg" class="l-dlg" aria-label="Plant card"></dialog>
 <dialog id="toolDlg" class="l-dlg" aria-label="Tool form"></dialog>
+<dialog id="toolHelp" class="t-side" aria-labelledby="thTitle"></dialog>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="geo.js"></script>

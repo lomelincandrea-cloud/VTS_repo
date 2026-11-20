@@ -476,3 +476,55 @@ body .g-c.on[data-k]{cursor:inherit}
 .doors a{border-radius:16px;background:var(--surface)}
 .doors a:hover,.l-card:hover,.t-item:hover{background:var(--water-soft)}
 .tabs button{color:var(--ink2)}
+
+/* R2 Tool: six numbered steps, help line, "?" side panel */
+.vh{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.t-stepbar{display:flex;align-items:flex-start;gap:.6rem;flex-wrap:nowrap}
+.t-steps{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:.3rem .2rem;align-items:center;flex:1;min-width:0}
+.t-steps li{display:flex;align-items:center;gap:.2rem}
+.t-steps li+li::before{content:"\203A";color:var(--ctl);font-weight:700;font-size:1.2rem}
+.t-step{display:inline-flex;align-items:center;gap:.4rem;min-height:44px;padding:.2rem .75rem .2rem .3rem;font-size:.95rem;border:2px solid var(--water);border-radius:999px;background:var(--surface);color:var(--water);font-weight:700;text-decoration:none}
+.t-num{display:inline-flex;align-items:center;justify-content:center;width:1.75rem;height:1.75rem;border-radius:50%;background:var(--water-soft);color:var(--water);font-size:.9rem}
+.t-step:hover{background:var(--water-soft)}
+.t-step[aria-current]{background:var(--yel);color:var(--yel-ink)}
+.t-step[aria-current] .t-num{background:var(--water);color:#fff}
+.t-help{width:44px;height:44px;border-radius:50%;border:2px solid var(--water);background:var(--surface);color:var(--water);font:700 1.2rem var(--body);cursor:pointer;flex:none}
+.t-hint{margin:.2rem 0 0;color:var(--ink2)}
+dialog.t-side{margin:0 0 0 auto;height:100vh;max-height:100vh;width:min(440px,94vw);background:var(--surface);color:var(--ink);border-left:1px solid var(--line);padding:0}
+dialog.t-side::backdrop{background:rgba(18,38,26,.35)}
+.t-sidein{padding:1.2rem;display:flex;flex-direction:column;gap:.9rem}
+.t-helpl{margin:0;padding-left:1.4rem;display:grid;gap:.7rem}
+.t-helpl b{display:block}
+.t-helpl span{color:var(--ink2)}
+
+/* R2 Yearly plan overview grid */
+.o-grid{min-width:980px}
+.o-grid td.o-c{vertical-align:top;min-width:3.6rem}
+.o-chip{position:relative;display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;margin:2px;padding:0 .35rem;border-radius:10px;font:600 .9rem var(--body);cursor:pointer;text-decoration:none;color:var(--ink);background:var(--surface)}
+.o-done{border:2px solid var(--field)}
+.o-plan{border:2px dotted var(--water)}
+.o-late{border:2px solid var(--alert);background:var(--alert-soft);font-weight:800}
+.o-extra{border-style:dashed}
+.o-tip{display:none;position:absolute;left:50%;bottom:calc(100% + 6px);transform:translateX(-50%);z-index:5;width:max-content;max-width:16rem;white-space:normal;background:var(--ink);color:#fff;font:500 .82rem/1.35 var(--body);padding:.4rem .6rem;border-radius:8px;text-align:left;pointer-events:none}
+.o-chip:hover .o-tip,.o-chip:focus-visible .o-tip{display:block}
+.o-chip.o-hide .o-tip{display:none}
+.o-key{display:inline-flex;align-items:center;gap:.3rem;padding:.15rem .6rem;border-radius:999px;font-size:.85rem;font-weight:600;color:var(--ink);background:var(--surface);white-space:nowrap}
+.o-key.o-prog{border:2px solid var(--silt)}
+.o-cost td,.o-cost th{background:var(--ground);font-size:.85rem}
+.t-rec{display:flex;flex-direction:column;gap:.7rem;margin-top:.8rem;border:2px solid var(--water)}
+
+/* R2 Next visits: calendar and table */
+.c-wrap{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:1.25rem;align-items:start}
+@media (max-width:900px){.c-wrap{grid-template-columns:1fr}}
+.c-head{justify-content:space-between}
+.c-grid{min-width:0;width:100%;table-layout:fixed;font-size:.9rem}
+.c-grid th,.c-grid td{padding:2px;text-align:center;border:0;background:transparent;font-weight:600}
+.c-day{position:relative;width:100%;min-height:44px;border:1.5px solid var(--line);border-radius:10px;background:var(--surface);cursor:pointer;font:600 .95rem var(--body)}
+.c-day.has{border:2px solid var(--water);background:var(--water-soft)}
+.c-day.late{border-color:var(--alert)}
+.c-day.today{box-shadow:inset 0 0 0 2px var(--yel)}
+.c-day[aria-pressed="true"]{background:var(--yel);border-color:var(--water);color:var(--yel-ink)}
+.c-n{position:absolute;top:2px;right:4px;font-size:.68rem;font-weight:800;color:var(--water)}
+.c-tab{min-width:760px}
+.c-tab td{vertical-align:top}
+.c-tab details summary{cursor:pointer;min-height:44px;display:flex;align-items:center}
