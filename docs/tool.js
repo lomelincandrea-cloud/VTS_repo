@@ -1,5 +1,5 @@
 /* Maintenance tool (prototype). Sections: My VTS (4a), Yearly plan (4b), Next visits (4c), Dashboard and reports (4d).
-   Data through window.VTSStore (store.js). Routes: #tool, #tool/vts, #tool/vts/<site id>, #tool/plan, #tool/visits, #tool/dashboard, #tool/old.
+   Data through window.VTSStore (store.js). Routes: #tool, #tool/vts, #tool/vts/<site id>, #tool/plan, #tool/visits, #tool/dashboard.
    app.js calls window.toolRoute(parts). */
 (function () {
   "use strict";
@@ -33,7 +33,6 @@
     const [v, a] = parts;
     const which = v || "vts";
     qa("#toolTabs a").forEach(x => x.dataset.t === which ? x.setAttribute("aria-current", "page") : x.removeAttribute("aria-current"));
-    q("#toolOld").hidden = which !== "old"; view().hidden = which === "old";
     if (map) { map.remove(); map = null; }
     if (which === "vts" && a === "new" && window.ToolRegister) window.ToolRegister.page();
     else if (which === "vts" && a) card(a, parts[2], parts[3]);

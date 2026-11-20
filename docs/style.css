@@ -110,9 +110,6 @@ tr:last-child td{border-bottom:0}
 .tag.due{background:var(--silt-soft);color:var(--ink)}
 .tag.act{background:var(--alert-soft);color:var(--ink)}
 .tag.info{background:var(--water-soft);color:var(--ink)}
-.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.75rem}
-.tile{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:.9rem 1rem}
-.tile b{font-family:var(--head);font-size:2rem;display:block;line-height:1}
 
 /* forms */
 form .f{display:flex;flex-direction:column;gap:.25rem;margin-bottom:.9rem}
@@ -135,40 +132,10 @@ ol.flow li>span:last-child{color:var(--muted);font-size:.95rem;max-width:24ch}
 @media (max-width:760px){ol.flow{grid-template-columns:1fr;gap:1.5rem}ol.flow::before{left:calc(50% - 3px);right:auto;top:46px;bottom:60px;width:6px;height:auto}ol.flow li{background:var(--ground)}}
 ul.plain{margin:0;padding-left:1.15rem;display:grid;gap:.35rem}
 
-/* phone */
+/* dialogs */
 dialog{border:0;padding:0;background:transparent;max-width:100vw}
 dialog::backdrop{background:rgba(10,25,22,.6)}
-.phone{width:min(390px,94vw);max-height:88vh;overflow:auto;background:var(--surface);color:var(--ink);border-radius:26px;border:8px solid var(--ink);padding:1rem}
-.q{border-top:1px solid var(--line);padding:.8rem 0}
-.q p{font-weight:600;margin-bottom:.5rem}
-.ans{display:grid;grid-template-columns:repeat(3,1fr);gap:.35rem}
-.ans button{min-height:44px;border:2px solid var(--line);border-radius:8px;background:var(--surface);font-weight:700;font-size:.85rem;cursor:pointer}
-.ans button[aria-pressed="true"].n{background:var(--field-soft);border-color:var(--field)}
-.ans button[aria-pressed="true"].a{background:var(--alert-soft);border-color:var(--alert)}
-.ans button[aria-pressed="true"].x{background:var(--ground);border-color:var(--muted)}
-.guide{margin-top:.5rem;padding:.6rem;background:var(--alert-soft);border-radius:8px;font-size:.88rem}
 .note{border:1.5px dashed var(--silt);background:var(--silt-soft);padding:.6rem .8rem;border-radius:8px;font-size:.88rem}
-/* manual form format (same palette as the Excel forms) */
-:root{--fblue:#03467E;--fblue-t:#03467E;--fkey:#E6F0F9;--fplan:#FFF8DC;--fline:#C4D3E2}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--fblue-t:#9CC7F0;--fkey:#1B3247;--fplan:#3B3417;--fline:#35506A}}
-:root[data-theme="dark"]{--fblue-t:#9CC7F0;--fkey:#1B3247;--fplan:#3B3417;--fline:#35506A}
-.form{background:var(--surface);border:1px solid var(--fline);border-radius:6px;padding:1rem;font-family:"Arial Narrow",Archivo,Arial,sans-serif;font-stretch:85%}
-.fcode{display:inline-block;background:var(--fblue);color:#fff;font-weight:700;font-size:.8rem;padding:.2rem .9rem}
-.ftitle{font-size:1.5rem;font-weight:700;color:var(--fblue-t);border-bottom:4px solid var(--fblue);padding:.25rem 0 .2rem;margin-bottom:.75rem;text-transform:uppercase;line-height:1.15}
-.form .scroll{border:0;border-radius:0;background:transparent}
-.form table{min-width:0;font-size:.9rem}
-.form th,.form td{border:1px solid var(--fline);padding:.35rem .5rem}
-.form th{background:var(--fblue);color:#fff;text-align:center;vertical-align:middle;white-space:normal;font-family:inherit}
-table.fkeys{width:100%;margin-bottom:.9rem}
-table.fkeys td:first-child{background:var(--fkey);color:var(--fblue-t);font-weight:700;width:12rem}
-table.fgrid{min-width:980px}
-table.fgrid td.m{text-align:center;width:2.4rem;padding:.35rem .15rem}
-table.fgrid td.id{font-weight:700;color:var(--fblue-t)}
-tr.fplan td{background:var(--fplan)}tr.fplan td:first-child,tr.fcount td:first-child{font-weight:700;color:var(--fblue-t)}
-tr.fcount td{background:var(--fkey);font-weight:700}
-td.fall{text-align:center;font-style:italic;color:var(--muted)}
-table.flog{min-width:900px}table.flog td{height:2.4rem}
-.fpick{display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;margin-bottom:.75rem}.fpick select{width:auto;min-width:16rem}
 footer{border-top:1px solid var(--line);padding:1.5rem 0;color:var(--muted);font-size:.875rem}
 
 /* v0 look: headings, pill buttons and nav, rounded cards with soft shadow */
@@ -184,8 +151,8 @@ nav.main a[aria-current="page"]{background:var(--water);color:var(--surface)}
 .btn:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.15)}
 .btn.ghost{background:transparent;border-color:var(--water);color:var(--water)}
 .btn.field{background:var(--field);border-color:var(--field);color:var(--surface)}
-.panel,.tile,.scroll,.doors,.transect{border-radius:16px;box-shadow:var(--sh)}
-.stations button,.ans button,input,select,textarea,fieldset{border-radius:10px}
+.panel,.scroll,.doors,.transect{border-radius:16px;box-shadow:var(--sh)}
+.stations button,input,select,textarea,fieldset{border-radius:10px}
 th{font-stretch:normal}
 .proto{background:var(--silt-soft)}
 @media (prefers-reduced-motion:reduce){.btn,.btn:hover{transition:none;transform:none}}
@@ -384,7 +351,7 @@ body .g-c.on[data-k]{cursor:inherit}
 .t-cor p{margin:0}.t-corf{font-weight:600}
 
 /* How-to-use guides (Learn and Tool) */
-.guide{background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:var(--sh);padding:1rem 1.1rem}
+.guide{margin-top:.5rem;font-size:.88rem;background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:var(--sh);padding:1rem 1.1rem}
 .guide-head{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
 .guide-head h2{margin:0;font-size:1.35rem}
 .guide-intro{color:var(--muted);margin:.3rem 0 .8rem}
