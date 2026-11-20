@@ -624,5 +624,5 @@ window.ToolPlan = (function () {
       q("#toolDlg").close(); corFilter.status = "active"; corrective();
     };
   }
-  return {plan, visit, next, phone, corrective};
+  return {plan, visit, next, phone, corrective, newPlan};
 })();

@@ -19,7 +19,7 @@
     status: {label: "Status", private: "Its condition is seen only by your organization.", watershed: "Its condition counts in sub-watershed summaries.", public: "Its overall condition shows on the public map."}};
   const DECOM = ["Replaced", "Removed", "Land use changed", "Agreement ended", "Other"];
   const view = () => q("#toolView");
-  let map = null, pickMap = null;
+  let map = null;
   const today = () => new Date().toISOString().slice(0, 10);
 
   /* ---------- routing and session ---------- */
@@ -35,7 +35,8 @@
     qa("#toolTabs a").forEach(x => x.dataset.t === which ? x.setAttribute("aria-current", "page") : x.removeAttribute("aria-current"));
     q("#toolOld").hidden = which !== "old"; view().hidden = which === "old";
     if (map) { map.remove(); map = null; }
-    if (which === "vts" && a) card(a, parts[2], parts[3]);
+    if (which === "vts" && a === "new" && window.ToolRegister) window.ToolRegister.page();
+    else if (which === "vts" && a) card(a, parts[2], parts[3]);
     else if (which === "vts") myVts();
     else if (which === "plan" && window.ToolPlan) window.ToolPlan.plan(a, parts[2]);
     else if (which === "visit" && window.ToolPlan) { qa("#toolTabs a").forEach(x => x.dataset.t === "plan" ? x.setAttribute("aria-current", "page") : 0); window.ToolPlan.visit(a); }
@@ -81,10 +82,9 @@
   function myVts() {
     const sites = St.sites();
     view().innerHTML = `
-      <div class="l-row"><h2 style="margin:0">My VTS</h2><span class="l-sp"></span><label class="check" style="min-height:0"><input type="checkbox" id="tShowOff" checked> Show decommissioned</label><button class="btn" type="button" id="tAdd">Add a VTS</button></div>
+      <div class="l-row"><h2 style="margin:0">My VTS</h2><span class="l-sp"></span><label class="check" style="min-height:0"><input type="checkbox" id="tShowOff" checked> Show decommissioned</label><a class="btn" href="#tool/vts/new">Register a system</a></div>
       <div class="t-grid"><div class="lmap panel" id="tmap" aria-label="Map of your VTS"></div><div class="t-list" id="tlist"></div></div>
       <p class="small muted">Sample sites in made-up places. Colored dot: system type. Grey dashed dot: decommissioned. ${legend()}</p>`;
-    q("#tAdd").onclick = addDlg;
     q("#tShowOff").onchange = () => draw();
     if (window.L && window.L.map) {
       map = window.L.map("tmap", {scrollWheelZoom: false});
@@ -164,6 +164,10 @@
     if (f.startsWith("photo points")) return p.photo_points && `${p.photo_points.count}: ${p.photo_points.where}`;
     if (f.startsWith("designated mowing")) return p.designated_mowing_areas;
     if (f.startsWith("areas left unmowed")) return p.areas_left_unmowed;
+    if (f.startsWith("pump")) return p.pump && (p.pump.present ? "Yes. " + (p.pump.owner_contact || "Owner not set") : "No");
+    if (f.startsWith("operating water-level")) return p.operating_water_level_range;
+    if (f.startsWith("overflow marker")) return p.overflow_marker;
+    if (f.startsWith("drawdown time")) return p.drawdown_time;
     if (f.startsWith("year built") || f.startsWith("drainage area")) return "see Design";
     return p[field] || "";
   }
@@ -198,32 +202,5 @@
       dlg().close(); card(s.id);
     };
   }
-  function addDlg() {
-    openDlg(`<h3>Add a VTS</h3><form id="tAF" class="stack">
-      <div class="grid2"><div class="f"><label for="tAn">Name</label><input id="tAn" required></div>
-        <div class="f"><label for="tAt">System type</label><select id="tAt">${Object.entries(NAME).map(([k, n]) => `<option value="${k}">${n}</option>`).join("")}</select></div>
-        <div class="f"><label for="tAo">Project owner</label><input id="tAo" required></div>
-        <div class="f"><label for="tAy">Year built</label><input id="tAy" type="number" min="1950" max="2100"></div>
-        <div class="f"><label for="tAa">Drainage area (acres)</label><input id="tAa" type="number" min="0" step="0.1"></div></div>
-      <div class="f"><label>Location: click the map to place it</label><div id="tApick" class="t-pick"></div><p class="l-src" id="tAll">Not placed yet. You can place it later.</p></div>
-      <p class="l-src">New VTS start as Private for location, documents and status.</p>
-      <div class="row"><button class="btn" type="submit">Add</button><button class="btn ghost" type="button" data-close>Cancel</button></div></form>`, () => {
-      let ll = null;
-      if (window.L && window.L.map) {
-        if (pickMap) { pickMap.remove(); pickMap = null; }
-        pickMap = window.L.map("tApick").setView([36.68, -121.62], 10);
-        window.L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 18, attribution: "© OpenStreetMap contributors"}).addTo(pickMap);
-        let mk = null; pickMap.on("click", e => { ll = e.latlng; if (mk) mk.setLatLng(ll); else mk = window.L.circleMarker(ll, {radius: 9, color: "#fff", weight: 2, fillColor: "#03467E", fillOpacity: 1}).addTo(pickMap); q("#tAll").textContent = `Placed at ${ll.lat.toFixed(4)}, ${ll.lng.toFixed(4)}.`; });
-        setTimeout(() => pickMap.invalidateSize(), 80);
-      } else q("#tApick").innerHTML = '<p class="muted">The map could not load.</p>';
-      q("#tAF").onsubmit = e => {
-        e.preventDefault();
-        const id = St.nextId("sites", "S-NEW-"), a = parseFloat(q("#tAa").value), y = parseInt(q("#tAy").value, 10);
-        St.add("sites", {id, name: q("#tAn").value.trim(), type: q("#tAt").value, year_built: isNaN(y) ? null : y, drainage_area: isNaN(a) ? null : {value: a, unit: "acres"},
-          huc12: null, location: ll ? {lat: +ll.lat.toFixed(5), lon: +ll.lng.toFixed(5)} : null, project_owner: q("#tAo").value.trim(), status: "active", decommissioned: null,
-          params: {}, sharing: {wildlife_in_food_safety_record: false, show_owner_in_water_summary: false}, privacy: {location: "private", documents: "private", status: "private"}, design: [], documents: []});
-        dlg().close(); location.hash = "#tool/vts/" + id;
-      };
-    });
-  }
+
 })();

@@ -327,6 +327,45 @@
                 "null"
               ],
               "description": "Areas left unmowed on purpose, and why. Agreed once by the supervisor and the project owner."
+            },
+            "operating_water_level_range": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "Site_Params 'Operating water-level range' (treatment wetland), from the design."
+            },
+            "overflow_marker": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "Site_Params 'Overflow marker (elevation)' (sediment basin)."
+            },
+            "drawdown_time": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "Site_Params 'Drawdown time (dry basins)' (sediment basin)."
+            },
+            "pump": {
+              "type": [
+                "object",
+                "null"
+              ],
+              "properties": {
+                "present": {
+                  "type": "boolean"
+                },
+                "owner_contact": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "description": "Site_Params 'Pump (yes/no), owner and contact': who checks and repairs it."
             }
           }
         },

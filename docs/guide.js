@@ -44,7 +44,7 @@ window.VTSGuide = (function () {
   }
   function tool() {
     render(document.getElementById("toolGuide"), "tool", "the Tool", "Plan the year, record every visit, and keep track of repairs. It works with sample data: try anything, then use Reset sample data.", [
-      {icon: "pin", title: "My VTS", text: "Your systems on a map. Open a card to see its design, Site Conditions, documents, who can see them, and its Site History. Add or decommission a system here.", href: "#tool/vts"},
+      {icon: "pin", title: "My VTS", text: "Your systems on a map. Open a card to see its design, Site Conditions, documents, who can see them, and its Site History. Register or decommission a system here.", href: "#tool/vts"},
       {icon: "gantt", title: "Yearly plan", text: "A chart of tasks by month. Press Edit, click a month and pick the day. Use + to add a task. Routine tasks happen at every visit.", href: "#tool/plan"},
       {icon: "sheet", title: "Next visits", text: "The visits coming up. Open the Visit Sheet to record a visit, or send it to the crew's phone.", href: "#tool/visits"},
       {icon: "phone", title: "Send to phone", text: "The crew opens the link or QR code, fills in the checklist in the field, and sends back a results file you import.", href: "#tool/visits"},
