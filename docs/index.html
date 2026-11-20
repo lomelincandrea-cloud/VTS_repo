@@ -30,40 +30,39 @@
 
 <main id="main" tabindex="-1">
 <!-- HOME -->
-<section class="view" id="v-home"><div class="wrap stack lg">
-  <div class="hero stack">
-    <h1>Treatment that keeps working, from the field to Monterey Bay</h1>
-    <p class="lede">Vegetated treatment systems clean farm runoff before it reaches creeks, sloughs and the bay. They only work if someone looks after them. This is the place to plan one, learn to maintain one, or ask for a crew.</p>
-    <div class="row"><a class="btn" href="#start">Plan a new system</a><a class="btn ghost" href="#maintain">Maintain a system</a></div>
-    <div class="transect" role="img" aria-label="Drawing of a watershed: water runs from the hills through farm fields, passes a sediment basin, a vegetated ditch, a woodchip bioreactor and a treatment wetland, and reaches Monterey Bay.">
-      <svg viewBox="0 0 1200 360" aria-hidden="true">
-        <defs><pattern id="rows" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(-18)"><line x1="0" y1="7" x2="14" y2="7" stroke="var(--field)" stroke-width="3" opacity=".55"/></pattern></defs>
-        <g fill="none" stroke="var(--line)" stroke-width="1.5">
-          <path d="M0 120 C110 40 230 20 330 80 C400 122 480 110 560 160"/><path d="M0 150 C120 78 220 60 320 112 C390 148 470 140 540 185"/><path d="M0 182 C130 118 220 104 310 144 C370 170 430 170 500 205"/>
-          <path d="M40 70 C100 30 180 22 240 44"/>
-        </g>
-        <path d="M0 215 C200 200 360 205 470 222 C570 240 720 260 900 283 L990 296 L990 360 L0 360Z" fill="var(--field-soft)"/>
-        <path d="M250 208 L560 236 L540 300 L210 268Z" fill="url(#rows)"/>
-        <path d="M600 246 L850 277 L836 330 L580 300Z" fill="url(#rows)"/>
-        <rect x="990" y="296" width="210" height="64" fill="var(--water-soft)"/>
-        <g fill="none" stroke="var(--water)" stroke-width="2" stroke-linecap="round" opacity=".7"><path d="M1010 318 q12 -8 24 0 t24 0 t24 0"/><path d="M1090 338 q12 -8 24 0 t24 0 t24 0"/><path d="M1120 312 q10 -7 20 0 t20 0"/></g>
-        <path d="M150 95 C250 150 360 200 470 222 C520 232 570 240 620 246 C670 252 720 260 770 266 C815 272 860 278 900 283 C930 287 960 292 990 296 L1200 302" fill="none" stroke="var(--water)" stroke-width="6" stroke-linecap="round"/>
-        <!-- SB -->
-        <g transform="translate(470 222)"><path d="M-34 -44 L34 -44 L22 -18 L-22 -18Z" fill="var(--water-soft)" stroke="var(--ink)" stroke-width="2.5"/><path d="M-22 -22 L22 -22" stroke="var(--silt)" stroke-width="5"/><line x1="0" y1="-18" x2="0" y2="-9" stroke="var(--ink)" stroke-width="2"/><circle r="9" fill="var(--surface)" stroke="var(--water)" stroke-width="4"/></g>
-        <!-- VD -->
-        <g transform="translate(620 246)"><path d="M-36 -44 L-12 -20 L12 -20 L36 -44" fill="none" stroke="var(--ink)" stroke-width="2.5"/><g stroke="var(--field)" stroke-width="3" stroke-linecap="round"><path d="M-28 -40 l-3 -10 M-20 -32 l-3 -10 M-8 -22 l-2 -10 M8 -22 l2 -10 M20 -32 l3 -10 M28 -40 l3 -10 M0 -21 l0 -10"/></g><line x1="0" y1="-20" x2="0" y2="-9" stroke="var(--ink)" stroke-width="2"/><circle r="9" fill="var(--surface)" stroke="var(--water)" stroke-width="4"/></g>
-        <!-- WB -->
-        <g transform="translate(770 266)"><rect x="-34" y="-46" width="68" height="26" rx="3" fill="var(--silt-soft)" stroke="var(--ink)" stroke-width="2.5"/><g fill="var(--silt)"><rect x="-27" y="-41" width="9" height="5"/><rect x="-12" y="-37" width="9" height="5"/><rect x="3" y="-42" width="9" height="5"/><rect x="17" y="-36" width="9" height="5"/><rect x="-22" y="-30" width="9" height="5"/><rect x="-4" y="-29" width="9" height="5"/><rect x="12" y="-28" width="9" height="5"/></g><line x1="0" y1="-20" x2="0" y2="-9" stroke="var(--ink)" stroke-width="2"/><circle r="9" fill="var(--surface)" stroke="var(--water)" stroke-width="4"/></g>
-        <!-- TW -->
-        <g transform="translate(900 283)"><ellipse cx="0" cy="-30" rx="38" ry="12" fill="var(--water-soft)" stroke="var(--ink)" stroke-width="2.5"/><g stroke="var(--field)" stroke-width="3" stroke-linecap="round"><path d="M-22 -30 l0 -20 M-14 -28 l-3 -22 M-4 -27 l0 -24 M8 -28 l3 -22 M18 -30 l0 -19"/></g><line x1="0" y1="-18" x2="0" y2="-9" stroke="var(--ink)" stroke-width="2"/><circle r="9" fill="var(--surface)" stroke="var(--water)" stroke-width="4"/></g>
-        <g font-family="Barlow Condensed, Arial Narrow, Arial, sans-serif" font-weight="700" fill="var(--muted)" font-size="17"><text x="60" y="62">Hills and headwaters</text><text x="330" y="330">Farm fields</text><text x="1020" y="286">Monterey Bay</text></g>
-      </svg>
+<section class="view" id="v-home">
+  <div class="h-hero">
+    <div class="wrap h-copy">
+      <h1>Treatment that keeps working, from the field to Monterey Bay</h1>
+      <p class="lede">Vegetated treatment systems clean farm runoff before it reaches creeks, sloughs and the bay. They only work if someone looks after them. This is the place to plan one, learn to maintain one, or ask for a crew.</p>
+      <div class="row"><a class="btn" href="#start">Plan a new system</a><a class="btn ghost" href="#maintain">Maintain a system</a></div>
     </div>
-    <div class="stations" id="stations"></div>
-    <div class="panel" id="sysdetail" aria-live="polite"></div>
+    <svg class="h-art h-art-h" viewBox="0 175 1200 350" role="group" aria-label="Water flowing through four treatment systems, brown at the field and clearer at the bay. Tap a system for details.">
+<defs><linearGradient id="wath" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1200" y2="0"><stop offset="0" stop-color="#8B5E3C"/><stop offset=".22" stop-color="#9A7149"/><stop offset=".42" stop-color="#7C9487"/><stop offset=".66" stop-color="#3FA3B8"/><stop offset="1" stop-color="#4CD0EA"/></linearGradient>
+<radialGradient id="glowh"><stop offset="0" stop-color="#F6B800" stop-opacity=".6"/><stop offset="1" stop-color="#F6B800" stop-opacity="0"/></radialGradient>
+<filter id="shh" filterUnits="userSpaceOnUse" x="-100" y="-100" width="1500" height="1300"><feDropShadow dx="0" dy="6" stdDeviation="7" flood-color="#000" flood-opacity=".22"/></filter>
+<path id="midh" d="M-40,300 C120,226 250,376 400,300 S640,226 780,300 S1010,376 1240,290"/></defs><g aria-hidden="true">
+<g filter="url(#shh)"><use href="#midh" stroke="#fff" stroke-opacity=".9" stroke-width="96" fill="none" stroke-linecap="round"/><use href="#midh" stroke="url(#wath)" stroke-width="84" fill="none" stroke-linecap="round"/></g>
+<use href="#midh" stroke="#fff" stroke-opacity=".16" stroke-width="26" fill="none" stroke-linecap="round" transform="translate(0,-14) "/>
+<g class="h-specks" data-p="midh"></g><text x="28" y="196" class="h-end">FIELD RUNOFF</text><text x="28" y="216" class="h-end2">brown with soil</text><text x="1172" y="196" text-anchor="end" class="h-end">TO MONTEREY BAY</text><text x="1172" y="216" text-anchor="end" class="h-end2">clearer, less nitrate</text></g><g class="h-stations" data-p="midh"><g class="h-st" data-k="SB" tabindex="0" role="button" aria-pressed="false" aria-label="Sediment basin"><circle class="h-halo" r="66"/><circle class="h-disc" r="46"/><g><path d="M-22,2 Q0,24 22,2 L22,-4 L-22,-4Z" fill="#8a5a33"/><path d="M-22,-4 Q0,6 22,-4" stroke="#8a5a33" stroke-width="2" fill="none"/></g><g transform="translate(0,84)" class="h-pillg"><rect x="-96" y="-18" width="192" height="36" rx="18"/><text text-anchor="middle" y="6">Sediment basin</text></g></g><g class="h-st" data-k="VD" tabindex="0" role="button" aria-pressed="false" aria-label="Vegetated ditch"><circle class="h-halo" r="66"/><circle class="h-disc" r="46"/><g><path d="M-18,12 Q-15,-2 -12,-14" stroke="#2F7D4A" stroke-width="3.5" stroke-linecap="round" fill="none"/><path d="M-9,12 Q-6,-2 -3,-14" stroke="#2F7D4A" stroke-width="3.5" stroke-linecap="round" fill="none"/><path d="M0,12 Q3,-2 6,-14" stroke="#2F7D4A" stroke-width="3.5" stroke-linecap="round" fill="none"/><path d="M9,12 Q12,-2 15,-14" stroke="#2F7D4A" stroke-width="3.5" stroke-linecap="round" fill="none"/><path d="M18,12 Q21,-2 24,-14" stroke="#2F7D4A" stroke-width="3.5" stroke-linecap="round" fill="none"/></g><g transform="translate(0,84)" class="h-pillg"><rect x="-96" y="-18" width="192" height="36" rx="18"/><text text-anchor="middle" y="6">Vegetated ditch</text></g></g><g class="h-st" data-k="WB" tabindex="0" role="button" aria-pressed="false" aria-label="Woodchip bioreactor"><circle class="h-halo" r="66"/><circle class="h-disc" r="46"/><g><rect x="-18" y="-10" width="12" height="6" rx="1.5" fill="#B98A57" transform="rotate(12 -12 -7)"/><rect x="-4" y="-8" width="12" height="6" rx="1.5" fill="#B98A57" transform="rotate(-18 2 -5)"/><rect x="8" y="-10" width="12" height="6" rx="1.5" fill="#B98A57" transform="rotate(25 14 -7)"/><rect x="-14" y="0" width="12" height="6" rx="1.5" fill="#B98A57" transform="rotate(-10 -8 3)"/><rect x="0" y="2" width="12" height="6" rx="1.5" fill="#B98A57" transform="rotate(16 6 5)"/><rect x="10" y="0" width="12" height="6" rx="1.5" fill="#B98A57" transform="rotate(-22 16 3)"/></g><g transform="translate(0,84)" class="h-pillg"><rect x="-96" y="-18" width="192" height="36" rx="18"/><text text-anchor="middle" y="6">Woodchip bioreactor</text></g></g><g class="h-st" data-k="TW" tabindex="0" role="button" aria-pressed="false" aria-label="Treatment wetland"><circle class="h-halo" r="66"/><circle class="h-disc" r="46"/><g><path d="M-14,12 L-14,-12" stroke="#2F7D4A" stroke-width="3" stroke-linecap="round"/><ellipse cx="-14" cy="-14" rx="2.6" ry="6" fill="#6B4A2A"/><path d="M-4,12 L-4,-12" stroke="#2F7D4A" stroke-width="3" stroke-linecap="round"/><ellipse cx="-4" cy="-14" rx="2.6" ry="6" fill="#6B4A2A"/><path d="M6,12 L6,-12" stroke="#2F7D4A" stroke-width="3" stroke-linecap="round"/><ellipse cx="6" cy="-14" rx="2.6" ry="6" fill="#6B4A2A"/><path d="M16,12 L16,-12" stroke="#2F7D4A" stroke-width="3" stroke-linecap="round"/><ellipse cx="16" cy="-14" rx="2.6" ry="6" fill="#6B4A2A"/><path d="M-22,10 Q-10,4 0,10 T22,10" stroke="#3FA3B8" stroke-width="2" fill="none"/></g><g transform="translate(0,84)" class="h-pillg"><rect x="-96" y="-18" width="192" height="36" rx="18"/><text text-anchor="middle" y="6">Treatment wetland</text></g></g></g></svg><svg class="h-art h-art-v" viewBox="0 0 400 1050" role="group" aria-label="Water flowing through four treatment systems, brown at the field and clearer at the bay. Tap a system for details.">
+<defs><linearGradient id="watv" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="1000"><stop offset="0" stop-color="#8B5E3C"/><stop offset=".22" stop-color="#9A7149"/><stop offset=".42" stop-color="#7C9487"/><stop offset=".66" stop-color="#3FA3B8"/><stop offset="1" stop-color="#4CD0EA"/></linearGradient>
+<radialGradient id="glowv"><stop offset="0" stop-color="#F6B800" stop-opacity=".6"/><stop offset="1" stop-color="#F6B800" stop-opacity="0"/></radialGradient>
+<filter id="shv" filterUnits="userSpaceOnUse" x="-100" y="-100" width="1500" height="1300"><feDropShadow dx="0" dy="6" stdDeviation="7" flood-color="#000" flood-opacity=".22"/></filter>
+<path id="midv" d="M200,-40 C330,90 80,210 200,330 S330,540 200,660 S90,870 210,1040"/></defs><g aria-hidden="true">
+<g filter="url(#shv)"><use href="#midv" stroke="#fff" stroke-opacity=".9" stroke-width="96" fill="none" stroke-linecap="round"/><use href="#midv" stroke="url(#watv)" stroke-width="84" fill="none" stroke-linecap="round"/></g>
+<use href="#midv" stroke="#fff" stroke-opacity=".16" stroke-width="26" fill="none" stroke-linecap="round" transform="translate(0,0) translate(-14,0)"/>
+<g class="h-specks" data-p="midv"></g><text x="20" y="30" class="h-end">FIELD RUNOFF</text><text x="20" y="50" class="h-end2">brown with soil</text><text x="380" y="1004" text-anchor="end" class="h-end">TO MONTEREY BAY</text><text x="380" y="1024" text-anchor="end" class="h-end2">clearer, less nitrate</text></g><g class="h-stations" data-p="midv"><g class="h-st" data-k="SB" tabindex="0" role="button" aria-pressed="false" aria-label="Sediment basin"><circle class="h-halo" r="66"/><circle class="h-disc" r="46"/><g><path d="M-22,2 Q0,24 22,2 L22,-4 L-22,-4Z" fill="#8a5a33"/><path d="M-22,-4 Q0,6 22,-4" stroke="#8a5a33" stroke-width="2" fill="none"/></g><g transform="translate(0,84)" class="h-pillg"><rect x="-96" y="-18" width="192" height="36" rx="18"/><text text-anchor="middle" y="6">Sediment basin</text></g></g><g class="h-st" data-k="VD" tabindex="0" role="button" aria-pressed="false" aria-label="Vegetated ditch"><circle class="h-halo" r="66"/><circle class="h-disc" r="46"/><g><path d="M-18,12 Q-15,-2 -12,-14" stroke="#2F7D4A" stroke-width="3.5" stroke-linecap="round" fill="none"/><path d="M-9,12 Q-6,-2 -3,-14" stroke="#2F7D4A" stroke-width="3.5" stroke-linecap="round" fill="none"/><path d="M0,12 Q3,-2 6,-14" stroke="#2F7D4A" stroke-width="3.5" stroke-linecap="round" fill="none"/><path d="M9,12 Q12,-2 15,-14" stroke="#2F7D4A" stroke-width="3.5" stroke-linecap="round" fill="none"/><path d="M18,12 Q21,-2 24,-14" stroke="#2F7D4A" stroke-width="3.5" stroke-linecap="round" fill="none"/></g><g transform="translate(0,84)" class="h-pillg"><rect x="-96" y="-18" width="192" height="36" rx="18"/><text text-anchor="middle" y="6">Vegetated ditch</text></g></g><g class="h-st" data-k="WB" tabindex="0" role="button" aria-pressed="false" aria-label="Woodchip bioreactor"><circle class="h-halo" r="66"/><circle class="h-disc" r="46"/><g><rect x="-18" y="-10" width="12" height="6" rx="1.5" fill="#B98A57" transform="rotate(12 -12 -7)"/><rect x="-4" y="-8" width="12" height="6" rx="1.5" fill="#B98A57" transform="rotate(-18 2 -5)"/><rect x="8" y="-10" width="12" height="6" rx="1.5" fill="#B98A57" transform="rotate(25 14 -7)"/><rect x="-14" y="0" width="12" height="6" rx="1.5" fill="#B98A57" transform="rotate(-10 -8 3)"/><rect x="0" y="2" width="12" height="6" rx="1.5" fill="#B98A57" transform="rotate(16 6 5)"/><rect x="10" y="0" width="12" height="6" rx="1.5" fill="#B98A57" transform="rotate(-22 16 3)"/></g><g transform="translate(0,84)" class="h-pillg"><rect x="-96" y="-18" width="192" height="36" rx="18"/><text text-anchor="middle" y="6">Woodchip bioreactor</text></g></g><g class="h-st" data-k="TW" tabindex="0" role="button" aria-pressed="false" aria-label="Treatment wetland"><circle class="h-halo" r="66"/><circle class="h-disc" r="46"/><g><path d="M-14,12 L-14,-12" stroke="#2F7D4A" stroke-width="3" stroke-linecap="round"/><ellipse cx="-14" cy="-14" rx="2.6" ry="6" fill="#6B4A2A"/><path d="M-4,12 L-4,-12" stroke="#2F7D4A" stroke-width="3" stroke-linecap="round"/><ellipse cx="-4" cy="-14" rx="2.6" ry="6" fill="#6B4A2A"/><path d="M6,12 L6,-12" stroke="#2F7D4A" stroke-width="3" stroke-linecap="round"/><ellipse cx="6" cy="-14" rx="2.6" ry="6" fill="#6B4A2A"/><path d="M16,12 L16,-12" stroke="#2F7D4A" stroke-width="3" stroke-linecap="round"/><ellipse cx="16" cy="-14" rx="2.6" ry="6" fill="#6B4A2A"/><path d="M-22,10 Q-10,4 0,10 T22,10" stroke="#3FA3B8" stroke-width="2" fill="none"/></g><g transform="translate(0,84)" class="h-pillg"><rect x="-96" y="-18" width="192" height="36" rx="18"/><text text-anchor="middle" y="6">Treatment wetland</text></g></g></g></svg>
+    <p class="wrap h-cap">Illustration, not measured results.</p>
+  </div>
+<div class="wrap stack lg">
+<div class="h-flow">
+  <div class="stack h-sec">
+    <h2>Choose a system</h2>
+    <div class="h-pick" id="sysPick" role="group" aria-label="Choose a system"></div>
+    <div class="panel h-card" id="sysCard" aria-live="polite"></div>
   </div>
 
-  <div class="stack">
+  <div class="stack h-sec">
     <h2>What do you need today?</h2>
     <div class="doors">
       <a href="#start"><strong>I’m thinking about installing a system</strong><span>Which system fits, where to put it, what it costs, and the food safety questions.</span></a>
@@ -72,13 +71,14 @@
     </div>
   </div>
 
-  <div class="stack">
+  <div class="stack h-sec">
     <h2>Where the systems are</h2>
-    <p class="muted">18 systems from the Central Coast Wetlands Group (CCWG) public site inventory. Some are outside the project watershed. Site records stay private unless the site partners choose to share them.</p>
-    <div class="chips" id="mapchips" role="group" aria-label="Filter by system"></div>
+    <p class="h-big"><b id="siteCount">18</b> <span>systems on the public site inventory. Some are outside the project watershed.</span></p>
+    <p class="muted">From the Central Coast Wetlands Group (CCWG) public site inventory. Site records stay private unless the site partners choose to share them.</p>
     <div class="lmapbox">
       <div class="lmap panel" id="homemap" aria-label="Map of VTS sites"></div>
-      <div class="stack">
+      <div class="h-float h-fl"><div class="chips" id="mapchips" role="group" aria-label="Filter by system"></div></div>
+      <div class="stack h-float h-fr">
         <div id="mapcounts"></div>
         <fieldset id="maplayers"><legend>Map layers</legend>
           <label class="check"><input type="checkbox" data-l="ws"> Sub-watersheds (CalWater)</label>
@@ -90,11 +90,12 @@
     </div>
   </div>
 
-  <div class="panel stack">
+  <div class="panel stack h-sec">
     <h2>Not a regulatory tool</h2>
-    <p>This site is run by [HOST ORGANIZATION], not by a regulator. What you record about your system is yours. Nothing is sent to an agency unless you export it and send it yourself.</p>
-    <p class="small muted">Draft wording, to be agreed with CMSF and partners.</p>
+    <p>This site is not run by a regulator. What you record about your system is yours. Nothing is sent to an agency unless you export it and send it yourself.</p>
+    <p class="small muted"><span class="l-chip y">In progress</span> The host organization has not been chosen yet. Draft wording, to be agreed with CMSF and partners.</p>
   </div>
+</div>
 </div></section>
 
 <!-- START -->
@@ -155,7 +156,7 @@
     <div class="panel stack"><h2>A trained crew does it</h2><p>A maintenance workforce visits on a schedule, does the checks and the hands-on work, and leaves you the record.</p><ul class="plain"><li>You always know who is coming, when, and in what vehicle.</li><li>The crew talks to you first about anything they find.</li><li>What the crew sees stays with the team and the site partners.</li></ul><a class="btn field" href="#request">Request maintenance</a><p class="small muted">The workforce model is a proposal. Who hosts it and how it is funded are still open.</p></div>
     <div class="panel stack"><h2>Your own people do it</h2><p>Use the same checklists and plan the crew uses. The tool reminds you what is due and keeps the log.</p><ul class="plain"><li>Checklists your irrigators can fill on a phone or on paper.</li><li>A yearly plan for each system.</li><li>Records you can print and share if you choose.</li></ul><div class="row"><a class="btn" href="#tool">Open the tool demo</a><a class="btn ghost" href="#learn">Training materials</a></div></div>
   </div>
-  <div class="stack"><h2>How it works</h2>
+  <div class="stack h-band"><h2>How it works</h2>
     <ol class="flow">
       <li><span class="fnum" aria-hidden="true">1</span><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 56 C20 40 12 31 12 22 a20 20 0 0 1 40 0 C52 31 44 40 32 56Z" fill="var(--water-soft)" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round"/><path d="M22 24 q5 -6 10 0 t10 0" fill="none" stroke="var(--water)" stroke-width="3" stroke-linecap="round"/></svg><strong>Register your system</strong><span>Type, size and watershed. Location stays private.</span></li>
       <li><span class="fnum" aria-hidden="true">2</span><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="8" y="12" width="48" height="44" rx="5" fill="var(--surface)" stroke="var(--ink)" stroke-width="3"/><path d="M8 24 H56" stroke="var(--ink)" stroke-width="3"/><path d="M20 6 V16 M44 6 V16" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/><g fill="var(--field)"><rect x="15" y="30" width="8" height="7"/><rect x="41" y="30" width="8" height="7"/><rect x="28" y="42" width="8" height="7"/></g><rect x="28" y="30" width="8" height="7" fill="var(--water)"/></svg><strong>Get a yearly plan</strong><span>Routine visits, a spring visit, a pre-storm visit in August, a January review, and checks after storms.</span></li>

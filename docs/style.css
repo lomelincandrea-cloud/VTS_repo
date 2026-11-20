@@ -57,15 +57,6 @@ main section.view.on{display:block}
 .lede{font-size:1.15rem;color:var(--ink2)}
 
 /* hero */
-.hero{padding-top:1.5rem}
-.transect{overflow-x:auto;margin:1.25rem 0 0;border-radius:10px;background:var(--surface);border:1px solid var(--line)}
-.transect svg{display:block;min-width:820px;width:100%;height:auto}
-.stations{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;margin-top:.6rem}
-@media (max-width:640px){.stations{grid-template-columns:repeat(2,1fr)}}
-.stations button{min-height:48px;border:2px solid var(--ctl);background:var(--surface);border-radius:8px;font-weight:700;cursor:pointer;text-align:left;padding:.5rem .75rem}
-.stations button[aria-pressed="true"]{border-color:var(--water);background:var(--yel);color:var(--yel-ink)}
-.stations button[aria-pressed="true"] small{color:var(--yel-ink)}
-.stations small{display:block;font-weight:500;color:var(--muted)}
 
 /* door links */
 .doors{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:0;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface)}
@@ -148,8 +139,7 @@ a.btn:not(.ghost):not(.field)::after{content:"\2192";display:inline-flex;align-i
 .btn:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.15)}
 .btn.ghost{background:var(--surface);border-color:var(--water);color:var(--water)}
 .btn.field{background:var(--field);border-color:var(--field);color:#fff}
-.panel,.scroll,.doors,.transect{border-radius:16px;box-shadow:var(--sh)}
-.stations button,input,select,textarea,fieldset{border-radius:10px}
+.panel,.scroll,.doors{border-radius:16px;box-shadow:var(--sh)}
 th{font-stretch:normal}
 .proto{background:var(--silt-soft)}
 @media (prefers-reduced-motion:reduce){.btn,.btn:hover{transition:none;transform:none}}
@@ -467,6 +457,54 @@ body .g-c.on[data-k]{cursor:inherit}
 .d-frame{width:100%;height:70vh;border:1px solid var(--line);border-radius:10px;background:#fff;margin-top:.5rem}
 .d-filters .l-lab{min-width:0;max-width:100%;flex:1 1 12rem}.d-filters .l-lab select{width:100%;max-width:100%}
 
+/* R1 Home: water ribbon hero (still), system picker, water line, map panels, doors */
+#v-home{padding-top:0}
+.h-hero{background:linear-gradient(180deg,var(--ground) 0,var(--mist) 100%);padding-top:clamp(1.25rem,4vw,2.75rem)}
+.h-copy{display:flex;flex-direction:column;gap:1rem}
+.h-art{display:block;width:100%;height:auto}.h-art-v{display:none;max-width:440px;margin:0 auto}
+@media (max-width:760px){.h-art-h{display:none}.h-art-v{display:block}}
+.h-cap{color:var(--ink2);font-size:.85rem;text-align:right;padding-top:.3rem;padding-bottom:.9rem;max-width:1180px}
+.h-end{fill:var(--ink);font:700 15px var(--body);letter-spacing:1.4px}.h-end2{fill:var(--ink2);font:14px var(--body)}
+.h-st{cursor:pointer;outline:none}.h-st .h-halo{fill:url(#glowh);opacity:0;transition:opacity .2s}.h-art-v .h-st .h-halo{fill:url(#glowv)}
+.h-st .h-disc{fill:#fff;stroke:var(--water);stroke-width:5;transition:stroke .2s}
+.h-st:hover .h-disc{stroke:var(--yel)}
+.h-st .h-pillg rect{fill:#fff;stroke:var(--water);stroke-width:3}.h-st .h-pillg text{font:700 17px var(--body);fill:var(--ink)}
+.h-st[aria-pressed=true] .h-halo{opacity:1}.h-st[aria-pressed=true] .h-disc{stroke:var(--yel);stroke-width:8}
+.h-st[aria-pressed=true] .h-pillg rect{fill:var(--yel);stroke:var(--water)}.h-st[aria-pressed=true] .h-pillg text{fill:var(--yel-ink)}
+.h-st:focus-visible .h-disc{stroke:var(--water);stroke-width:10}
+.h-st:focus-visible .h-pillg rect{stroke-width:5}
+.h-pick{display:flex;flex-wrap:wrap;gap:.5rem}
+.h-pick button{min-height:44px;padding:.4rem 1rem;border-radius:12px;border:2px solid var(--ctl);background:var(--surface);color:var(--ink);font:600 1rem var(--body);cursor:pointer}
+.h-pick button[aria-pressed=true]{background:var(--yel);border-color:var(--water);color:var(--yel-ink)}
+.h-card{display:flex;flex-direction:column;gap:.7rem}
+.h-card h3{font:700 clamp(1.6rem,3vw,2rem)/1.1 var(--head);color:var(--water)}
+.h-short{color:var(--ink2)}
+.h-next{color:var(--water);font-weight:700}
+.h-in{animation:hfade .2s ease-out}
+@keyframes hfade{from{opacity:0}to{opacity:1}}
+.h-flow{display:flex;flex-direction:column;gap:2.75rem;border-left:2px solid var(--water);padding-left:clamp(1rem,3vw,2.25rem);margin-left:.4rem}
+.h-sec>h2{position:relative}
+.h-sec>h2::before{content:"";position:absolute;left:calc(-1 * clamp(1rem,3vw,2.25rem) - 8px);top:.3em;width:14px;height:14px;border-radius:50%;background:var(--ground);border:2px solid var(--water)}
+html.fx .h-sec{opacity:0;transform:translateY(8px);transition:opacity .3s,transform .3s}
+html.fx .h-sec.in{opacity:1;transform:none}
+.h-big{display:flex;align-items:baseline;gap:.6rem;flex-wrap:wrap}
+.h-big b{font:700 clamp(2.6rem,5vw,3.4rem)/1 var(--head);color:var(--water)}
+.h-big span{color:var(--ink2);max-width:40ch}
+.h-pin span{display:inline-block;white-space:nowrap;background:var(--yel);color:var(--yel-ink);border:2px solid var(--water);border-radius:999px;padding:.15rem .6rem;font:700 .85rem var(--body);transform:translate(-50%,-6px)}
+.h-pin{background:none;border:0}
+.sitelist button[aria-pressed=true]{background:var(--yel);color:var(--yel-ink)}
+@media (min-width:1024px){
+  .lmapbox{display:block;position:relative}
+  .lmapbox .lmap{height:600px}
+  .h-float{position:absolute;z-index:500;background:color-mix(in srgb,var(--surface) 94%,transparent);border:1px solid var(--line);border-radius:14px;padding:.7rem .8rem;box-shadow:0 6px 20px rgba(18,38,26,.12)}
+  .h-fl{top:12px;left:12px;max-width:calc(100% - 360px)}
+  .h-fr{top:12px;right:12px;width:310px;max-height:576px;overflow:auto}
+  .h-fr .sitelist{max-height:220px}
+}
+@media (max-width:1023px){.lmapbox{display:flex;flex-direction:column;gap:1rem}.h-float{position:static}.h-fl{order:-1}}
+.doors a::after{content:"→"!important;width:2.1rem;height:2.1rem;border-radius:50%;background:var(--yel);color:var(--yel-ink);border:2px solid var(--water);display:flex;align-items:center;justify-content:center;font:700 1rem/1 var(--body)!important}
+.doors a{padding-right:3.6rem!important}
+
 /* R0 affordance: pressable cards have a 2px blue border and an arrow; plain panels a hairline */
 .l-card,.t-item,.doors a,.guide-step,.l-pcard{border:2px solid var(--water)!important;position:relative}
 .l-card,.t-item,.doors a{padding-right:2.6rem!important}
@@ -528,3 +566,11 @@ dialog.t-side::backdrop{background:rgba(18,38,26,.35)}
 .c-tab{min-width:760px}
 .c-tab td{vertical-align:top}
 .c-tab details summary{cursor:pointer;min-height:44px;display:flex;align-items:center}
+
+/* Maintain: "How it works" as a soft blue band, four steps with chevrons */
+.h-band{background:var(--mist);border-radius:20px;padding:clamp(1.25rem,3vw,2rem)}
+.h-band ol.flow::before{display:none}
+.h-band ol.flow svg{background:var(--surface)}
+.h-band ol.flow li+li::after{content:"\203A";position:absolute;left:-.6rem;top:30px;font:700 2.2rem/1 var(--body);color:var(--water)}
+.h-band ol.flow li>span:last-child{color:var(--ink2)}
+@media (max-width:760px){.h-band ol.flow li{background:transparent}.h-band ol.flow li+li::after{left:50%;top:-1.6rem;transform:translateX(-50%) rotate(90deg)}}

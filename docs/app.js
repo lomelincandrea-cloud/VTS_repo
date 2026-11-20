@@ -25,7 +25,7 @@ function route(){const parts=(location.hash||"#home").slice(1).split("/");const 
      but bring the page's tab bar back into view if it is above the screen */
   if(top){window.scrollTo(0,0);const h=$("section.view.on h1");if(h&&first===false){h.setAttribute("tabindex","-1");h.focus({preventScroll:true})}}
   else if(!navClick)setTimeout(()=>{const bar=$("section.view.on .l-tabs");if(!bar)return;const hd=($("header.top")||{}).offsetHeight||0,y=bar.getBoundingClientRect().top;if(y<hd)window.scrollBy(0,y-hd-8)},0);
-  if(r==="home")setTimeout(()=>{lmap?lmap.invalidateSize():homeMap()},0);}
+  if(r==="home")setTimeout(()=>{placeRibbon();lmap?lmap.invalidateSize():homeMap()},0);}
 addEventListener("hashchange",()=>{first=false;route()});
 /* skip link: the site uses the hash for pages, so move focus by hand */
 $("#skipLink").onclick=e=>{e.preventDefault();const t=$("section.view.on h1")||$("#main");t.setAttribute("tabindex","-1");t.focus()};
@@ -38,12 +38,30 @@ $$(".tabs").forEach(tl=>tl.addEventListener("click",e=>{const b=e.target.closest
 /* chips helper */
 function chips(box,items,cur,cb){box.innerHTML="";items.forEach(([k,l])=>{const b=el("button",{class:"chip",type:"button","aria-pressed":k===cur},esc(l));b.onclick=()=>{cb(k);chips(box,items,k,cb)};box.append(b)})}
 
-/* home: stations */
+/* home: the water ribbon (still) and the system picker. Ribbon buttons and picker buttons select the same system. */
 let curSys="SB";
-function stations(){const box=$("#stations");box.innerHTML="";ORDER.forEach(k=>{const b=el("button",{type:"button","aria-pressed":k===curSys},esc(SYS[k].n)+"<small>"+esc(SYS[k].s)+"</small>");b.onclick=()=>{curSys=k;stations()};box.append(b)});
-  const s=SYS[curSys];$("#sysdetail").innerHTML=`<div class="grid2"><div class="stack"><h3>${esc(s.n)}</h3><p>${esc(s.what)}</p></div><div class="stack"><p><strong>Looking after it:</strong> ${esc(s.upkeep)}</p><p class="small muted">${s.t[0]} maintenance tasks in the draft manual, for example ${esc(s.t.slice(1).join(", "))}.</p></div></div>`;}
+const NEXT={SB:"VD",VD:"WB",WB:"TW",TW:null},POS=[.2,.42,.64,.86];
+function placeRibbon(){/* put the four buttons on the ribbon and scatter the sediment specks; needs the SVG to be measurable */
+  $$(".h-stations").forEach(g=>{if(g.dataset.done)return;const m=document.getElementById(g.parentNode.querySelector("defs path").id);let L=0;try{L=m.getTotalLength()}catch(e){}if(!L)return;
+    ORDER.forEach((k,i)=>{const p=m.getPointAtLength(L*POS[i]);g.querySelector('[data-k="'+k+'"]').setAttribute("transform","translate("+p.x.toFixed(1)+","+p.y.toFixed(1)+")")});
+    const sp=g.parentNode.querySelector(".h-specks"),vert=g.closest("svg").classList.contains("h-art-v");let seed=3,r=()=>(seed=(seed*16807)%2147483647)/2147483647,h="";
+    for(let i=0;i<46;i++){const t=.02+r()*.5,p=m.getPointAtLength(L*t),a=(r()-.5)*44;h+='<circle cx="'+(p.x+(vert?a:0)).toFixed(0)+'" cy="'+(p.y+(vert?0:a)).toFixed(0)+'" r="'+(1.8+r()*3.2).toFixed(1)+'" fill="#6F4526" opacity="'+(.9-t*1.5).toFixed(2)+'"/>'}
+    if(sp)sp.innerHTML=h;g.dataset.done="1";});}
+function selSys(k){curSys=k;
+  $$(".h-st").forEach(e=>e.setAttribute("aria-pressed",e.dataset.k===k));
+  $$("#sysPick button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.k===k));
+  const s=SYS[k],nx=NEXT[k],c=$("#sysCard");
+  c.classList.remove("h-in");void c.offsetWidth;c.classList.add("h-in");
+  c.innerHTML=`<h3>${esc(s.n)}</h3><p class="h-short">${esc(s.s)}</p><div class="grid2"><p>${esc(s.what)}</p><p><strong>Looking after it:</strong> ${esc(s.upkeep)}</p></div>
+    <p class="h-next">Next, the water enters ${nx?"the "+esc(SYS[nx].n.toLowerCase()):"Monterey Bay"}.</p><div class="row"><a class="btn" href="#learn/manual/${k}">Read the manual: ${esc(s.n)}</a></div>`;}
+function stations(){const box=$("#sysPick");box.innerHTML="";ORDER.forEach(k=>{const b=el("button",{type:"button","data-k":k,"aria-pressed":k===curSys},esc(SYS[k].n));b.onclick=()=>selSys(k);box.append(b)});
+  $$(".h-st").forEach(g=>{g.onclick=()=>selSys(g.dataset.k);g.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();selSys(g.dataset.k)}}});
+  placeRibbon();selSys(curSys);}
+/* sections fade in once when they reach the screen (off with reduced motion) */
+function fadeIn(){if(!("IntersectionObserver" in window)||calm())return;document.documentElement.classList.add("fx");
+  const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target)}}),{threshold:.08});
+  $$(".h-sec").forEach(x=>io.observe(x));}
 
-/* maps */
 function drawMap(box,opts={}){const f=opts.filter||"ALL";let h=`<svg viewBox="0 0 340 520" role="img" aria-label="Map of Central Coast watersheds">`;
   HUC.forEach(w=>{const n=f==="ALL"?Object.values(w.s).reduce((a,b)=>a+b,0):(w.s[f]||0);
     const cls=opts.plain?"":(n?"has"+(opts.sel===w.id?" sel":""):"");
@@ -54,14 +72,14 @@ function drawMap(box,opts={}){const f=opts.filter||"ALL";let h=`<svg viewBox="0 
   if(opts.onpick)box.querySelectorAll("path.has").forEach(p=>p.onclick=()=>opts.onpick(p.dataset.id));}
 /* home: Leaflet map of the 18 CCWG sites (public view: location and system only, no status) */
 const SCOL={SB:"#2B7BBF",TW:"#3C9D5B",VD:"#C99700",WB:"#DD6B2A"};
-let mapF="ALL";var lmap=null,lmapLay=null,lmapMk={};const mapLy={ws:true,riv:true};
+let mapF="ALL",mapSel=null;var lmap=null,lmapLay=null,lmapMk={};const mapLy={ws:true,riv:true};
 function homeMap(){const box=$("#homemap"),G=window.VTS_GEO||{},feats=((G.points||{}).features||[]).filter(f=>mapF==="ALL"||f.properties.system===mapF);
   if(!window.L){box.innerHTML=`<p class="muted" style="padding:1rem">The map could not load. Check your internet connection and reload.</p>`;}
   else if(lmap||box.clientWidth){
     /* the map is created only once its box is visible, so Leaflet measures the right size */
-    if(!lmap){lmap=L.map(box,{scrollWheelZoom:false});
+    if(!lmap){lmap=L.map(box,{scrollWheelZoom:false,zoomControl:false});L.control.zoom({position:"bottomright"}).addTo(lmap);
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:18,attribution:"© OpenStreetMap contributors"}).addTo(lmap);
-      lmapLay={ws:L.layerGroup().addTo(lmap),riv:L.layerGroup().addTo(lmap),sites:L.layerGroup().addTo(lmap)};
+      lmapLay={ws:L.layerGroup().addTo(lmap),riv:L.layerGroup().addTo(lmap),sites:L.layerGroup().addTo(lmap),sel:L.layerGroup().addTo(lmap)};
       const all=((G.points||{}).features||[]).map(f=>[f.geometry.coordinates[1],f.geometry.coordinates[0]]);
       all.length?lmap.fitBounds(all,{padding:[30,30]}):lmap.setView([36.74,-121.6],9);
       if(window.ResizeObserver)new ResizeObserver(()=>{if(box.clientWidth)lmap.invalidateSize()}).observe(box);}
@@ -70,11 +88,16 @@ function homeMap(){const box=$("#homemap"),G=window.VTS_GEO||{},feats=((G.points
     if(mapLy.riv&&G.rivers)L.geoJSON(G.rivers,{style:{color:"#4AA3DF",weight:1.2,opacity:.8},onEachFeature:(f,l)=>f.properties.GNIS_NAME&&l.bindTooltip(esc(f.properties.GNIS_NAME))}).addTo(lmapLay.riv);
     feats.forEach(f=>{const p=f.properties,c=SCOL[p.system]||"#888";
       const m=L.circleMarker([f.geometry.coordinates[1],f.geometry.coordinates[0]],{radius:9,color:"#fff",weight:2,fillColor:c,fillOpacity:.95}).addTo(lmapLay.sites);
-      m.bindPopup(`<strong>${esc(p.name)}</strong><br>${esc(SYS[p.system]?SYS[p.system].n:p.system)}<br><small>${esc([p.ws,p.ha].filter(x=>x&&x!=="undefined").join(" · "))}</small><br><a href="#learn/manual/${p.system}">How to maintain it</a>`);lmapMk[p.id]=m;});}
+      m.bindPopup(`<strong>${esc(p.name)}</strong><br>${esc(SYS[p.system]?SYS[p.system].n:p.system)}<br><small>${esc([p.ws,p.ha].filter(x=>x&&x!=="undefined").join(" · "))}</small><br><a href="#learn/manual/${p.system}">How to maintain it</a>`);m.on("click",()=>pickSite(p.id));lmapMk[p.id]=m;});
+    if(mapSel&&lmapMk[mapSel])pickSite(mapSel,true);}
   let h="";ORDER.forEach(k=>{if(mapF!=="ALL"&&mapF!==k)return;const n=feats.filter(f=>f.properties.system===k).length;h+=`<div class="count"><b>${n}</b><span><span class="sdot" style="background:${SCOL[k]}"></span>${esc(SYS[k].n)}${n===1?"":SYS[k].n.endsWith("ch")?"es":"s"}</span></div>`});
   h+=`<div class="sitelist" role="list">${feats.map(f=>`<button type="button" role="listitem" data-id="${f.properties.id}"><span class="sdot" style="background:${SCOL[f.properties.system]}"></span><span>${esc(f.properties.name)}<small>${esc(SYS[f.properties.system].n)}</small></span></button>`).join("")}</div>`;
   $("#mapcounts").innerHTML=h;
-  $$("#mapcounts .sitelist button").forEach(b=>b.onclick=()=>{const m=lmapMk[b.dataset.id];if(m){calm()?lmap.setView(m.getLatLng(),13,{animate:false}):lmap.flyTo(m.getLatLng(),13);m.openPopup();box.scrollIntoView({behavior:calm()?"auto":"smooth",block:"center"})}});}
+  $$("#mapcounts .sitelist button").forEach(b=>b.onclick=()=>{const m=lmapMk[b.dataset.id];if(m){calm()?lmap.setView(m.getLatLng(),13,{animate:false}):lmap.flyTo(m.getLatLng(),13);pickSite(b.dataset.id);m.openPopup();box.scrollIntoView({behavior:calm()?"auto":"smooth",block:"center"})}});}
+/* the selected site gets a yellow pill label with its system name */
+function pickSite(id,quiet){mapSel=id;const G=window.VTS_GEO||{},f=((G.points||{}).features||[]).find(x=>x.properties.id===id);if(!f||!lmapLay)return;lmapLay.sel.clearLayers();
+  L.marker([f.geometry.coordinates[1],f.geometry.coordinates[0]],{interactive:false,keyboard:false,icon:L.divIcon({className:"h-pin",html:`<span>${esc(SYS[f.properties.system]?SYS[f.properties.system].n:f.properties.system)}</span>`,iconSize:null,iconAnchor:[0,34]})}).addTo(lmapLay.sel);
+  $$("#mapcounts .sitelist button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.id===id));}
 function mapLayers(){$$("#maplayers input").forEach(i=>{i.checked=mapLy[i.dataset.l];i.onchange=()=>{mapLy[i.dataset.l]=i.checked;homeMap()}})}
 function mapChips(){chips($("#mapchips"),[["ALL","All systems"],...ORDER.map(k=>[k,SYS[k].n])],mapF,k=>{mapF=k;homeMap()})}
 
@@ -122,7 +145,8 @@ const AUDN={crew:"Crew",ranch:"Ranch staff",owner:"Landowner"};
 let lAud="all",lSys="ALL";
 function learn(){$("#learnBody").innerHTML=MAT.filter(m=>(lAud==="all"||m[2].includes(lAud))&&(lSys==="ALL"||m[3].includes(lSys))).map(m=>`<tr><td><strong>${esc(m[0])}</strong></td><td>${esc(m[1])}</td><td>${m[2].split(" ").map(a=>AUDN[a]).join(", ")}</td><td><span class="tag ${m[4]==="Draft"?"info":"due"}">${m[4]}</span></td></tr>`).join("")||`<tr><td colspan="4">Nothing for this combination yet.</td></tr>`}
 
-stations();mapChips();mapLayers();homeMap();
+stations();mapChips();mapLayers();homeMap();fadeIn();
+{const n=((window.VTS_GEO||{}).points||{}).features;if(n&&$("#siteCount"))$("#siteCount").textContent=n.length;}
 chips($("#startchips"),ORDER.map(k=>[k,SYS[k].n]),stSys,k=>{stSys=k;startGrid()});startGrid();layers();whereMap();
 chips($("#audchips"),AUD,lAud,k=>{lAud=k;learn()});chips($("#lsyschips"),[["ALL","All systems"],...ORDER.map(k=>[k,SYS[k].n])],lSys,k=>{lSys=k;learn()});learn();
 route();
