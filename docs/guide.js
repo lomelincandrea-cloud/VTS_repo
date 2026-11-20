@@ -38,7 +38,7 @@ window.VTSGuide = (function () {
     render(document.getElementById("learnGuide"), "learn", "Learn", "Everything a crew needs to look after a system, in four places. Tap a step to go there.", [
       {icon: "book", title: "Pick your system", text: "Open Manual and choose sediment basin, wetland, ditch, bioreactor, or corrective work. Tasks are grouped by visit.", href: "#learn/manual/SB"},
       {icon: "flow", title: "Open a task", text: "Each task has a step-by-step diagram, the steps, what to bring, safety, and when to call the supervisor.", href: "#learn/task/SB_T01"},
-      {icon: "leaf", title: "Find a plant", text: "In Field Guide, drag the seedling along the bank to a zone, then filter. Tap a card to see how to recognize it.", href: "#learn/plants"},
+      {icon: "leaf", title: "Field Guide: find a plant", text: "In Field Guide, drag the seedling along the bank to a zone, then filter. Tap a card to see how to recognize it.", href: "#learn/plants"},
       {icon: "download", title: "Download the forms", text: "The manual, the Field Guide, the Visit Sheets and the forms, in PDF or Excel. They are drafts for review.", href: "#learn/downloads"}],
       "Tip: the Read first box on each system page has safety, waste, and the basics that apply to every system.");
   }

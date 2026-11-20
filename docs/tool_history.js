@@ -7,14 +7,14 @@ window.ToolHistory = (function () {
   const esc = s => K().esc(s);
   const filt = {kind: "all"};
   const KIND = {
-    done: {label: "Visit done", dot: "#2F8F4E", group: "visits"},
-    extra: {label: "Visit not in the plan", dot: "#2F8F4E", group: "visits"},
-    noplan: {label: "Visit done", dot: "#2F8F4E", group: "visits"},
+    done: {label: "Visit done", dot: "#2F7D4A", group: "visits"},
+    extra: {label: "Visit not in the plan", dot: "#2F7D4A", group: "visits"},
+    noplan: {label: "Visit done", dot: "#2F7D4A", group: "visits"},
     missed: {label: "Planned visit not recorded", dot: "#B4361F", group: "visits"},
     planned: {label: "Planned visit", dot: "#2B7BBF", group: "visits"},
     found: {label: "Repair needed", dot: "#C99700", group: "repairs"},
     sched: {label: "Repair scheduled", dot: "#C99700", group: "repairs"},
-    fixed: {label: "Repair done", dot: "#2F8F4E", group: "repairs"},
+    fixed: {label: "Repair done", dot: "#2F7D4A", group: "repairs"},
     lab: {label: "Laboratory results", dot: "#6B4FA0", group: "visits"},
     change: {label: "Record changed", dot: "#5B6E83", group: "changes"},
     site: {label: "System", dot: "var(--ink)", group: "changes"}};

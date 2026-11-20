@@ -103,8 +103,8 @@
     const ground = "M0,340 " + g.replace(/^M/, "L") + "L1000,340 Z", deco = (x, fn) => fn(x * 10, gY(x));
     const reed = (x, y) => `<g stroke="#3C9D5B" stroke-width="3" stroke-linecap="round"><path d="M${x},${y} V${y - 48}"/><path d="M${x + 9},${y} V${y - 36}"/><path d="M${x - 9},${y} V${y - 40}"/></g><ellipse cx="${x}" cy="${y - 52}" rx="4" ry="9" fill="#8a6a3b"/>`;
     const tuft = (x, y) => `<g stroke="#4aa866" stroke-width="3" fill="none" stroke-linecap="round"><path d="M${x},${y} q-6,-22 -16,-30"/><path d="M${x},${y} v-34"/><path d="M${x},${y} q6,-22 16,-30"/></g>`;
-    const shrub = (x, y) => `<rect x="${x - 3}" y="${y - 18}" width="6" height="18" fill="#8a6a3b"/><circle cx="${x - 14}" cy="${y - 24}" r="16" fill="#3C9D5B"/><circle cx="${x + 14}" cy="${y - 24}" r="16" fill="#2F8F4E"/><circle cx="${x}" cy="${y - 38}" r="17" fill="#43a965"/><circle cx="${x + 8}" cy="${y - 42}" r="4" fill="#E87AA6"/>`;
-    const tree = (x, y) => `<rect x="${x - 5}" y="${y - 62}" width="10" height="62" fill="#8a6a3b"/><circle cx="${x}" cy="${y - 84}" r="38" fill="#2F8F4E"/><circle cx="${x - 24}" cy="${y - 68}" r="24" fill="#3C9D5B"/><circle cx="${x + 26}" cy="${y - 70}" r="24" fill="#43a965"/>`;
+    const shrub = (x, y) => `<rect x="${x - 3}" y="${y - 18}" width="6" height="18" fill="#8a6a3b"/><circle cx="${x - 14}" cy="${y - 24}" r="16" fill="#3C9D5B"/><circle cx="${x + 14}" cy="${y - 24}" r="16" fill="#2F7D4A"/><circle cx="${x}" cy="${y - 38}" r="17" fill="#43a965"/><circle cx="${x + 8}" cy="${y - 42}" r="4" fill="#E87AA6"/>`;
+    const tree = (x, y) => `<rect x="${x - 5}" y="${y - 62}" width="10" height="62" fill="#8a6a3b"/><circle cx="${x}" cy="${y - 84}" r="38" fill="#2F7D4A"/><circle cx="${x - 24}" cy="${y - 68}" r="24" fill="#3C9D5B"/><circle cx="${x + 26}" cy="${y - 70}" r="24" fill="#43a965"/>`;
     return `<svg viewBox="0 0 1000 340" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="lgw" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7cc4f0"/><stop offset="1" stop-color="#3f93cf"/></linearGradient><linearGradient id="lgs" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a98557"/><stop offset="1" stop-color="#6f5233"/></linearGradient></defs>
       ${ZN.map(([c], i) => `<rect id="lzr_${c}" x="${i * 250}" y="0" width="250" height="340" fill="#03467E" opacity="0"/>`).join("")}
       <path d="M0,196 L270,196 L270,238 L0,238 Z" fill="url(#lgw)" opacity=".9"/><path d="${ground}" fill="url(#lgs)"/><path d="M0,196 L270,196" stroke="#fff" stroke-width="3" opacity=".7" stroke-dasharray="14 10"/>
@@ -130,7 +130,7 @@
   function plants() {
     view().innerHTML = `<h2 class="l-title">Plant picker</h2><p>Where do you want to plant? Drag the seedling along the bank, or tap a zone. Then filter by system, type, or flowers. The same plants are in the Field Guide (VTS_D02).</p>
       <div class="l-bank" id="lbank">${bankSvg()}${ZN.map(([c, n], i) => `<div class="l-zlab" data-z="${c}" style="left:${i * 25 + 12.5}%">${n}</div>`).join("")}
-        <div class="l-pin" id="lpin" tabindex="0" role="slider" aria-label="Planting zone" aria-valuemin="0" aria-valuemax="3"><svg viewBox="0 0 54 54" aria-hidden="true"><circle cx="27" cy="27" r="25" fill="#fff" stroke="#03467E" stroke-width="3"/><path d="M27 42 V26" stroke="#3C9D5B" stroke-width="3.5" stroke-linecap="round"/><path d="M27 28 C17 28 13 20 13 15 C21 15 27 19 27 28Z" fill="#43a965"/><path d="M27 26 C35 26 41 20 41 13 C33 13 27 17 27 26Z" fill="#2F8F4E"/></svg></div>
+        <div class="l-pin" id="lpin" tabindex="0" role="slider" aria-label="Planting zone" aria-valuemin="0" aria-valuemax="3"><svg viewBox="0 0 54 54" aria-hidden="true"><circle cx="27" cy="27" r="25" fill="#fff" stroke="#03467E" stroke-width="3"/><path d="M27 42 V26" stroke="#3C9D5B" stroke-width="3.5" stroke-linecap="round"/><path d="M27 28 C17 28 13 20 13 15 C21 15 27 19 27 28Z" fill="#43a965"/><path d="M27 26 C35 26 41 20 41 13 C33 13 27 17 27 26Z" fill="#2F7D4A"/></svg></div>
         <div class="l-hint" id="lhint">Drag me or tap a zone</div></div>
       <div class="l-row" style="margin-top:.6rem"><b id="lzinfo" class="l-zinfo"></b><span class="l-sp"></span><button class="l-pill" type="button" id="lallz">All zones</button></div>
       <div class="l-pills" id="lfsys"></div><div class="l-pills" id="lfgrp"></div>
@@ -210,7 +210,7 @@
       b.setAttribute("aria-expanded", "true"); v.hidden = false;
       v.innerHTML = `<div class="l-row"><b>${esc(d.title)}</b><span class="l-sp"></span><a href="${d.file}" target="_blank" rel="noopener">Open in a new tab</a></div><iframe class="l-pdf" src="${d.file}" title="${esc(d.title)}"></iframe>
         <p class="l-src">If the document does not show on your phone, use Download or Open in a new tab.</p>`;
-      v.scrollIntoView({behavior: "smooth", block: "start"});
+      v.scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start"});
     });
   }
 })();

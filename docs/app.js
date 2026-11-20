@@ -11,15 +11,24 @@ const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&g
 
 /* routing */
 const ROUTES=["home","start","maintain","request","learn","tool","phone"];
-function route(){const parts=(location.hash||"#home").slice(1).split("/");const r=ROUTES.includes(parts[0])?parts[0]:"home";
+let lastTop=null,navClick=false,first=true;
+/* a click on a tab or pill keeps the page where it is; a click on a card or link inside the content may move to the tab bar */
+document.addEventListener("click",e=>{const a=e.target.closest("a[href^='#']");navClick=!!(a&&a.closest(".l-pills,.l-tabs,nav,[role=group],[role=tablist]"));setTimeout(()=>navClick=false,500)},true);
+const calm=()=>window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+function route(){const parts=(location.hash||"#home").slice(1).split("/");const r=ROUTES.includes(parts[0])?parts[0]:"home";const top=r!==lastTop;lastTop=r;
   if(r==="learn"&&window.learnRoute)window.learnRoute(parts.slice(1));
   if(r==="tool"&&window.toolRoute)window.toolRoute(parts.slice(1));
   if(r==="phone"&&window.ToolPlan)window.ToolPlan.phone(parts.slice(1).join("/"));
   $$("section.view").forEach(v=>v.classList.toggle("on",v.id==="v-"+r));
   $$("nav.main a").forEach(a=>{const on=a.dataset.r===r||(r==="request"&&a.dataset.r==="maintain");on?a.setAttribute("aria-current","page"):a.removeAttribute("aria-current")});
-  window.scrollTo(0,0);
+  /* scroll to the top and focus the h1 only when the page changes (home, learn, tool...); inside a page keep the place,
+     but bring the page's tab bar back into view if it is above the screen */
+  if(top){window.scrollTo(0,0);const h=$("section.view.on h1");if(h&&first===false){h.setAttribute("tabindex","-1");h.focus({preventScroll:true})}}
+  else if(!navClick)setTimeout(()=>{const bar=$("section.view.on .l-tabs");if(!bar)return;const hd=($("header.top")||{}).offsetHeight||0,y=bar.getBoundingClientRect().top;if(y<hd)window.scrollBy(0,y-hd-8)},0);
   if(r==="home")setTimeout(()=>{lmap?lmap.invalidateSize():homeMap()},0);}
-addEventListener("hashchange",route);
+addEventListener("hashchange",()=>{first=false;route()});
+/* skip link: the site uses the hash for pages, so move focus by hand */
+$("#skipLink").onclick=e=>{e.preventDefault();const t=$("section.view.on h1")||$("#main");t.setAttribute("tabindex","-1");t.focus()};
 
 /* tabs */
 $$(".tabs").forEach(tl=>tl.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
@@ -65,7 +74,7 @@ function homeMap(){const box=$("#homemap"),G=window.VTS_GEO||{},feats=((G.points
   let h="";ORDER.forEach(k=>{if(mapF!=="ALL"&&mapF!==k)return;const n=feats.filter(f=>f.properties.system===k).length;h+=`<div class="count"><b>${n}</b><span><span class="sdot" style="background:${SCOL[k]}"></span>${esc(SYS[k].n)}${n===1?"":SYS[k].n.endsWith("ch")?"es":"s"}</span></div>`});
   h+=`<div class="sitelist" role="list">${feats.map(f=>`<button type="button" role="listitem" data-id="${f.properties.id}"><span class="sdot" style="background:${SCOL[f.properties.system]}"></span><span>${esc(f.properties.name)}<small>${esc(SYS[f.properties.system].n)}</small></span></button>`).join("")}</div>`;
   $("#mapcounts").innerHTML=h;
-  $$("#mapcounts .sitelist button").forEach(b=>b.onclick=()=>{const m=lmapMk[b.dataset.id];if(m){lmap.flyTo(m.getLatLng(),13);m.openPopup();box.scrollIntoView({behavior:"smooth",block:"center"})}});}
+  $$("#mapcounts .sitelist button").forEach(b=>b.onclick=()=>{const m=lmapMk[b.dataset.id];if(m){calm()?lmap.setView(m.getLatLng(),13,{animate:false}):lmap.flyTo(m.getLatLng(),13);m.openPopup();box.scrollIntoView({behavior:calm()?"auto":"smooth",block:"center"})}});}
 function mapLayers(){$$("#maplayers input").forEach(i=>{i.checked=mapLy[i.dataset.l];i.onchange=()=>{mapLy[i.dataset.l]=i.checked;homeMap()}})}
 function mapChips(){chips($("#mapchips"),[["ALL","All systems"],...ORDER.map(k=>[k,SYS[k].n])],mapF,k=>{mapF=k;homeMap()})}
 
