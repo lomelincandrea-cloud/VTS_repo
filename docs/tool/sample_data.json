@@ -5,7 +5,8 @@
   "generated_for_period": {
    "start": "2026-01-01",
    "end": "2026-11-19"
-  }
+  },
+  "materials_note": "The materials and unit costs in the 2026 plans are made up, only to show how the Estimated cost row works. They are not real prices."
  },
  "organization": {
   "id": "ORG-SAMPLE",
@@ -459,7 +460,15 @@
     },
     {
      "date": "2026-04-15",
-     "type": "Spring"
+     "type": "Spring",
+     "materials": [
+      {
+       "item": "Straw wattle",
+       "qty": 4,
+       "unit": "each",
+       "unit_cost": 30
+      }
+     ]
     },
     {
      "date": "2026-06-10",
@@ -467,7 +476,15 @@
     },
     {
      "date": "2026-08-19",
-     "type": "Pre-storm"
+     "type": "Pre-storm",
+     "materials": [
+      {
+       "item": "Rock for the outlet apron",
+       "qty": 1,
+       "unit": "ton",
+       "unit_cost": 60
+      }
+     ]
     },
     {
      "date": "2026-10-21",
@@ -475,7 +492,15 @@
     },
     {
      "date": "2026-12-09",
-     "type": "Routine"
+     "type": "Routine",
+     "materials": [
+      {
+       "item": "Trash bags",
+       "qty": 1,
+       "unit": "box",
+       "unit_cost": 15
+      }
+     ]
     }
    ]
   },
@@ -493,7 +518,21 @@
     },
     {
      "date": "2026-04-15",
-     "type": "Spring"
+     "type": "Spring",
+     "materials": [
+      {
+       "item": "Native plant plugs",
+       "qty": 50,
+       "unit": "each",
+       "unit_cost": 2
+      },
+      {
+       "item": "Weed-free straw mulch",
+       "qty": 4,
+       "unit": "bale",
+       "unit_cost": 12
+      }
+     ]
     },
     {
      "date": "2026-06-10",
@@ -505,7 +544,15 @@
     },
     {
      "date": "2026-10-21",
-     "type": "Routine"
+     "type": "Routine",
+     "materials": [
+      {
+       "item": "Trash bags",
+       "qty": 1,
+       "unit": "box",
+       "unit_cost": 15
+      }
+     ]
     },
     {
      "date": "2026-12-09",
@@ -527,7 +574,21 @@
     },
     {
      "date": "2026-04-15",
-     "type": "Spring"
+     "type": "Spring",
+     "materials": [
+      {
+       "item": "Native seed mix",
+       "qty": 5,
+       "unit": "lb",
+       "unit_cost": 25
+      },
+      {
+       "item": "Erosion control blanket",
+       "qty": 2,
+       "unit": "roll",
+       "unit_cost": 85
+      }
+     ]
     },
     {
      "date": "2026-06-10",
@@ -535,7 +596,15 @@
     },
     {
      "date": "2026-08-19",
-     "type": "Pre-storm"
+     "type": "Pre-storm",
+     "materials": [
+      {
+       "item": "Straw wattle",
+       "qty": 6,
+       "unit": "each",
+       "unit_cost": 30
+      }
+     ]
     },
     {
      "date": "2026-10-21",
@@ -543,7 +612,15 @@
     },
     {
      "date": "2026-12-09",
-     "type": "Routine"
+     "type": "Routine",
+     "materials": [
+      {
+       "item": "Trash bags",
+       "qty": 1,
+       "unit": "box",
+       "unit_cost": 15
+      }
+     ]
     }
    ]
   },
@@ -561,7 +638,15 @@
     },
     {
      "date": "2026-04-15",
-     "type": "Spring"
+     "type": "Spring",
+     "materials": [
+      {
+       "item": "Woodchips to top up the bed",
+       "qty": 2,
+       "unit": "cubic yard",
+       "unit_cost": 40
+      }
+     ]
     },
     {
      "date": "2026-06-10",
@@ -569,7 +654,15 @@
     },
     {
      "date": "2026-08-19",
-     "type": "Pre-storm"
+     "type": "Pre-storm",
+     "materials": [
+      {
+       "item": "Inlet screen",
+       "qty": 1,
+       "unit": "each",
+       "unit_cost": 45
+      }
+     ]
     },
     {
      "date": "2026-10-21",

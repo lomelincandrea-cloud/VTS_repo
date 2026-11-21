@@ -532,6 +532,44 @@
                   }
                 },
                 "description": "Tasks added to this visit beyond the suggestion: a manual task ID or free text."
+              },
+              "est_crew": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "description": "Crew size the supervisor plans for this visit. Set in the Tool."
+              },
+              "est_hours": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "description": "Hours on site the supervisor plans for this visit. Set in the Tool."
+              },
+              "materials": {
+                "type": "array",
+                "description": "Materials the supervisor plans for this visit, with a unit cost for the estimate. Entered in the Tool; crews do not record costs.",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "item"
+                  ],
+                  "properties": {
+                    "item": {
+                      "type": "string"
+                    },
+                    "qty": {
+                      "type": "number"
+                    },
+                    "unit": {
+                      "type": "string"
+                    },
+                    "unit_cost": {
+                      "type": "number"
+                    }
+                  }
+                }
               }
             }
           }
