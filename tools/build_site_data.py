@@ -192,6 +192,43 @@ for sub, src, pat in (("templates", ROOT / "tools" / "report_templates", "*.html
     (DOCS / "tool" / sub).mkdir(exist_ok=True)
     for f in sorted(src.glob(pat)): shutil.copy(f, DOCS / "tool" / sub / f.name)
 
+# ---------------- forms and annexes named in each task (Learn: "Forms for this task")
+# Codes are found in every text field of the task except the flow diagram. Corrective tasks (COR_) always get F05.
+FORMS_XLSX = DOCS / "downloads" / "VTS_forms.xlsx"
+D02 = next((d for d in docs if d["code"] == "VTS_D02"), None)
+def _file(path):
+    if not path.exists():
+        sys.exit(f"Forms for tasks: the file {path.relative_to(ROOT)} does not exist. Build the forms and the Field Guide first.")
+    return {"file": "downloads/" + path.name, "size_kb": round(path.stat().st_size / 1024)}
+def annexes_of(t):
+    text = json.dumps({k: v for k, v in t.items() if k != "flow"}, ensure_ascii=False)
+    out, seen = [], set()
+    def add(code, title, path, kind, sheet, tool):
+        if code in seen: return
+        seen.add(code)
+        a = {"code": code, "title": title, "kind": kind, "sheet": sheet, "tool": tool}
+        if path is None: a.update({"file": None, "size_kb": None})
+        else: a.update(_file(path))
+        out.append(a)
+    named = sorted(set(re.findall(r"\b(SB|TW|VD|WB)_F04\b", text)))
+    if t["sys"] in SYS_NAME and t["sys"] != "COR" and (named or re.search(r"(?<![A-Z_])F04\b", text)):
+        named = sorted(set(named) | {t["sys"]})
+    for sy in named:
+        add(f"{sy}_F04", f"Visit Sheet, {SYS_NAME[sy].lower()}", DOCS / "downloads" / f"{sy}_F04_visual_inspection_checklist.xlsx", "xlsx", None, ["#tool/sheets", "Step 4, Visit Sheets"])
+    if not named and re.search(r"(?<![A-Z_])F04\b", text):   # a corrective task names the Visit Sheet of whatever system it is in
+        add("F04", "Visit Sheet of your system", None, "xlsx", None, ["#learn/downloads", "All Visit Sheets in Downloads"])
+    if re.search(r"(?<![A-Z])(VTS_)?F06\b", text):
+        add("VTS_F06", "Site History", FORMS_XLSX, "xlsx", "VTS_F06", ["#tool/vts", "Site History of each VTS"])
+    if t["id"].startswith("COR_") or re.search(r"(?<![A-Z])(VTS_)?F05\b", text):
+        add("VTS_F05", "Corrective Maintenance Log", FORMS_XLSX, "xlsx", "VTS_F05", ["#tool/corrective", "Step 5, Maintenance log"])
+    if re.search(r"\bVTS_F07\b", text):
+        add("VTS_F07", "Site Card", FORMS_XLSX, "xlsx", "VTS_F07", ["#tool/vts", "The card of each VTS"])
+    if re.search(r"\bVTS_D02\b", text):
+        add("VTS_D02", "Field Guide", (DOCS / D02["file"]) if D02 else ROOT / "missing_Field_Guide.pdf", "pdf", None, ["#learn/plants", "Field Guide: find a plant"])
+    return out
+for t in tasks:
+    t["annexes"] = annexes_of(t)
+
 # ---------------- parts of each system (Learn: clickable illustration); every task and checklist id must exist
 parts_src = json.loads((ROOT / "tools" / "site_data" / "system_parts.json").read_text(encoding="utf-8"))
 task_ids, item_ids, bad = {t["id"] for t in tasks}, {c["id"] for c in checklist}, []

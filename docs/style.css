@@ -671,3 +671,13 @@ dialog.t-side::backdrop{background:rgba(18,38,26,.35)}
 @media (max-width:480px){.g-tab,.d-mx,.d-hist,.c-tab,.t-mat,.o-cost td,.o-cost th,.d-st,.d-card,.d-tile span,.l-door,.l-cstep span{font-size:1rem!important}}
 @media (max-width:480px){.c-grid,.c-day,.guide{font-size:1rem!important}}
 .h-copy h1{text-transform:none;max-width:760px;font-size:clamp(2.2rem,4.6vw,3.6rem)}
+
+/* R7a forms for each task */
+.l-forms{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:.8rem 1rem;margin:.6rem 0}
+.l-forms ul{list-style:none;margin:.4rem 0 0;padding:0;display:flex;flex-direction:column}
+.l-forms li{display:flex;flex-wrap:wrap;align-items:center;gap:.3rem .9rem;min-height:44px;border-top:1px solid var(--line);padding:.3rem 0}
+.l-fic svg{width:1.4rem;height:1.4rem;color:var(--water);display:block}
+.l-ft{font-weight:600;flex:1 1 14rem}
+.l-forms a{font-weight:600;min-height:44px;display:inline-flex;align-items:center}
+.l-fcount{display:inline-flex;align-items:center;gap:2px;color:var(--water);font-size:.85rem;font-weight:700}
+.l-fcount svg{width:1.05rem;height:1.05rem}

@@ -161,7 +161,16 @@
   const IC = {eye: '<path d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6S2 12 2 12z"/><circle cx="12" cy="12" r="2.8"/>',
     wrench: '<path d="M14.5 6.5a4 4 0 0 0 5 5L12 19a2.1 2.1 0 0 1-3-3l7.5-7.5a4 4 0 0 0-2-2z"/>',
     truck: '<path d="M2 6h11v9H2z"/><path d="M13 9h4l3 3v3h-7z"/><circle cx="6" cy="17" r="1.8"/><circle cx="16.5" cy="17" r="1.8"/>',
-    bag: '<path d="M5 8h14l-1 12H6z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>'};
+    bag: '<path d="M5 8h14l-1 12H6z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>',
+    form: '<path d="M6 3h9l3 3v15H6z"/><path d="M15 3v3h3"/><path d="M9 11h6M9 15h6"/>'};
+  /* "Forms for this task": the Visit Sheet, Site History, Corrective Log, Site Card or Field Guide the task names */
+  const size = kb => kb >= 1024 ? (kb / 1024).toFixed(1) + " MB" : kb + " KB";
+  function formsHtml(t) {
+    const a = t.annexes || []; if (!a.length) return "";
+    return `<div class="l-forms"><b>Forms for this task</b><ul>${a.map(x => `<li><span class="l-fic">${ico("form")}</span><span class="l-ft">${esc(x.title)}${x.sheet ? ` <span class="l-src">(sheet ${esc(x.sheet)})</span>` : ""}</span>
+      ${x.file ? `<a href="${x.file}" download>Download (${x.kind === "pdf" ? "PDF" : "Excel"}, ${size(x.size_kb)})</a>` : ""}
+      ${x.tool ? `<a href="${x.tool[0]}">${x.file ? "Use it in the Tool" : esc(x.tool[1])} →</a>` : ""}</li>`).join("")}</ul></div>`;
+  }
   const ico = k => `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${IC[k]}</svg>`;
   function levelIcon(t) {
     const heavy = /contractor/i.test(t.type || ""), lv = t.level || "";
@@ -169,7 +178,7 @@
     return keys.length ? `<span class="l-lv" title="${text}">${keys.map(ico).join("")}<span class="vh">${text}</span></span>` : "";
   }
   const stripTags = h => String(h || "").replace(/<[^>]+>/g, "");
-  const card = t => `<a class="l-card" href="#learn/task/${t.id}"><span class="l-row">${levelIcon(t)}<b>${esc(t.name)}</b><small class="l-src">${t.id}</small></span>
+  const card = t => `<a class="l-card" href="#learn/task/${t.id}"><span class="l-row">${levelIcon(t)}<b>${esc(t.name)}</b><small class="l-src">${t.id}</small>${(t.annexes || []).length ? `<span class="l-fcount" title="${t.annexes.length} form${t.annexes.length > 1 ? "s" : ""}">${ico("form")}${t.annexes.length}<span class="vh"> forms</span></span>` : ""}</span>
     <span>${t.freq.map(f => chip(f, "y")).join("")}${t.type ? chip(t.type) : ""}</span><span class="l-src">${stripTags(t.short).slice(0, 150)}${stripTags(t.short).length > 150 ? "…" : ""}</span></a>`;
   const toolList = t => stripTags(t.tools).split(/,\s*(?![^()]*\))/).map(x => x.trim().replace(/\.$/, "")).filter(Boolean);
   /* ---------- one task ---------- */
@@ -189,6 +198,7 @@
       <h2 class="l-title">${levelIcon(t)} ${esc(t.name)}</h2>
       <div>${t.freq.map(f => chip(f, "y")).join("")}${t.type ? chip(t.type) : ""}${t.level ? chip(t.level, "g") : ""}${t.status ? chip(t.status === "Draft" ? "Draft for review" : t.status, "r") : ""}</div>
       <p class="l-src">${t.when}</p><div class="l-banner">${t.short}</div>
+      ${formsHtml(t)}
       ${toolList(t).length ? `<div class="l-bring"><b>What to bring</b> ${toolList(t).map(x => `<span class="l-tool">${ico("bag")}${esc(x)}</span>`).join("")}</div>` : ""}
       ${whereHtml(t)}
       <div class="l-two">
