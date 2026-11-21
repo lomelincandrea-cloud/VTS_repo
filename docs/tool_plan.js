@@ -85,7 +85,13 @@ window.ToolPlan = (function () {
     const sc = m => m === selM ? ' class="g-sel"' : "";
     /* resource rows: one small button per visit in the month (crew and hours, materials), the cost per visit and the year total */
     const res = (kind, pv) => {
-      if (kind === "crew") return `<button type="button" class="g-cellb" data-ed="crew" data-pv="${pv.id}" aria-label="Crew and hours, ${esc(pv.type)} ${esc(pv.date)}">${pv.est_crew ?? "–"} · ${pv.est_hours ?? "–"} h</button>`;
+      if (kind === "crew") {
+        /* a visit already done shows what its closed Visit Sheet recorded (crew size · crew hours); a planned one keeps the editable estimate */
+        const dv = doneVisit(s, pv);
+        if (dv) return `<span class="g-rec" title="Recorded on the closed Visit Sheet of ${esc(dv.date)}: crew size · total crew hours">${dv.crew_size ?? "–"} · ${dv.hours_crew_total ?? "–"} h<small>recorded</small></span>`;
+        const set = pv.est_crew != null || pv.est_hours != null;
+        return `<button type="button" class="g-cellb" data-ed="crew" data-pv="${pv.id}" aria-label="Crew and hours, ${esc(pv.type)} ${esc(pv.date)}${set ? "" : ", not set"}">${set ? `${pv.est_crew ?? "–"} · ${pv.est_hours ?? "–"} h` : "Add"}</button>`;
+      }
       const m = pv.materials || [];
       return `<button type="button" class="g-cellb g-tipb" data-ed="mat" data-pv="${pv.id}" aria-label="Materials, ${esc(pv.type)} ${esc(pv.date)}: ${m.length ? m.map(x => `${x.qty} ${x.unit || ""} ${x.item}`).join(", ") : "none"}">${m.length} item${m.length === 1 ? "" : "s"}<span class="o-tip" aria-hidden="true">${m.length ? m.map(x => `${esc(x.qty)} ${esc(x.unit || "")} ${esc(x.item)}${x.unit_cost ? " · $" + esc(x.unit_cost) : ""}`).join("<br>") : "No materials yet. Select to add."}</span></button>`;
     };
@@ -730,10 +736,11 @@ window.ToolPlan = (function () {
       <p class="l-src">${list.length} rows: ${nPrev} preventive visit${nPrev === 1 ? "" : "s"}, ${nCor} corrective repair${nCor === 1 ? "" : "s"}. Newest first.</p>
       <div class="scroll"><table class="c-tab lg-tab"><thead><tr><th>Date</th><th>VTS</th><th>Kind</th><th>What</th><th>Result</th><th>Status</th><th><span class="vh">Links</span></th></tr></thead><tbody>
         ${list.map((r, i) => {
+          const mo = `${MONTHS[+r.date.slice(5, 7) - 1]} ${r.date.slice(0, 4)}`, sep = !i || mo !== `${MONTHS[+list[i - 1].date.slice(5, 7) - 1]} ${list[i - 1].date.slice(0, 4)}`;
           const open = r.c && LOGF.open === r.c.id;
           const links = r.c ? `<button class="btn ghost sm" type="button" data-lgo="${r.c.id}" aria-expanded="${open}">${open ? "Hide details" : "Details"}</button>`
             : r.link ? `<a href="${r.link}">${esc(r.linkText)} →</a>` : "";
-          return `<tr class="${r.kind === "Corrective" ? "lg-cor" : ""}${open ? " lg-open" : ""}"><td>${esc(r.date)}</td><td><span class="sdot" style="background:${K().COLOR[r.s.type]}"></span><a href="#tool/vts/${r.s.id}/history">${esc(r.s.name)}</a></td>
+          return `${sep ? `<tr class="lg-month"><th colspan="7" scope="colgroup">${mo}</th></tr>` : ""}<tr class="${r.kind === "Corrective" ? "lg-cor" : ""}${open ? " lg-open" : ""}"><td>${esc(r.date)}</td><td><span class="sdot" style="background:${K().COLOR[r.s.type]}"></span><a href="#tool/vts/${r.s.id}/history">${esc(r.s.name)}</a></td>
             <td>${r.kind === "Preventive" ? "Preventive visit" : "Corrective repair"}</td><td>${esc(r.what)}</td><td>${esc(r.result)}</td><td>${stChip(r.status)}</td><td>${links}</td></tr>
             ${open ? `<tr class="lg-detail"><td colspan="7">${corCard(r.c)}</td></tr>` : ""}`; }).join("") || `<tr><td colspan="7">Nothing here with these filters.</td></tr>`}
       </tbody></table></div>`;
