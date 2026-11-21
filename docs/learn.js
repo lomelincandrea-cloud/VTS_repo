@@ -1,5 +1,6 @@
-/* Learn: the manual by system and task, the Field Guide plant picker, and the downloads.
-   Data: window.VTS_LEARN, built by tools/build_site_data.py from the two workbooks. Routes: #learn/manual/SB, #learn/task/SB_T01,
+/* Learn: a landing page with four doors and the maintenance cycle; the manual by system (illustration with clickable parts,
+   the year, the tasks) and by task; the Field Guide plant picker; and the downloads.
+   Data: window.VTS_LEARN, built by tools/build_site_data.py from the two workbooks. Routes: #learn (landing), #learn/manual/SB, #learn/task/SB_T01,
    #learn/topic/TOP-01, #learn/plants, #learn/downloads, #learn/materials. app.js calls window.learnRoute(parts). */
 (function () {
   "use strict";
@@ -20,13 +21,17 @@
   function tabs(cur) {
     qa("#learnTabs a").forEach(a => a.dataset.t === cur ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current"));
     q("#learnMaterials").hidden = cur !== "materials"; view().hidden = cur === "materials";
+    /* "How to use Learn" only on the landing page and on All materials */
+    const g = q("#learnGuide"); if (g) g.hidden = !(cur === "landing" || cur === "materials");
   }
+  const label = k => `<span class="l-mod l-mod-${k.toLowerCase().replace(/ /g, "")}">${esc(k)}</span>`;
 
   window.learnRoute = function (parts) {
     const [v, a] = parts;
-    const which = !v ? "manual" : v;
+    const which = !v ? "landing" : v;
     tabs(["task", "topic"].includes(which) ? "manual" : which);
-    if (which === "task") task(a);
+    if (which === "landing") landing();
+    else if (which === "task") task(a);
     else if (which === "topic") topic(a);
     else if (which === "plants") plants();
     else if (which === "downloads") downloads();
@@ -34,28 +39,139 @@
     else manual(a);
   };
 
-  /* ---------- manual by system, tasks grouped by visit ---------- */
+  /* ---------- Learn landing: four doors, the maintenance cycle, Field Guide ---------- */
+  const IP = chip("In progress", "y");
+  function landing() {
+    const sheet = L.downloads.filter(d => /_F04$/.test(d.code)), natives = L.plants.filter(p => p.status === "Native").length;
+    const doors = [
+      ["Plan", "Plan a system", "For landowners and growers thinking about installing one.", [
+        [`<a href="#start">Which system fits →</a>`], [`<a href="#start">Where should it go →</a>`], [`Cost ranges ${IP}`], [`Permits to check ${IP}`]]],
+      ["Maintain", "Maintain a system", "For crews, irrigators and supervisors who look after one.", [
+        [`<a href="#lcycle" data-jump="lcycle">The maintenance cycle, step by step →</a>`], ...MAIN.map(k => [`<a href="#learn/manual/${k}">${esc(L.systems[k])}: parts, year and tasks →</a>`])],
+        `${L.tasks.length} tasks · ${L.checklist.length} checklist items`],
+      ["Food safety", "Food safety", "For growers and food safety staff who show the record to an auditor.", [
+        [`<a href="downloads/Sample_Food_Safety_Record_vegetated_ditch.pdf" download>Sample Food Safety Record (PDF)</a>`], [`<a href="downloads/VD_F04_visual_inspection_checklist.xlsx" download>Blank Visit Sheet (Excel)</a>`], [`<a href="#tool/dashboard">Dashboard and reports in the Tool →</a>`]]],
+      ["Plants", "Plants and tools", "For anyone choosing plants or looking for a form.", [
+        [`<a href="#learn/plants">Field Guide: find a plant →</a>`], [`<a href="#learn/downloads">Downloads →</a>`], [`<a href="#learn/materials">All materials →</a>`]],
+        `${natives} native plants · ${L.downloads.length} downloads`]];
+    view().innerHTML = `
+      <p class="l-start"><b>New to this?</b> Begin with <a href="#start">Which system fits</a>.</p>
+      <div class="l-doors">${doors.map(([k, t, who, items, count]) => `<section class="l-door" aria-labelledby="ld-${k}">${label(k)}<h2 id="ld-${k}">${esc(t)}</h2><p>${esc(who)}</p>
+        <p class="l-src">${count || `${items.length} item${items.length === 1 ? "" : "s"}`}</p><ul class="plain">${items.map(i => `<li>${i[0]}</li>`).join("")}</ul></section>`).join("")}</div>
+      <section class="stack" id="lcycle" aria-labelledby="lcycleT"><h2 id="lcycleT">The maintenance cycle</h2>
+        <p class="muted">Where each step lives on this site. The cycle starts again every January.</p>
+        <ol class="l-cycle">${CYCLE.map(([n, t, w, href, where], i) => `<li><a class="l-cstep" href="${href}"><span class="l-cn">${i + 1}</span><b>${esc(t)}</b><span>${esc(w)}</span><span class="l-cw">${esc(where)} →</span></a></li>`).join("")}</ol></section>
+      <a class="l-feat" href="#learn/plants">${label("Plants")}<b>Field Guide: find a plant</b><span>Drag the seedling along the bank to a zone, then filter. ${natives} native plants, with how to recognize each one.</span></a>`;
+    qa("[data-jump]").forEach(x => x.onclick = e => { e.preventDefault(); const t = q("#" + x.dataset.jump); t.scrollIntoView({block: "start"}); t.setAttribute("tabindex", "-1"); t.focus({preventScroll: true}); });
+  }
+  const CYCLE = [["1", "Plan", "January, in the office", "#tool/plan", "Yearly plan in the Tool"],
+    ["2", "Visit", "Routine, spring, pre-storm", "#learn/downloads", "Visit Sheet download"],
+    ["3", "Look and recognize", "Every visit", "#learn/plants", "Field Guide"],
+    ["4", "Fix", "Quick fix or scheduled repair", "#learn/topic/TOP-16", "Corrective Maintenance"],
+    ["5", "Record and review", "After every visit and in January", "#tool/vts", "Site History in the Tool"]];
+
+  /* ---------- one system: illustration with parts, the year, the tasks, plants ---------- */
+  const RAINY = [9, 10, 11, 0, 1, 2, 3];
+  const VISITS = [["Routine visit", "Routine", "At every visit, all year", t => t.visit === "Routine visit", "all"],
+    ["January review (office)", "January review", "January, in the office", t => t.visit === "January review (office)", [0]],
+    ["Spring visit", "Spring visit", "April", t => t.visit === "Spring visit", [3]],
+    ["Pre-storm visit", "Pre-storm visit", "August", t => t.visit === "Pre-storm visit", [7]],
+    ["After storms", "After storms", "October to April, within 48 hours", t => t.freq.some(f => /^After storm/i.test(f)), RAINY],
+    ["When needed", "When needed", "No fixed month", t => t.visit === "When needed", null]];
+  const HOW = {SB: ["Water comes in muddy", "Soil settles", "Clearer water leaves"], VD: ["Plants slow the water", "Roots and stems hold soil", "Water moves on"],
+    WB: ["Nitrate-rich water enters the buried woodchips", "Microbes turn nitrate into nitrogen gas", "Water leaves with less nitrate"], TW: ["Water spreads and slows", "Plants and microbes work", "Water leaves"]};
+  let visF = "all", partSel = null, howStep = 0;
+  const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   function manual(s) {
     s = L.systems[s] ? s : "SB";
+    if (manual.last !== s) { visF = "all"; partSel = null; howStep = 0; manual.last = s; }
     const ts = L.tasks.filter(t => t.sys === s).sort((a, b) => a.no - b.no);
-    const groups = L.visits.map(v => [v, ts.filter(t => t.visit === v)]).filter(([, g]) => g.length);
     const own = L.topics.filter(t => t.sys === s), general = L.topics.filter(t => !t.sys || t.sys === "General" || t.sys === "ALL");
     const tlist = ts_ => ts_.map(t => `<p class="l-li"><a href="#learn/topic/${t.id}">${esc(t.title)}</a></p>`).join("");
-    const sheet = L.downloads.find(d => d.code === `${s}_F04`);
+    const sheet = L.downloads.find(d => d.code === `${s}_F04`), parts = (L.parts || {})[s] || [];
+    const vis = VISITS.filter(v => ts.some(v[3]));
     view().innerHTML = `
-      <div class="l-pills" role="group" aria-label="System">${Object.keys(L.systems).map(k => `<a class="l-pill${k === s ? " on" : ""}" href="#learn/manual/${k}">${esc(L.systems[k])}</a>`).join("")}</div>
+      <div class="l-row">${label("Maintain")}<div class="l-pills" role="group" aria-label="System">${Object.keys(L.systems).map(k => `<a class="l-pill${k === s ? " on" : ""}" href="#learn/manual/${k}"${k === s ? ' aria-current="page"' : ""}>${esc(L.systems[k])}</a>`).join("")}</div></div>
+      ${parts.length ? `<div class="l-two l-sysfig">
+        <div><figure class="l-fig"><div class="l-figbox"><img src="img/learn/${s}.webp" alt="Illustration of a ${esc(L.systems[s].toLowerCase())} and its parts." width="1000" height="560">
+            ${parts.map((p, i) => `<button type="button" class="l-hot" style="left:${p.x}%;top:${p.y}%" data-part="${p.id}" aria-pressed="${p.id === partSel}" aria-label="${i + 1}: ${esc(p.name)}">${i + 1}</button>`).join("")}</div>
+          <figcaption class="l-src">Illustration made with ChatGPT by UCSC SIP interns. Simplified, not to scale.</figcaption></figure>
+          <h3>Parts of the ${esc(L.systems[s].toLowerCase())}</h3>
+          <ol class="l-parts">${parts.map((p, i) => `<li><button type="button" class="l-partb" data-part="${p.id}" aria-pressed="${p.id === partSel}" aria-controls="lpart"><span class="l-pn" aria-hidden="true">${i + 1}</span>${esc(p.name)}</button></li>`).join("")}</ol></div>
+        <div class="stack"><div class="panel" id="lpart" aria-live="polite">${partHtml(s, parts.find(p => p.id === partSel))}</div>${howHtml(s)}</div></div>` : ""}
+      <section class="stack" aria-labelledby="lyearT"><h2 id="lyearT" class="l-h">The year</h2>
+        <div class="l-year" role="img" aria-label="Months of the year. The rainy season is October to April.">${MONTHS.map((m, i) => `<span class="${RAINY.includes(i) ? "rain" : ""}">${m}</span>`).join("")}</div>
+        <div class="l-yvis" role="group" aria-label="Show the tasks of one visit">
+          <button type="button" class="l-vb" data-v="all" aria-pressed="${visF === "all"}">All visits <small>${ts.length}</small></button>
+          ${vis.map(v => `<button type="button" class="l-vb" data-v="${esc(v[0])}" aria-pressed="${visF === v[0]}" style="${barPos(v[4])}"><b>${esc(v[1])}</b> <small>${esc(v[2])} · ${ts.filter(v[3]).length}</small></button>`).join("")}</div>
+        <p class="l-src">Blue months: rainy season (October 1 to April 30). The cycle starts again every January.</p>
+        <div class="l-grid" id="lcards">${cards(ts)}</div></section>
       <div class="l-two">
-        <div>${groups.map(([v, g]) => `<h2 class="l-h">${esc(v)}</h2><div class="l-grid">${g.map(card).join("")}</div>`).join("") || "<p>No tasks.</p>"}</div>
-        <aside class="stack">
-          <div class="panel"><h3>Read first</h3>${tlist(own)}<h3 style="margin-top:.8rem">All systems</h3>${tlist(general)}</div>
-          ${sheet ? `<div class="panel"><h3>Visit Sheet</h3><p>The checklist for the ${esc(L.systems[s].toLowerCase())}, to fill in at each visit.</p><p><a class="btn sm" href="${sheet.file}" download>Download (Excel)</a> ${chip("Draft", "y")}</p></div>` : ""}
-        </aside>
+        <div class="panel"><h3>Read first</h3>${tlist(own)}<h3 style="margin-top:.8rem">All systems</h3>${tlist(general)}</div>
+        <div class="stack">${sheet ? `<div class="panel"><h3>Visit Sheet</h3><p>The checklist for the ${esc(L.systems[s].toLowerCase())}, to fill in at each visit.</p><p><a class="btn sm" href="${sheet.file}" download>Download (Excel)</a> ${chip("Draft", "y")}</p></div>` : ""}
+          ${plantsFor(s)}</div>
       </div>`;
+    qa("[data-part]").forEach(b => b.onclick = () => { partSel = partSel === b.dataset.part ? null : b.dataset.part; qa("[data-part]").forEach(x => x.setAttribute("aria-pressed", x.dataset.part === partSel)); q("#lpart").innerHTML = partHtml(s, parts.find(p => p.id === partSel)); });
+    qa(".l-vb").forEach(b => b.onclick = () => { visF = b.dataset.v; qa(".l-vb").forEach(x => x.setAttribute("aria-pressed", x === b)); q("#lcards").innerHTML = cards(ts); });
+    wireHow(s);
   }
-  const card = t => `<a class="l-card" href="#learn/task/${t.id}"><span class="l-row"><b>${esc(t.name)}</b><small class="l-src">${t.id}</small></span>
-    <span>${t.freq.map(f => chip(f, "y")).join("")}${t.type ? chip(t.type) : ""}</span><span class="l-src">${stripTags(t.short).slice(0, 150)}${stripTags(t.short).length > 150 ? "…" : ""}</span></a>`;
-  const stripTags = h => String(h || "").replace(/<[^>]+>/g, "");
+  manual.last = null;
+  /* a visit's place on the strip: a marker on its month, a bar across its months, nothing when it has no month */
+  function barPos(m) {
+    if (m === "all") return "grid-column:1/13";
+    if (!m) return "grid-column:1/13";
+    if (m.length === 1) return `grid-column:${m[0] + 1}/span 2`;
+    return "grid-column:10/13";   /* after storms: Oct to Dec on the strip, and Jan to Apr in its text */
+  }
+  function cards(ts) {
+    const v = VISITS.find(x => x[0] === visF), list = v ? ts.filter(v[3]) : ts;
+    return list.map(card).join("") || `<p class="muted">No tasks for this visit.</p>`;
+  }
+  function partHtml(s, p) {
+    if (!p) return `<p class="muted">Select a numbered part on the drawing, or in the list, to see what to check there and which tasks look after it.</p>`;
+    const items = p.items.map(id => L.checklist.find(c => c.id === id)).filter(Boolean);
+    return `<h3>${esc(p.name)}</h3><p class="l-src">From the Visit Sheet checklist (${esc(s)}_F04).</p>
+      <ul class="l-check">${items.map(i => `<li><b>${esc(i.q)}</b>${i.look ? `<span><span class="l-ok">Looks normal</span> ${esc(i.look)}</span>` : ""}${i.ab ? `<span><span class="l-bad">Needs attention</span> ${esc(i.ab)}</span>` : ""}</li>`).join("")}</ul>
+      ${p.tasks.length ? `<p><b>Tasks</b></p><ul class="plain">${p.tasks.map(id => { const t = taskBy(id); return `<li><a href="#learn/task/${id}">${esc(t ? t.name : id)}</a> <span class="l-src">${id}</span></li>`; }).join("")}</ul>` : `<p class="l-src">No task in the manual is linked to these checklist items.</p>`}`;
+  }
+  /* "How it works" in three still steps; the drawings are coming, so each step shows a placeholder for now */
+  function howHtml(s) {
+    const st = HOW[s]; if (!st) return "";
+    return `<div class="panel l-how" aria-labelledby="lhowT"><h3 id="lhowT">How it works</h3>
+      <div class="l-howbtn" role="group" aria-label="Step">${st.map((_, i) => `<button type="button" data-how="${i}" aria-pressed="${i === howStep}">${i + 1}</button>`).join("")}</div>
+      <div class="l-howimg" aria-hidden="true">Drawing coming</div><p class="l-howt" aria-live="polite"><b>${howStep + 1}.</b> ${esc(st[howStep])}</p>
+      ${howStep < st.length - 1 ? `<button class="btn ghost sm" type="button" id="lhowN">Next step</button>` : `<button class="btn ghost sm" type="button" id="lhowN">Start again</button>`}</div>`;
+  }
+  function wireHow(s) {
+    const box = q(".l-how"); if (!box) return;
+    const go = i => { howStep = i; box.outerHTML = howHtml(s); wireHow(s); const n = q(".l-how .l-howt"); n.classList.add("h-in"); };
+    qa("[data-how]", box).forEach(b => b.onclick = () => go(+b.dataset.how));
+    q("#lhowN", box).onclick = () => go((howStep + 1) % HOW[s].length);
+  }
+  function plantsFor(s) {
+    const n = L.plants.filter(p => p.status === "Native" && p.sys.includes(s));
+    if (!n.length) return `<div class="panel stack">${label("Plants")}<h3>Plants for a ${esc(L.systems[s].toLowerCase())}</h3><p>The Field Guide lists no plants for this system.</p><p><a href="#learn/plants">Open the Field Guide →</a></p></div>`;
+    return `<div class="panel stack">${label("Plants")}<h3>Plants for a ${esc(L.systems[s].toLowerCase())}</h3><div class="l-bank l-bank-sm">${bankSvg()}</div>
+      <p>${n.length} native plants in the Field Guide grow in this system: ${["W", "L", "M", "H"].map(z => `${n.filter(p => p.zones.includes(z)).length} in the ${ZN.find(a => a[0] === z)[1].toLowerCase()} zone`).join(", ")}.</p>
+      <p><a href="#learn/plants" data-plants="${s}">Open the Field Guide with only these plants →</a></p></div>`;
+  }
+  document.addEventListener("click", e => { const a = e.target.closest("[data-plants]"); if (a) { ps.sys = a.dataset.plants; } });
 
+  /* task level as an icon: eye = observe or measure only, eye + wrench = observe + minor action, wrench = action, truck = heavy maintenance by a contractor */
+  const IC = {eye: '<path d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6S2 12 2 12z"/><circle cx="12" cy="12" r="2.8"/>',
+    wrench: '<path d="M14.5 6.5a4 4 0 0 0 5 5L12 19a2.1 2.1 0 0 1-3-3l7.5-7.5a4 4 0 0 0-2-2z"/>',
+    truck: '<path d="M2 6h11v9H2z"/><path d="M13 9h4l3 3v3h-7z"/><circle cx="6" cy="17" r="1.8"/><circle cx="16.5" cy="17" r="1.8"/>',
+    bag: '<path d="M5 8h14l-1 12H6z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>'};
+  const ico = k => `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${IC[k]}</svg>`;
+  function levelIcon(t) {
+    const heavy = /contractor/i.test(t.type || ""), lv = t.level || "";
+    const [keys, text] = heavy ? [["truck"], "Heavy maintenance by a contractor"] : /observe \+ minor/i.test(lv) ? [["eye", "wrench"], "Observe and a minor action"] : /observe/i.test(lv) ? [["eye"], "Observe or measure only"] : /action/i.test(lv) ? [["wrench"], "Action"] : [[], ""];
+    return keys.length ? `<span class="l-lv" title="${text}">${keys.map(ico).join("")}<span class="vh">${text}</span></span>` : "";
+  }
+  const stripTags = h => String(h || "").replace(/<[^>]+>/g, "");
+  const card = t => `<a class="l-card" href="#learn/task/${t.id}"><span class="l-row">${levelIcon(t)}<b>${esc(t.name)}</b><small class="l-src">${t.id}</small></span>
+    <span>${t.freq.map(f => chip(f, "y")).join("")}${t.type ? chip(t.type) : ""}</span><span class="l-src">${stripTags(t.short).slice(0, 150)}${stripTags(t.short).length > 150 ? "…" : ""}</span></a>`;
+  const toolList = t => stripTags(t.tools).split(/,\s*(?![^()]*\))/).map(x => x.trim().replace(/\.$/, "")).filter(Boolean);
   /* ---------- one task ---------- */
   function task(id) {
     const t = taskBy(id);
@@ -69,18 +185,29 @@
     const items = L.checklist.filter(i => i.go.includes(t.id));
     view().innerHTML = `
       <p><a href="#learn/manual/${t.sys}">← ${esc(L.systems[t.sys])}</a></p>
-      <div class="l-row">${sysTag(t.sys)}<span class="l-src">${t.id} · ${esc(t.visit)}</span></div>
-      <h2 class="l-title">${esc(t.name)}</h2>
+      <div class="l-row">${label("Maintain")}${sysTag(t.sys)}<span class="l-src">${t.id} · ${esc(t.visit)}</span></div>
+      <h2 class="l-title">${levelIcon(t)} ${esc(t.name)}</h2>
       <div>${t.freq.map(f => chip(f, "y")).join("")}${t.type ? chip(t.type) : ""}${t.level ? chip(t.level, "g") : ""}${t.status ? chip(t.status === "Draft" ? "Draft for review" : t.status, "r") : ""}</div>
       <p class="l-src">${t.when}</p><div class="l-banner">${t.short}</div>
+      ${toolList(t).length ? `<div class="l-bring"><b>What to bring</b> ${toolList(t).map(x => `<span class="l-tool">${ico("bag")}${esc(x)}</span>`).join("")}</div>` : ""}
+      ${whereHtml(t)}
       <div class="l-two">
         <div>${t.flow ? `<figure class="l-flow">${t.flow}<figcaption class="l-src">Steps to ${esc(t.name.toLowerCase())}.</figcaption></figure>` : ""}
           <div class="l-box"><b>Steps</b><div><ol class="l-steps">${steps}</ol></div></div></div>
-        <div>${g && g.by[t.sys] ? box("In this system", g.by[t.sys]) : ""}${box("Responsibilities", t.resp)}${box("Tools and equipment", t.tools)}${box("Safety", t.safety)}${box("Waste handling", t.waste)}${box("Escalation", t.esc, true)}${box("Notes", t.notes)}
+        <div>${g && g.by[t.sys] ? box("In this system", g.by[t.sys]) : ""}${box("Responsibilities", t.resp)}${box("Safety", t.safety)}${box("Waste handling", t.waste)}${box("Escalation", t.esc, true)}${box("Notes", t.notes)}
           ${items.length ? box("Visit Sheet items that send you here", "<ul>" + items.map(i => `<li>${esc(i.q)} <span class="l-src">${i.id}</span></li>`).join("") + "</ul>") : ""}
           ${t.basis.length ? `<p class="l-src"><b>Basis:</b> ${t.basis.map(esc).join("; ")}</p>` : ""}</div>
       </div>
       ${g ? `<p class="l-src">Done together with ${g.members.filter(m => m !== t.id).map(m => `<a href="#learn/task/${m}">${esc(m)}</a>`).join(", ")} (${esc(g.name)}).</p>` : ""}`;
+  }
+
+  /* "Where you work": a small copy of the system drawing with this task's parts highlighted */
+  function whereHtml(t) {
+    const parts = ((L.parts || {})[t.sys] || []).filter(p => p.tasks.includes(t.id));
+    if (!parts.length) return "";
+    const all = L.parts[t.sys];
+    return `<figure class="l-where"><div class="l-figbox"><img src="img/learn/${t.sys}.webp" alt="" width="1000" height="560">${parts.map(p => `<span class="l-hot on" style="left:${p.x}%;top:${p.y}%" aria-hidden="true">${all.indexOf(p) + 1}</span>`).join("")}</div>
+      <figcaption><b>Where you work:</b> ${parts.map(p => esc(p.name)).join(", ")}. <a href="#learn/manual/${t.sys}">See all the parts →</a></figcaption></figure>`;
   }
 
   /* ---------- one topic ---------- */
@@ -128,7 +255,7 @@
       <span>${p.sys.map(sysTag).join(" ")}</span><span class="l-src">${esc(src)}</span></span></button>`;
   }
   function plants() {
-    view().innerHTML = `<h2 class="l-title">Plant picker</h2><p>Where do you want to plant? Drag the seedling along the bank, or tap a zone. Then filter by system, type, or flowers. The same plants are in the Field Guide (VTS_D02).</p>
+    view().innerHTML = `${label("Plants")}<h2 class="l-title">Plant picker</h2><p>Where do you want to plant? Drag the seedling along the bank, or tap a zone. Then filter by system, type, or flowers. The same plants are in the Field Guide (VTS_D02).</p>
       <div class="l-bank" id="lbank">${bankSvg()}${ZN.map(([c, n], i) => `<div class="l-zlab" data-z="${c}" style="left:${i * 25 + 12.5}%">${n}</div>`).join("")}
         <div class="l-pin" id="lpin" tabindex="0" role="slider" aria-label="Planting zone" aria-valuemin="0" aria-valuemax="3"><svg viewBox="0 0 54 54" aria-hidden="true"><circle cx="27" cy="27" r="25" fill="#fff" stroke="#03467E" stroke-width="3"/><path d="M27 42 V26" stroke="#3C9D5B" stroke-width="3.5" stroke-linecap="round"/><path d="M27 28 C17 28 13 20 13 15 C21 15 27 19 27 28Z" fill="#43a965"/><path d="M27 26 C35 26 41 20 41 13 C33 13 27 17 27 26Z" fill="#2F7D4A"/></svg></div>
         <div class="l-hint" id="lhint">Drag me or tap a zone</div></div>
@@ -196,7 +323,7 @@
 
   /* ---------- downloads ---------- */
   function downloads() {
-    view().innerHTML = `<h2 class="l-title">Downloads</h2>
+    view().innerHTML = `${label("Plants and tools")}<h2 class="l-title">Downloads</h2>
       <p class="l-banner">These are drafts for review. They have not had technical review yet, and they will change.</p>
       <div class="l-grid">${L.downloads.map((d, i) => `<div class="panel stack l-doc"><div class="l-row"><b>${esc(d.title)}</b><span class="l-sp"></span>${chip("Draft", "y")}</div>
         <span class="l-src">${esc(d.code)} · ${d.kind.toUpperCase()} · ${d.size_kb >= 1024 ? (d.size_kb / 1024).toFixed(1) + " MB" : d.size_kb + " KB"}</span><p>${esc(d.what)}</p>

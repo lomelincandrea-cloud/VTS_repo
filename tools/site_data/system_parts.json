@@ -1,0 +1,389 @@
+{
+ "_about": "Parts of each system for Learn: one per Visit Sheet checklist section (Safety & access is not a part). Checklist items and task ids come from the manual workbook; x and y place the numbered hotspot on the cropped illustration, in % of its width and height. build_site_data.py checks every task id.",
+ "systems": {
+  "SB": {
+   "image": "FIG-03-p14.jpg",
+   "parts": [
+    {
+     "id": "SB-P1",
+     "name": "Inlet, outlet & controls",
+     "items": [
+      "SB-CL-13",
+      "SB-CL-14",
+      "SB-CL-15"
+     ],
+     "tasks": [
+      "COR_T02",
+      "COR_T03",
+      "COR_T04",
+      "SB_T04",
+      "SB_T07"
+     ],
+     "x": 79,
+     "y": 66
+    },
+    {
+     "id": "SB-P2",
+     "name": "Flow & water level",
+     "items": [
+      "SB-CL-02",
+      "SB-CL-03",
+      "SB-CL-04",
+      "SB-CL-05",
+      "SB-CL-19",
+      "SB-CL-20"
+     ],
+     "tasks": [
+      "COR_T01",
+      "COR_T07",
+      "SB_T04"
+     ],
+     "x": 42,
+     "y": 46
+    },
+    {
+     "id": "SB-P3",
+     "name": "Sediment",
+     "items": [
+      "SB-CL-06",
+      "SB-CL-07",
+      "SB-CL-08"
+     ],
+     "tasks": [
+      "SB_T05",
+      "SB_T09"
+     ],
+     "x": 31,
+     "y": 82
+    },
+    {
+     "id": "SB-P4",
+     "name": "Vegetation",
+     "items": [
+      "SB-CL-09",
+      "SB-CL-10",
+      "SB-CL-11",
+      "SB-CL-12"
+     ],
+     "tasks": [
+      "SB_T03",
+      "SB_T06"
+     ],
+     "x": 10,
+     "y": 53
+    },
+    {
+     "id": "SB-P5",
+     "name": "Embankments & erosion",
+     "items": [
+      "SB-CL-16",
+      "SB-CL-17",
+      "SB-CL-18"
+     ],
+     "tasks": [
+      "COR_T03",
+      "COR_T04",
+      "SB_T07"
+     ],
+     "x": 66,
+     "y": 38
+    },
+    {
+     "id": "SB-P6",
+     "name": "Boundaries & farm activity",
+     "items": [
+      "SB-CL-21"
+     ],
+     "tasks": [],
+     "x": 6,
+     "y": 18
+    }
+   ]
+  },
+  "VD": {
+   "image": "FIG-02-p49.jpg",
+   "parts": [
+    {
+     "id": "VD-P1",
+     "name": "Vegetation",
+     "items": [
+      "VD-CL-07",
+      "VD-CL-08",
+      "VD-CL-09"
+     ],
+     "tasks": [
+      "VD_T03"
+     ],
+     "x": 31,
+     "y": 46
+    },
+    {
+     "id": "VD-P2",
+     "name": "Banks, sediment & erosion",
+     "items": [
+      "VD-CL-10",
+      "VD-CL-11",
+      "VD-CL-12",
+      "VD-CL-14"
+     ],
+     "tasks": [
+      "COR_T02",
+      "COR_T03",
+      "COR_T04",
+      "VD_T05",
+      "VD_T06"
+     ],
+     "x": 49,
+     "y": 44
+    },
+    {
+     "id": "VD-P3",
+     "name": "Flow & water quality",
+     "items": [
+      "VD-CL-02",
+      "VD-CL-03",
+      "VD-CL-13"
+     ],
+     "tasks": [
+      "COR_T07"
+     ],
+     "x": 53,
+     "y": 66
+    },
+    {
+     "id": "VD-P4",
+     "name": "Sediment",
+     "items": [
+      "VD-CL-05",
+      "VD-CL-06"
+     ],
+     "tasks": [
+      "VD_T05",
+      "VD_T11"
+     ],
+     "x": 53,
+     "y": 80
+    },
+    {
+     "id": "VD-P5",
+     "name": "Inlet, outlet & controls",
+     "items": [
+      "VD-CL-04"
+     ],
+     "tasks": [
+      "VD_T04"
+     ],
+     "x": 78,
+     "y": 69
+    },
+    {
+     "id": "VD-P6",
+     "name": "Boundaries & farm activity",
+     "items": [
+      "VD-CL-15"
+     ],
+     "tasks": [],
+     "x": 9,
+     "y": 40
+    }
+   ]
+  },
+  "WB": {
+   "image": "FIG-53-p67.jpg",
+   "parts": [
+    {
+     "id": "WB-P1",
+     "name": "Inlet, outlet & controls",
+     "items": [
+      "WB-CL-02",
+      "WB-CL-03",
+      "WB-CL-10"
+     ],
+     "tasks": [
+      "COR_T01",
+      "COR_T03",
+      "COR_T04",
+      "WB_T04"
+     ],
+     "x": 31,
+     "y": 54
+    },
+    {
+     "id": "WB-P2",
+     "name": "Flow & drainage",
+     "items": [
+      "WB-CL-04",
+      "WB-CL-05",
+      "WB-CL-06",
+      "WB-CL-11",
+      "WB-CL-12"
+     ],
+     "tasks": [
+      "COR_T05",
+      "COR_T07",
+      "WB_T04"
+     ],
+     "x": 43,
+     "y": 68
+    },
+    {
+     "id": "WB-P3",
+     "name": "Woodchips & wildlife",
+     "items": [
+      "WB-CL-13",
+      "WB-CL-14"
+     ],
+     "tasks": [
+      "COR_T04",
+      "COR_T05"
+     ],
+     "x": 62,
+     "y": 54
+    },
+    {
+     "id": "WB-P4",
+     "name": "Embankments & erosion",
+     "items": [
+      "WB-CL-07",
+      "WB-CL-08"
+     ],
+     "tasks": [
+      "COR_T02",
+      "COR_T03",
+      "COR_T04",
+      "WB_T08"
+     ],
+     "x": 13,
+     "y": 78
+    },
+    {
+     "id": "WB-P5",
+     "name": "Vegetation",
+     "items": [
+      "WB-CL-09"
+     ],
+     "tasks": [
+      "WB_T03"
+     ],
+     "x": 58,
+     "y": 38
+    },
+    {
+     "id": "WB-P6",
+     "name": "Boundaries & farm activity",
+     "items": [
+      "WB-CL-15"
+     ],
+     "tasks": [],
+     "x": 6,
+     "y": 30
+    }
+   ]
+  },
+  "TW": {
+   "image": "FIG-TW-01.png",
+   "parts": [
+    {
+     "id": "TW-P1",
+     "name": "Vegetation",
+     "items": [
+      "TW-CL-08",
+      "TW-CL-09",
+      "TW-CL-10",
+      "TW-CL-16",
+      "TW-CL-18"
+     ],
+     "tasks": [
+      "COR_T04",
+      "TW_T03"
+     ],
+     "x": 32,
+     "y": 60
+    },
+    {
+     "id": "TW-P2",
+     "name": "Water level & flow",
+     "items": [
+      "TW-CL-02",
+      "TW-CL-03",
+      "TW-CL-14",
+      "TW-CL-15"
+     ],
+     "tasks": [
+      "COR_T07"
+     ],
+     "x": 63,
+     "y": 51
+    },
+    {
+     "id": "TW-P3",
+     "name": "Inlet, outlet & controls",
+     "items": [
+      "TW-CL-04",
+      "TW-CL-05"
+     ],
+     "tasks": [
+      "COR_T01",
+      "COR_T02",
+      "COR_T03",
+      "TW_T02"
+     ],
+     "x": 80,
+     "y": 69
+    },
+    {
+     "id": "TW-P4",
+     "name": "Sediment",
+     "items": [
+      "TW-CL-06",
+      "TW-CL-07"
+     ],
+     "tasks": [
+      "TW_T05",
+      "TW_T10"
+     ],
+     "x": 44,
+     "y": 76
+    },
+    {
+     "id": "TW-P5",
+     "name": "Wildlife & debris",
+     "items": [
+      "TW-CL-12",
+      "TW-CL-13"
+     ],
+     "tasks": [
+      "COR_T04",
+      "TW_T02",
+      "TW_T08"
+     ],
+     "x": 18,
+     "y": 37
+    },
+    {
+     "id": "TW-P6",
+     "name": "Berms & erosion",
+     "items": [
+      "TW-CL-11"
+     ],
+     "tasks": [
+      "COR_T02",
+      "COR_T03"
+     ],
+     "x": 6,
+     "y": 66
+    },
+    {
+     "id": "TW-P7",
+     "name": "Boundaries & farm activity",
+     "items": [
+      "TW-CL-17"
+     ],
+     "tasks": [],
+     "x": 90,
+     "y": 33
+    }
+   ]
+  }
+ }
+}

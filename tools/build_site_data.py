@@ -3,6 +3,7 @@
 Reads   tools/manual_builder/data/VTS_manual_content.xlsx        (manual: tasks, steps, flows, topics, checklist, site conditions)
         tools/plant_catalogue_builder/data/VTS_plant_catalogue.xlsx (Field Guide: plants, watchlist, icons, sources)
         tools/site_data/plant_icons.json                          (plant icon drawings)
+        tools/site_data/system_parts.json                         (parts of each system for Learn; the build stops if a task id does not exist)
 Writes  docs/learn_data.js      window.VTS_LEARN = {...}
         docs/img/manual/*        figures used by the topics
         docs/downloads/*         latest draft PDFs and Excel forms (marked DRAFT on the site), and the sample Food Safety Record
@@ -191,9 +192,20 @@ for sub, src, pat in (("templates", ROOT / "tools" / "report_templates", "*.html
     (DOCS / "tool" / sub).mkdir(exist_ok=True)
     for f in sorted(src.glob(pat)): shutil.copy(f, DOCS / "tool" / sub / f.name)
 
+# ---------------- parts of each system (Learn: clickable illustration); every task and checklist id must exist
+parts_src = json.loads((ROOT / "tools" / "site_data" / "system_parts.json").read_text(encoding="utf-8"))
+task_ids, item_ids, bad = {t["id"] for t in tasks}, {c["id"] for c in checklist}, []
+for sy, v in parts_src["systems"].items():
+    for prt in v["parts"]:
+        bad += [f"{sy} part '{prt['name']}': task {t} does not exist" for t in prt["tasks"] if t not in task_ids]
+        bad += [f"{sy} part '{prt['name']}': checklist item {i} does not exist" for i in prt["items"] if i not in item_ids]
+if bad:
+    sys.exit("system_parts.json has links that do not exist in the manual workbook:\n  " + "\n  ".join(bad))
+parts = {sy: v["parts"] for sy, v in parts_src["systems"].items()}
+
 data = {"built": date.today().isoformat(), "visits": VISIT_ORDER, "systems": SYS_NAME, "tasks": tasks, "groups": groups, "topics": topics,
         "checklist": checklist, "siteParams": site_params, "plants": plants, "watch": watch, "plantSources": plant_sources,
-        "icons": icons["icons"], "iconNames": icon_names, "flowerHex": icons["flowerHex"], "downloads": docs}
+        "icons": icons["icons"], "iconNames": icon_names, "flowerHex": icons["flowerHex"], "downloads": docs, "parts": parts}
 out = DOCS / "learn_data.js"
 out.write_text("// Built by tools/build_site_data.py from the manual and plant catalogue workbooks. Do not edit by hand.\nwindow.VTS_LEARN=" + json.dumps(data, ensure_ascii=False, separators=(",", ":")) + ";\n", encoding="utf-8")
 shutil.rmtree(tmp, ignore_errors=True)
