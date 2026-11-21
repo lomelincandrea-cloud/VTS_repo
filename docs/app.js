@@ -10,7 +10,7 @@ const el=(t,a={},h="")=>{const e=document.createElement(t);for(const k in a)e.se
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
 /* routing */
-const ROUTES=["home","start","maintain","request","learn","tool","phone"];
+const ROUTES=["home","start","maintain","request","learn","tool","phone","report"];
 let lastTop=null,navClick=false,first=true;
 /* a click on a tab or pill keeps the page where it is; a click on a card or link inside the content may move to the tab bar */
 document.addEventListener("click",e=>{const a=e.target.closest("a[href^='#']");navClick=!!(a&&a.closest(".l-pills,.l-tabs,nav,[role=group],[role=tablist]"));setTimeout(()=>navClick=false,500)},true);
@@ -19,6 +19,7 @@ function route(){const parts=(location.hash||"#home").slice(1).split("/");const 
   if(r==="learn"&&window.learnRoute)window.learnRoute(parts.slice(1));
   if(r==="tool"&&window.toolRoute)window.toolRoute(parts.slice(1));
   if(r==="phone"&&window.ToolPlan)window.ToolPlan.phone(parts.slice(1).join("/"));
+  if(r==="report"&&window.ToolDash)window.ToolDash.sample(parts[1]);
   $$("section.view").forEach(v=>v.classList.toggle("on",v.id==="v-"+r));
   $$("nav.main a").forEach(a=>{const on=a.dataset.r===r||(r==="request"&&a.dataset.r==="maintain");on?a.setAttribute("aria-current","page"):a.removeAttribute("aria-current")});
   /* scroll to the top and focus the h1 only when the page changes (home, learn, tool...); inside a page keep the place,
@@ -151,6 +152,7 @@ $("#reqForm").addEventListener("submit",e=>{e.preventDefault();const f=e.target;
 
 /* learn */
 const MAT=[
+ ["Sample reports: Food Safety Record and Water Summary","What the Tool prints, made with sample data. Open them in the browser and print or save as PDF.","crew ranch owner",ORDER,"Sample","#report/food-safety/sample"],
  ["Operation and Maintenance Manual (VTS_D01)","The full manual: every task, step by step, with safety notes.","crew",ORDER,"Draft"],
  ["Field Guide (VTS_D02)","Plants, signs of problems, wildlife and the parts of a system, with photos.","crew",ORDER,"Draft"],
  ["Visit Sheet (F04)","One sheet per visit: the tasks of the visit, the inspection checklist, what you fixed on the spot, what was done, and overview photos. Excel and print.","crew ranch",ORDER,"Draft"],
@@ -171,7 +173,7 @@ const MAT=[
 const AUD=[["all","Everyone"],["crew","Maintenance crew"],["ranch","Ranch manager or irrigator"],["owner","Landowner"]];
 const AUDN={crew:"Crew",ranch:"Ranch staff",owner:"Landowner"};
 let lAud="all",lSys="ALL";
-function learn(){$("#learnBody").innerHTML=MAT.filter(m=>(lAud==="all"||m[2].includes(lAud))&&(lSys==="ALL"||m[3].includes(lSys))).map(m=>`<tr><td><strong>${esc(m[0])}</strong></td><td>${esc(m[1])}</td><td>${m[2].split(" ").map(a=>AUDN[a]).join(", ")}</td><td><span class="tag ${m[4]==="Draft"?"info":"due"}">${m[4]}</span></td></tr>`).join("")||`<tr><td colspan="4">Nothing for this combination yet.</td></tr>`}
+function learn(){$("#learnBody").innerHTML=MAT.filter(m=>(lAud==="all"||m[2].includes(lAud))&&(lSys==="ALL"||m[3].includes(lSys))).map(m=>`<tr><td><strong>${m[5]?`<a href="${m[5]}">${esc(m[0])}</a>`:esc(m[0])}</strong></td><td>${esc(m[1])}</td><td>${m[2].split(" ").map(a=>AUDN[a]).join(", ")}</td><td><span class="tag ${m[4]==="Draft"?"info":"due"}">${m[4]}</span></td></tr>`).join("")||`<tr><td colspan="4">Nothing for this combination yet.</td></tr>`}
 
 stations();mapChips();mapLayers();homeMap();fadeIn();
 {const n=((window.VTS_GEO||{}).points||{}).features;if(n&&$("#siteCount"))$("#siteCount").textContent=n.length;}

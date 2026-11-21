@@ -215,6 +215,7 @@ window.ToolDash = (function () {
       ${one ? `<div class="row"><button type="button" class="btn" data-rep="fsr" data-s="${one.s.id}">Food Safety Record</button><button type="button" class="btn" data-rep="ws" data-s="${one.s.id}">Water Quality and Maintenance Summary</button></div>`
         : `<ul class="d-replist">${models.map(row).join("")}</ul>`}
       <p class="l-src">Each report opens here, ready to print or to save as PDF. Period: the year chosen above. Every page says Sample data.</p>
+      <p>See a sample first: <a href="#report/food-safety/sample">Food Safety Record</a> · <a href="#report/water-summary/sample">Water Quality and Maintenance Summary</a>.</p>
       <p class="l-warn" id="dRepMsg" hidden></p></div>`;
   }
 
@@ -313,5 +314,27 @@ window.ToolDash = (function () {
     if (q("#dHpdf")) q("#dHpdf").onclick = () => viewer(`Change history · ${filt.year}`, historyDoc(historyRows(sites)), fileBase() + "_change_history");
   }
   const msg = t => { const m = q("#dRepMsg"); if (m) { m.textContent = t; m.hidden = false; } };
-  return {render};
+
+  /* ---------- public sample reports (#report/food-safety/sample, #report/water-summary/sample): no sign-in, the sample data file as it is ---------- */
+  const SAMPLE_SITE = "S-VD";   /* the vegetated ditch, the same system as the sample Food Safety Record PDF */
+  async function sample(kind) {
+    const box = document.getElementById("reportView"), fsr = kind !== "water-summary";
+    const title = fsr ? "Food Safety Record" : "Water Quality and Maintenance Summary";
+    box.innerHTML = `<p class="l-src">Preparing the sample report…</p>`;
+    try {
+      const [d, ind] = await Promise.all(["tool/sample_data.json", "tool/indicators.json"].map(f => fetch(f, {cache: "no-cache"}).then(r => { if (!r.ok) throw new Error(f + " " + r.status); return r.json(); })));
+      const it = RM().itemsFrom((window.VTS_LEARN || {}).checklist);
+      const r = fsr ? RM().foodSafety(d, ind, it, SAMPLE_SITE, false) : RM().waterSummary(d, ind, it, SAMPLE_SITE);
+      const html = (await getEnv()).render(fsr ? "food_safety_record.html" : "water_summary.html", {r, font_dir: new URL("tool/fonts", location.href).href});
+      box.innerHTML = `<div class="r-banner"><p><b>Sample report, made with sample data.</b> ${fsr ? "Documentation you can show an auditor. The auditor or the program decides what it needs; this is not a compliance report." : "For funders and partners. It never shows the exact place."}</p>
+          <div class="row"><button class="btn" type="button" id="rPrint">Print or save as PDF</button><a class="btn ghost" href="#tool/dashboard">Make yours in the Tool →</a>
+          <a href="#report/${fsr ? "water-summary" : "food-safety"}/sample">See the ${fsr ? "Water Quality and Maintenance Summary" : "Food Safety Record"} →</a></div></div>
+        <h1 class="r-title">${title}</h1>
+        <iframe id="rFrame" class="r-frame" title="${title}, sample"></iframe>`;
+      const f = document.getElementById("rFrame"); f.srcdoc = html;
+      f.onload = () => { try { f.style.height = Math.max(900, f.contentDocument.documentElement.scrollHeight + 40) + "px"; } catch (e) {} };
+      document.getElementById("rPrint").onclick = () => { f.contentWindow.focus(); f.contentWindow.print(); };
+    } catch (e) { box.innerHTML = `<div class="panel">The sample report could not be made (${esc(e.message)}). Open the site from a web server, not as a file.</div>`; }
+  }
+  return {render, sample};
 })();

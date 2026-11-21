@@ -758,3 +758,8 @@ dialog.t-side::backdrop{background:rgba(18,38,26,.35)}
 
 /* R7e introductory paragraphs */
 .t-intro{color:var(--muted);max-width:68ch;margin:.2rem 0 .4rem}
+
+/* R7f public sample reports */
+.r-banner{background:var(--silt-soft);border:2px solid var(--water);border-radius:14px;padding:.8rem 1rem;display:flex;flex-direction:column;gap:.6rem}
+.r-title{font-size:clamp(1.8rem,3.4vw,2.6rem)}
+.r-frame{width:100%;min-height:900px;border:1px solid var(--line);border-radius:12px;background:#fff}

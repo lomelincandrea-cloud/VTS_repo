@@ -50,7 +50,7 @@
         [`<a href="#lcycle" data-jump="lcycle">The maintenance cycle, step by step →</a>`], ...MAIN.map(k => [`<a href="#learn/manual/${k}">${esc(L.systems[k])}: parts, year and tasks →</a>`])],
         `${L.tasks.length} tasks · ${L.checklist.length} checklist items`],
       ["Food safety", "Food safety", "For growers and food safety staff who show the record to an auditor.", [
-        [`<a href="downloads/Sample_Food_Safety_Record_vegetated_ditch.pdf" download>Sample Food Safety Record (PDF)</a>`], [`<a href="downloads/VD_F04_visual_inspection_checklist.xlsx" download>Blank Visit Sheet (Excel)</a>`], [`<a href="#tool/dashboard">Dashboard and reports in the Tool →</a>`]]],
+        [`<a href="#report/food-safety/sample">Sample Food Safety Record →</a> · <a href="downloads/Sample_Food_Safety_Record_vegetated_ditch.pdf" download>PDF</a>`], [`<a href="#report/water-summary/sample">Sample Water Quality and Maintenance Summary →</a>`], [`<a href="downloads/VD_F04_visual_inspection_checklist.xlsx" download>Blank Visit Sheet (Excel)</a>`], [`<a href="#tool/dashboard">Dashboard and reports in the Tool →</a>`]]],
       ["Plants", "Plants and tools", "For anyone choosing plants or looking for a form.", [
         [`<a href="#learn/plants">Field Guide: find a plant →</a>`], [`<a href="#learn/downloads">Downloads →</a>`], [`<a href="#learn/materials">All materials →</a>`]],
         `${natives} native plants · ${L.downloads.length} downloads`]];
