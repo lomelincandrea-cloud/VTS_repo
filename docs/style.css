@@ -553,7 +553,8 @@ dialog.t-side::backdrop{background:rgba(18,38,26,.35)}
 
 /* R2 Next visits: calendar and table */
 .c-wrap{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:1.25rem;align-items:start}
-@media (max-width:900px){.c-wrap{grid-template-columns:1fr}}
+@media (max-width:900px){.c-wrap{grid-template-columns:minmax(0,1fr)}}
+.c-wrap>*{min-width:0}
 .c-head{justify-content:space-between}
 .c-grid{min-width:0;width:100%;table-layout:fixed;font-size:.9rem}
 .c-grid th,.c-grid td{padding:2px;text-align:center;border:0;background:transparent;font-weight:600}
@@ -658,3 +659,13 @@ dialog.t-side::backdrop{background:rgba(18,38,26,.35)}
 .l-where .l-hot{width:28px;height:28px;font-size:.8rem;border-width:2px}
 .l-where figcaption{font-size:.88rem;margin-top:.3rem}
 .l-how .btn{align-self:flex-start}
+
+/* R6 phone polish */
+.scroll{position:relative}
+@media (max-width:480px){.c-cal{padding:.6rem}.c-grid th,.c-grid td{padding:1px}.c-day{font-size:.88rem;border-radius:8px}.c-head b{font-size:1rem}}
+@media (max-width:480px){
+  .l-src,.small,.l-warn,.l-banner,.guide-d,.guide-intro,.guide-tip,.h-text,.d-res,.t-kv,.l-check li,.l-box>div,.l-body,.lede,.sitelist button,.sitelist small,.t-item small,.h-cap,.l-card .l-src,.d-rep p,.t-helpl span{font-size:1rem}
+  table{font-size:1rem}
+}
+@media (max-width:480px){.g-tab,.d-mx,.d-hist,.c-tab,.t-mat,.o-cost td,.o-cost th,.d-st,.d-card,.d-tile span,.l-door,.l-cstep span{font-size:1rem!important}}
+@media (max-width:480px){.c-grid,.c-day,.guide{font-size:1rem!important}}
