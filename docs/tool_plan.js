@@ -690,27 +690,67 @@ window.ToolPlan = (function () {
   /* ================= Corrective Maintenance Log (F05), interactive ================= */
   const COR_T04_ACTIONS = ["filled an inactive burrow", "reduced cover near the berm", "stopped work (nest or possible protected species)", "passed to the supervisor"];
   const STATUS_CHIP = {open: "y", escalated: "r", resolved: "g"};
-  let corFilter = {status: "active", site: ""};
-  function corrective(siteArg) {
-    if (siteArg !== undefined) corFilter.site = siteArg || "";
-    const all = St.data.corrective_entries.slice().sort((a, b) => b.date.localeCompare(a.date));
-    const list = all.filter(c => (!corFilter.site || c.site === corFilter.site) && (corFilter.status === "all" || (corFilter.status === "active" ? c.status !== "resolved" : c.status === corFilter.status)));
-    const count = st => all.filter(c => (!corFilter.site || c.site === corFilter.site) && (st === "active" ? c.status !== "resolved" : st === "all" || c.status === st)).length;
-    K().view().innerHTML = `<div class="l-row"><h2 style="margin:0">Corrective log</h2><span class="l-sp"></span>
-        <label class="l-lab">VTS <select id="cSite"><option value="">All</option>${St.sites().map(s => `<option value="${s.id}"${s.id === corFilter.site ? " selected" : ""}>${esc(s.name)}</option>`).join("")}</select></label>
-        <button class="btn sm" type="button" id="cNew">Add a finding</button></div>
-      <p class="muted">Every repair the inspections found (Corrective Maintenance Log, F05). Schedule the repair into the yearly plan, then record what was done.</p>
-      <div class="l-pills" role="group" aria-label="Status">${[["active", "Open and escalated"], ["open", "Open"], ["escalated", "Escalated"], ["resolved", "Resolved"], ["all", "All"]].map(([k, n]) => `<button type="button" class="l-pill${corFilter.status === k ? " on" : ""}" data-cf="${k}" aria-pressed="${corFilter.status === k}">${n} <small>${count(k)}</small></button>`).join("")}</div>
-      <div class="t-corgrid">${list.map(corCard).join("") || `<div class="panel">Nothing here.</div>`}</div>`;
-    q("#cSite").onchange = e => corrective(e.target.value);
-    qa("[data-cf]").forEach(b => b.onclick = () => { corFilter.status = b.dataset.cf; corrective(); });
+  /* ================= Maintenance log: Site History (F06) and Corrective Maintenance Log (F05) in one table ================= */
+  const LOGF = {kind: "all", site: "", year: "", status: "", open: null};
+  const VSTAT = {done: "Done", extra: "Done", noplan: "Done", missed: "Missed", planned: "Planned"};
+  const SYMS = {Done: ["✓", "o-done"], Planned: ["○", "o-plan"], Missed: ["!", "o-late"], Open: ["○", "o-prog"], Escalated: ["!", "o-late"], Resolved: ["✓", "o-done"]};
+  const stChip = t => `<span class="o-key ${SYMS[t][1]}"><span aria-hidden="true">${SYMS[t][0]}</span> ${t}</span>`;
+  function logRows() {
+    const rows = [];
+    St.sites().forEach(s => {
+      (window.ToolHistory ? window.ToolHistory.events(s) : []).filter(e => VSTAT[e.kind]).forEach(e => rows.push({date: e.date, s, kind: "Preventive", what: e.title, result: e.text, status: VSTAT[e.kind], link: e.link, linkText: e.linkText}));
+      St.data.corrective_entries.filter(c => c.site === s.id).forEach(c => {
+        const o = c.observation && St.data.observations.find(x => x.id === c.observation);
+        rows.push({date: c.date, s, kind: "Corrective", what: c.finding + (o && !c.finding.includes(o.item) ? ` (${o.item})` : ""), result: c.action_taken || "No action recorded yet", status: c.status[0].toUpperCase() + c.status.slice(1), c});
+      });
+    });
+    return rows.sort((a, b) => b.date.localeCompare(a.date));
+  }
+  function corrective(siteArg) { LOGF.kind = "Corrective"; LOGF.status = ""; if (siteArg !== undefined) LOGF.site = siteArg || ""; log(); }
+  function log(siteArg, fromRoute) {
+    if (fromRoute) Object.assign(LOGF, {kind: "all", status: "", open: null, site: siteArg || ""});   /* arriving at #tool/log or #tool/log/<VTS>: both kinds */
+    else if (siteArg !== undefined) LOGF.site = siteArg || "";
+    const all = logRows(), base = all.filter(r => (LOGF.kind === "all" || r.kind === LOGF.kind) && (!LOGF.site || r.s.id === LOGF.site) && (!LOGF.year || r.date.slice(0, 4) === LOGF.year));
+    const list = base.filter(r => !LOGF.status || r.status === LOGF.status);
+    const years = [...new Set(all.map(r => r.date.slice(0, 4)))].sort().reverse();
+    const sts = Object.keys(SYMS).filter(t => base.some(r => r.status === t));
+    const nPrev = list.filter(r => r.kind === "Preventive").length, nCor = list.length - nPrev;
+    K().view().innerHTML = `<div class="l-row"><h2 style="margin:0">Maintenance log</h2><span class="l-sp"></span><button class="btn" type="button" id="cNew">Add a finding</button></div>
+      <p class="muted">Site History (F06) and Corrective Maintenance Log (F05) in one table.</p>
+      <div class="l-row lg-filters">
+        <label class="l-lab">Kind <select id="lgK">${[["all", "All"], ["Preventive", "Preventive visits"], ["Corrective", "Corrective repairs"]].map(([v, t]) => `<option value="${v}"${LOGF.kind === v ? " selected" : ""}>${t}</option>`).join("")}</select></label>
+        <label class="l-lab">VTS <select id="lgS"><option value="">All</option>${St.sites().map(s => `<option value="${s.id}"${s.id === LOGF.site ? " selected" : ""}>${esc(s.name)}</option>`).join("")}</select></label>
+        <label class="l-lab">Year <select id="lgY"><option value="">All years</option>${years.map(y => `<option${y === LOGF.year ? " selected" : ""}>${y}</option>`).join("")}</select></label>
+        <span class="l-sp"></span><button class="btn ghost sm" type="button" id="lgCsv">Download CSV</button></div>
+      <div class="l-pills" role="group" aria-label="Status"><button type="button" class="l-pill${!LOGF.status ? " on" : ""}" data-ls="" aria-pressed="${!LOGF.status}">All <small>${base.length}</small></button>${sts.map(t => `<button type="button" class="l-pill${LOGF.status === t ? " on" : ""}" data-ls="${t}" aria-pressed="${LOGF.status === t}">${SYMS[t][0]} ${t} <small>${base.filter(r => r.status === t).length}</small></button>`).join("")}</div>
+      <p class="l-src">${list.length} rows: ${nPrev} preventive visit${nPrev === 1 ? "" : "s"}, ${nCor} corrective repair${nCor === 1 ? "" : "s"}. Newest first.</p>
+      <div class="scroll"><table class="c-tab lg-tab"><thead><tr><th>Date</th><th>VTS</th><th>Kind</th><th>What</th><th>Result</th><th>Status</th><th><span class="vh">Links</span></th></tr></thead><tbody>
+        ${list.map((r, i) => {
+          const open = r.c && LOGF.open === r.c.id;
+          const links = r.c ? `<button class="btn ghost sm" type="button" data-lgo="${r.c.id}" aria-expanded="${open}">${open ? "Hide details" : "Details and actions"}</button>`
+            : r.link ? `<a href="${r.link}">${esc(r.linkText)} →</a>` : "";
+          return `<tr class="${r.kind === "Corrective" ? "lg-cor" : ""}${open ? " lg-open" : ""}"><td>${esc(r.date)}</td><td><span class="sdot" style="background:${K().COLOR[r.s.type]}"></span><a href="#tool/vts/${r.s.id}/history">${esc(r.s.name)}</a></td>
+            <td>${r.kind === "Preventive" ? "Preventive visit" : "Corrective repair"}</td><td>${esc(r.what)}</td><td>${esc(r.result)}</td><td>${stChip(r.status)}</td><td>${links}</td></tr>
+            ${open ? `<tr class="lg-detail"><td colspan="7">${corCard(r.c)}</td></tr>` : ""}`; }).join("") || `<tr><td colspan="7">Nothing here with these filters.</td></tr>`}
+      </tbody></table></div>`;
+    q("#lgK").onchange = e => { LOGF.kind = e.target.value; LOGF.status = ""; log(); };
+    q("#lgS").onchange = e => { LOGF.site = e.target.value; log(); };
+    q("#lgY").onchange = e => { LOGF.year = e.target.value; log(); };
+    qa("[data-ls]").forEach(b => b.onclick = () => { LOGF.status = b.dataset.ls; log(); });
+    qa("[data-lgo]").forEach(b => b.onclick = () => { LOGF.open = LOGF.open === b.dataset.lgo ? null : b.dataset.lgo; const y = window.scrollY; log(); window.scrollTo(0, y); });
     q("#cNew").onclick = newFindingDlg;
-    qa("[data-csched]").forEach(b => b.onclick = () => scheduleDlg(all.find(c => c.id === b.dataset.csched)));
-    qa("[data-cact]").forEach(b => b.onclick = () => actionDlg(all.find(c => c.id === b.dataset.cact)));
+    const cors = St.data.corrective_entries;
+    qa("[data-csched]").forEach(b => b.onclick = () => scheduleDlg(cors.find(c => c.id === b.dataset.csched)));
+    qa("[data-cact]").forEach(b => b.onclick = () => actionDlg(cors.find(c => c.id === b.dataset.cact)));
+    q("#lgCsv").onclick = () => {
+      const cell = x => `"${String(x ?? "").replace(/"/g, '""')}"`;
+      const csv = "\ufeff" + [["Date", "VTS", "Kind", "What", "Result", "Status"], ...list.map(r => [r.date, r.s.name, r.kind === "Preventive" ? "Preventive visit" : "Corrective repair", r.what, r.result, r.status])].map(r => r.map(cell).join(",")).join("\r\n");
+      const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv], {type: "text/csv"})); a.download = `maintenance_log${LOGF.site ? "_" + LOGF.site : ""}${LOGF.year ? "_" + LOGF.year : ""}.csv`; a.click();
+    };
   }
   function corCard(c) {
     const s = St.site(c.site) || {name: c.site, type: "SB"}, t = c.task && taskBy(c.task), v = c.visit && St.visit(c.visit);
-    return `<div class="panel t-cor ${c.status}"><div class="l-row"><span class="sdot" style="background:${K().COLOR[s.type]}"></span><b>${esc(s.name)}</b><span class="l-sp"></span><span class="l-chip ${STATUS_CHIP[c.status] || ""}">${esc(c.status)}</span></div>
+    return `<div class="t-cor ${c.status}"><div class="l-row"><span class="sdot" style="background:${K().COLOR[s.type]}"></span><b>${esc(s.name)}</b><span class="l-sp"></span><span class="l-chip ${STATUS_CHIP[c.status] || ""}">${esc(c.status)}</span></div>
       <p class="t-corf">${esc(c.finding)}</p>
       <p class="l-src">Found ${esc(c.date)}${c.location ? " · " + esc(c.location) : ""}${c.urgency ? " · urgency: " + esc(c.urgency) : ""}${v ? ` · <a href="#tool/visit/${v.id}">from the ${esc(v.type)} visit</a>` : ""}</p>
       ${t ? `<p>Task: <a href="#learn/task/${t.id}">${esc(t.name)}</a> <span class="l-src">${t.id}</span></p>` : ""}
@@ -735,9 +775,9 @@ window.ToolPlan = (function () {
       if (c.scheduled && c.scheduled.date !== day) next = removeFrom(s, next, k, next.filter(v => v.date === c.scheduled.date).map(v => v.id));
       next = addTo(s, next, k, day, p);
       const pv = next.find(v => v.date === day);
-      const finish = () => { St.update("corrective_entries", c.id, {scheduled: {date: day, planned_id: pv.id}, task: k[0] === "+" ? c.task : k}, `Repair scheduled for ${day}`, "scheduled"); corrective(); };
+      const finish = () => { St.update("corrective_entries", c.id, {scheduled: {date: day, planned_id: pv.id}, task: k[0] === "+" ? c.task : k}, `Repair scheduled for ${day}`, "scheduled"); log(); };
       q("#toolDlg").close();
-      if (p.status === "approved") reasonCat(`Add the repair to the approved ${p.year} plan`, (reason, cat) => { St.update("annual_plans", p.id, {planned_visits: next}, `Repair scheduled (${c.id}) on ${day}. ${reason}`, cat); finish(); }, () => corrective());
+      if (p.status === "approved") reasonCat(`Add the repair to the approved ${p.year} plan`, (reason, cat) => { St.update("annual_plans", p.id, {planned_visits: next}, `Repair scheduled (${c.id}) on ${day}. ${reason}`, cat); finish(); }, () => log());
       else { p.planned_visits = next; St.persist(); finish(); }
     };
   }
@@ -763,13 +803,13 @@ window.ToolPlan = (function () {
       const changed = Object.fromEntries(Object.entries(patch).filter(([k, v]) => JSON.stringify(v) !== JSON.stringify(c[k] ?? null)));
       q("#toolDlg").close();
       if (Object.keys(changed).length) St.update("corrective_entries", c.id, changed, st === "resolved" && c.status !== "resolved" ? "Repair done and recorded" : "Action recorded", "action");
-      corrective();
+      log();
     };
   }
   function newFindingDlg() {
     const sites = St.sites().filter(s => s.status !== "decommissioned");
     K().openDlg(`<h3>Add a finding</h3><form id="nfF" class="stack">
-      <div class="grid2"><div class="f"><label for="nfS">VTS</label><select id="nfS">${sites.map(s => `<option value="${s.id}"${s.id === corFilter.site ? " selected" : ""}>${esc(s.name)}</option>`).join("")}</select></div>
+      <div class="grid2"><div class="f"><label for="nfS">VTS</label><select id="nfS">${sites.map(s => `<option value="${s.id}"${s.id === LOGF.site ? " selected" : ""}>${esc(s.name)}</option>`).join("")}</select></div>
         <div class="f"><label for="nfD">Date found</label><input type="date" id="nfD" value="${K().today()}" required></div></div>
       <div class="f"><label for="nfF2">What was found</label><input id="nfF2" required></div>
       <div class="grid2"><div class="f"><label for="nfL">Location in the system</label><input id="nfL"></div>
@@ -779,8 +819,8 @@ window.ToolPlan = (function () {
       e.preventDefault();
       St.add("corrective_entries", {id: St.nextId("corrective_entries", "C-NEW-"), site: q("#nfS").value, visit: null, observation: null, task: q("#nfT").value || null, date: q("#nfD").value, finding: q("#nfF2").value.trim(),
         location: q("#nfL").value.trim() || null, likely_cause: null, action_taken: null, urgency: null, materials_used: null, material_cost: null, hours: null, status: "open", resolved_date: null, scheduled: null, photos: []});
-      q("#toolDlg").close(); corFilter.status = "active"; corrective();
+      q("#toolDlg").close(); LOGF.kind = "Corrective"; LOGF.status = "Open"; LOGF.open = null; log();
     };
   }
-  return {plan, visit, next, sheets, phone, corrective, newPlan};
+  return {plan, visit, next, sheets, log, phone, corrective, newPlan};
 })();

@@ -709,3 +709,13 @@ dialog.t-side::backdrop{background:rgba(18,38,26,.35)}
 .rg-steps button{flex-wrap:wrap;text-align:left}
 .rg-steps button.on .rg-cnt{color:#fff}
 .g-tab thead th.g-sel{color:var(--yel-ink)!important;background:var(--yel)!important}
+
+/* R7c Maintenance log and Next visits: one table style */
+.c-tab th{background:var(--water);color:#fff;font-weight:700;padding:.55rem .7rem}
+.c-tab td{padding:.45rem .7rem;height:56px}
+.c-tab tbody tr:nth-child(even):not(.lg-detail) td{background:#F8FAF5}
+.lg-tab{min-width:980px}
+.lg-open td{background:#FFF6D6!important}
+.lg-detail td{background:var(--surface)!important;border-left:4px solid var(--yel);height:auto}
+.lg-detail .t-cor{border-left:0;padding:.4rem 0}
+.lg-filters{gap:.6rem 1rem}
