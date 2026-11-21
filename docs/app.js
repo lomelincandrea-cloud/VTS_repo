@@ -82,7 +82,7 @@ function homeMap(){const box=$("#homemap"),G=window.VTS_GEO||{},feats=((G.points
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:18,attribution:"© OpenStreetMap contributors"}).addTo(lmap);
       lmapLay={ws:L.layerGroup().addTo(lmap),riv:L.layerGroup().addTo(lmap),sites:L.layerGroup().addTo(lmap),sel:L.layerGroup().addTo(lmap)};
       const all=((G.points||{}).features||[]).map(f=>[f.geometry.coordinates[1],f.geometry.coordinates[0]]);
-      all.length?lmap.fitBounds(all,{padding:[30,30]}):lmap.setView([36.74,-121.6],9);
+      const wide=innerWidth>=1024;all.length?lmap.fitBounds(all,wide?{paddingTopLeft:[30,130],paddingBottomRight:[350,30]}:{padding:[30,30]}):lmap.setView([36.74,-121.6],9);/* from 1024 px the chips and the site list float over the map: keep the points clear of them */
       if(window.ResizeObserver)new ResizeObserver(()=>{if(box.clientWidth)lmap.invalidateSize()}).observe(box);}
     Object.values(lmapLay).forEach(l=>l.clearLayers());lmapMk={};
     if(mapLy.ws&&G.calw)L.geoJSON(G.calw,{style:{color:"#03467E",weight:1,fillColor:"#03467E",fillOpacity:.05},onEachFeature:(f,l)=>{const n=f.properties.hsa&&f.properties.hsa!=="undefined"?f.properties.hsa:f.properties.ha;if(n)l.bindTooltip(esc(n))}}).addTo(lmapLay.ws);
