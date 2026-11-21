@@ -755,3 +755,6 @@ dialog.t-side::backdrop{background:rgba(18,38,26,.35)}
 .d-res2{font-weight:600;font-size:.9rem}
 .d-nochart{color:var(--ink2);font-style:italic;padding:.6rem 0}
 .d-ccard.d-c-not_met{border-left:5px solid #B4361F}.d-ccard.d-c-met{border-left:5px solid #2F7D4A}.d-ccard.d-c-not_due{border-left:5px solid #C99700}
+
+/* R7e introductory paragraphs */
+.t-intro{color:var(--muted);max-width:68ch;margin:.2rem 0 .4rem}

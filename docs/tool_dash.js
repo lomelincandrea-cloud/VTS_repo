@@ -35,7 +35,7 @@ window.ToolDash = (function () {
     const p = period(filt.year), one = filt.site && models.length === 1 ? models[0] : null;
     K().view().innerHTML = `
       <div class="l-row"><h2 style="margin:0">Dashboard and reports</h2></div>
-      <p class="muted">How each system is doing against the targets of the Monitoring framework, and the reports you can print. Every status comes from the target written for that indicator; where there is no target it says so.</p>
+      <p class="t-intro">This is the monitoring of your systems. Each indicator compares what the crews recorded with the target set for that system. Start with the map, open a system for its details, and print a report when someone asks for one.</p>
       <div class="d-filters panel">
         <label class="l-lab">VTS <select id="dSite"><option value="">All my VTS (${all.length})</option>${all.map(s => `<option value="${s.id}"${s.id === filt.site ? " selected" : ""}>${esc(s.name)}${s.status === "decommissioned" ? " (decommissioned)" : ""}</option>`).join("")}</select></label>
         <label class="l-lab">System type <select id="dType"${filt.site ? " disabled" : ""}><option value="">All types</option>${Object.entries(K().NAME).map(([k, n]) => `<option value="${k}"${k === filt.type ? " selected" : ""}>${n}</option>`).join("")}</select></label>
@@ -182,7 +182,7 @@ window.ToolDash = (function () {
 
   function rollup(models) {
     return `<div class="panel stack"><h3 style="margin:0">All indicators at a glance</h3>
-        <p class="l-src">One row per VTS, one column per indicator. Tap a VTS for its details and reports.</p>
+        <p class="t-intro">One row per system, one column per indicator. A ✓ means it meets its target; tap a row to see why.</p>
         <div class="scroll"><table class="d-mx"><thead><tr><th>VTS</th>${models[0].w.indicators.map(i => `<th title="${esc(i.indicator)}"><span>${esc(i.id)}</span>${esc(SHORT[i.id])}</th>`).join("")}</tr></thead>
         <tbody>${models.map(({s, w}) => `<tr><th><a href="#tool/dashboard/${s.id}"><span class="sdot" style="background:${s.status === "decommissioned" ? "#9AA7B5" : K().COLOR[s.type]}"></span>${esc(s.name)}</a></th>
           ${w.indicators.map(i => { const [m, c] = MARK[i.status]; return `<td><span class="d-dot d-${c || "o"}" title="${esc(i.id + ": " + i.status_text + ". " + i.result)}">${m}</span></td>`; }).join("")}</tr>`).join("")}</tbody></table></div>
@@ -206,6 +206,7 @@ window.ToolDash = (function () {
     const row = ({s}) => `<li><span><span class="sdot" style="background:${K().COLOR[s.type]}"></span>${esc(s.name)}</span><span class="l-sp"></span>
       <button type="button" class="btn ghost sm" data-rep="fsr" data-s="${s.id}">Food Safety Record</button><button type="button" class="btn ghost sm" data-rep="ws" data-s="${s.id}">Water Summary</button></li>`;
     return `<div class="panel stack" id="dReports"><h3 style="margin:0">Reports</h3>
+      <p class="t-intro">Two printable reports built from your records: the Food Safety Record for an auditor, and the Water Quality and Maintenance Summary for funders and partners. Nothing is sent anywhere unless you send it.</p>
       <div class="d-reps">
         <div class="d-rep"><b>Food Safety Record</b><p>Visit by visit: vegetation, wildlife (only if the project owner chose so), farm activity, structures, water, trash, repairs, photos and sign-off. Documentation the project owner can show an auditor.</p>
           <label class="check"><input type="checkbox" id="dHist"> Add the change history at the end</label></div>

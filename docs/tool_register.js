@@ -54,7 +54,7 @@ window.ToolRegister = (function () {
     const v = K().view();
     v.innerHTML = `<p><a href="#tool/vts">← My VTS</a></p>
       <div class="l-row"><h2 style="margin:0">Register a system</h2><span class="l-sp"></span><button class="btn ghost sm" type="button" id="rgDiscard">Discard this draft</button></div>
-      <p class="muted">Seven short steps. Only the first one is needed to save; the rest can be filled in later from the card. The draft stays in this browser while you work.</p>
+      <p class="t-intro">Seven short steps. Only the first is needed to save; the card on the right fills in as you go, and you can finish the rest later.</p><p class="l-src">The draft stays in this browser while you work.</p>
       <ol class="rg-steps" id="rgSteps">${stepsHtml()}</ol>
       <div class="rg-layout"><form id="rgF" class="panel rg-body" novalidate>${body()}
         <p class="l-warn" id="rgMsg" hidden></p>

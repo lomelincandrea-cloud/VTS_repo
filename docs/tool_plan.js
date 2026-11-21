@@ -69,7 +69,7 @@ window.ToolPlan = (function () {
     const p = St.planOf(s.id, year);
     const head = `<p><a href="#tool/plan/all/${year}">← All VTS in ${year}</a></p><div class="l-row"><h2 style="margin:0">Plan of one VTS</h2><span class="l-sp"></span>
         <label class="l-lab">VTS <select id="pSite">${active.map(x => `<option value="${x.id}"${x.id === s.id ? " selected" : ""}>${esc(x.name)}</option>`).join("")}</select></label>
-        <label class="l-lab">Year <select id="pYear">${years.map(y => `<option${y === year ? " selected" : ""}>${y}</option>`).join("")}</select></label><a class="btn ghost sm" href="#tool/vts/${s.id}/history/${year}">Site History</a></div>`;
+        <label class="l-lab">Year <select id="pYear">${years.map(y => `<option${y === year ? " selected" : ""}>${y}</option>`).join("")}</select></label><a class="btn ghost sm" href="#tool/vts/${s.id}/history/${year}">Site History</a></div><p class="t-intro">The year of one system on one page: which visits, which tasks, who goes, what it needs and what it costs. Select a month to open its Visit Sheet or send it to a phone.</p>`;
     if (!p) {
       K().view().innerHTML = head + `<div class="panel stack"><p>No plan for ${year} yet.</p><div class="row"><button class="btn" type="button" id="pNew">Create the ${year} plan</button></div>
         <p class="small muted">It starts with the visits the manual fixes: the January review, the spring visit in April and the pre-storm visit in August, with their tasks. Routine tasks are done at every visit. Add the other visits you need on the chart.</p></div>`;
@@ -284,6 +284,7 @@ window.ToolPlan = (function () {
     K().view().innerHTML = `<div class="l-row"><h2 style="margin:0">Yearly plan</h2><span class="l-sp"></span>
         <label class="l-lab">Year <select id="oYear">${years.map(y => `<option${y === year ? " selected" : ""}>${y}</option>`).join("")}</select></label>
         <label class="l-lab">Labor rate <input type="number" min="0" step="1" id="pRate" value="${rate() ?? ""}" placeholder="$ per person-hour" style="width:9rem"></label></div>
+      <p class="t-intro">All your systems by month: ✓ done, ○ planned, ! overdue. Select a visit to open the plan of that system with the visit selected.</p>
       <p class="l-src">All your VTS in ${year}: ${count.done} done, ${count.plan} planned, ${count.late} overdue. Status uses today's date (${esc(K().today())}). Point at a visit for a summary; select it to open that VTS's plan with the visit selected.</p>
       <div class="scroll g-wrap"><table class="g-tab o-grid"><caption class="vh">Visits of every VTS by month in ${year}</caption>
         <thead><tr><th class="g-t" scope="col">VTS</th>${MONTHS.map(m => `<th scope="col">${m}</th>`).join("")}</tr></thead>
@@ -559,6 +560,7 @@ window.ToolPlan = (function () {
     const monthName = first.toLocaleDateString("en-US", {month: "long", year: "numeric"});
     K().view().innerHTML = `<div class="l-row"><h2 style="margin:0">Next visits</h2><span class="l-sp"></span>
         <label class="l-lab">VTS <select id="nSite"><option value="">All</option>${sites.map(s => `<option value="${s.id}"${s.id === cal.site ? " selected" : ""}>${esc(s.name)}</option>`).join("")}</select></label></div>
+      <p class="t-intro">What is coming up, across all your systems. Pick a day in the calendar to see only that day.</p>
       <div class="c-wrap">
         <div class="c-cal panel"><div class="l-row c-head"><button class="btn ghost sm" type="button" id="cPrev" aria-label="Previous month">‹</button><b id="cTitle" aria-live="polite">${esc(monthName)}</b><button class="btn ghost sm" type="button" id="cNext" aria-label="Next month">›</button></div>
           <table role="grid" class="c-grid" aria-labelledby="cTitle"><thead><tr role="row">${["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(d => `<th role="columnheader" scope="col">${d}</th>`).join("")}</tr></thead><tbody>${weeks.join("")}</tbody></table>
@@ -608,7 +610,8 @@ window.ToolPlan = (function () {
     const open = all.filter(v => v.status !== "closed").length;
     K().view().innerHTML = `<div class="l-row"><h2 style="margin:0">Visit Sheets</h2><span class="l-sp"></span>
         <label class="l-lab">VTS <select id="vsSite"><option value="">All</option>${St.sites().map(s => `<option value="${s.id}"${s.id === sheetSite ? " selected" : ""}>${esc(s.name)}</option>`).join("")}</select></label></div>
-      <p class="muted">${open} open, ${all.length - open} closed. Only closed visits count in the reports. Start a new Visit Sheet from Next visits or from a visit in the Yearly plan.</p>
+      <p class="t-intro">The record of each visit: open ones first. A visit counts in the reports only once it is closed.</p>
+      <p class="l-src">${open} open, ${all.length - open} closed. Start a new Visit Sheet from Next visits or from a visit in the Yearly plan.</p>
       <div class="scroll"><table><thead><tr><th>Date</th><th>VTS</th><th>Visit</th><th>Tasks done</th><th>Status</th><th><span class="vh">Open</span></th></tr></thead><tbody>
         ${all.map(v => { const s = St.site(v.site) || {name: v.site, type: "SB"}, closed = v.status === "closed";
           return `<tr><td>${esc(v.date)}</td><td><span class="sdot" style="background:${K().COLOR[s.type]}"></span>${esc(s.name)}</td><td>${esc(v.type)}</td>
@@ -716,7 +719,8 @@ window.ToolPlan = (function () {
     const sts = Object.keys(SYMS).filter(t => base.some(r => r.status === t));
     const nPrev = list.filter(r => r.kind === "Preventive").length, nCor = list.length - nPrev;
     K().view().innerHTML = `<div class="l-row"><h2 style="margin:0">Maintenance log</h2><span class="l-sp"></span><button class="btn" type="button" id="cNew">Add a finding</button></div>
-      <p class="muted">Site History (F06) and Corrective Maintenance Log (F05) in one table.</p>
+      <p class="t-intro">Everything that was done or found: planned visits and repairs in one table. Filter by kind, system or year, and download it.</p>
+      <p class="l-src">Site History (F06) and Corrective Maintenance Log (F05) in one table.</p>
       <div class="l-row lg-filters">
         <label class="l-lab">Kind <select id="lgK">${[["all", "All"], ["Preventive", "Preventive visits"], ["Corrective", "Corrective repairs"]].map(([v, t]) => `<option value="${v}"${LOGF.kind === v ? " selected" : ""}>${t}</option>`).join("")}</select></label>
         <label class="l-lab">VTS <select id="lgS"><option value="">All</option>${St.sites().map(s => `<option value="${s.id}"${s.id === LOGF.site ? " selected" : ""}>${esc(s.name)}</option>`).join("")}</select></label>

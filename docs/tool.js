@@ -61,7 +61,7 @@
   /* ---------- the six steps: help line under the tabs, and the "?" side panel ---------- */
   const HINT = {
     vts: [1, "Your systems on a map. Open one to see its card, Site History and who can see what."],
-    plan: [2, "See the year at a glance. Select a visit to open its record."],
+    plan: [2, "See the year at a glance. Select a visit to see its actions."],
     visits: [3, "Pick a day on the calendar to see its visits. Open the Visit Sheet or send it to a phone."],
     sheets: [4, "Every Visit Sheet, open ones first. Only closed visits count in the reports."],
     log: [5, "Visits and repairs in one table. Filter it, open a repair, download it."],
@@ -114,6 +114,7 @@
     const sites = St.sites();
     view().innerHTML = `
       <div class="l-row"><h2 style="margin:0">My VTS</h2><span class="l-sp"></span><label class="check" style="min-height:0"><input type="checkbox" id="tShowOff" checked> Show decommissioned</label><a class="btn" href="#tool/vts/new">Register a system</a></div>
+      <p class="t-intro">Every system your organization looks after. Open one to see its card, its Site History and who can see what. Register a new one with the button.</p>
       <div class="t-grid"><div class="lmap panel" id="tmap" aria-label="Map of your VTS"></div><div class="t-list" id="tlist"></div></div>
       <p class="small muted">Sample sites in made-up places. Colored dot: system type. Grey dashed dot: decommissioned. ${legend()}</p>`;
     q("#tShowOff").onchange = () => draw();
