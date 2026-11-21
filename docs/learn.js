@@ -20,7 +20,7 @@
 
   function tabs(cur) {
     qa("#learnTabs a").forEach(a => a.dataset.t === cur ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current"));
-    q("#learnMaterials").hidden = cur !== "materials"; view().hidden = cur === "materials";
+    q("#learnMaterials").hidden = !(cur === "materials" || cur === "landing"); view().hidden = cur === "materials";
     /* "How to use Learn" only on the landing page and on All materials */
     const g = q("#learnGuide"); if (g) g.hidden = !(cur === "landing" || cur === "materials");
   }

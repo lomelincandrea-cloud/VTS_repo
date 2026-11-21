@@ -8,6 +8,7 @@
   box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
 }
 *,*::before,*::after{box-sizing:inherit}
+[hidden]{display:none!important}
 html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 70px)}
 body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--body);font-size:1.0625rem;line-height:1.6}
 html{color-scheme:light}
@@ -669,3 +670,4 @@ dialog.t-side::backdrop{background:rgba(18,38,26,.35)}
 }
 @media (max-width:480px){.g-tab,.d-mx,.d-hist,.c-tab,.t-mat,.o-cost td,.o-cost th,.d-st,.d-card,.d-tile span,.l-door,.l-cstep span{font-size:1rem!important}}
 @media (max-width:480px){.c-grid,.c-day,.guide{font-size:1rem!important}}
+.h-copy h1{text-transform:none;max-width:760px;font-size:clamp(2.2rem,4.6vw,3.6rem)}
