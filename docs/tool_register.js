@@ -55,13 +55,48 @@ window.ToolRegister = (function () {
     v.innerHTML = `<p><a href="#tool/vts">← My VTS</a></p>
       <div class="l-row"><h2 style="margin:0">Register a system</h2><span class="l-sp"></span><button class="btn ghost sm" type="button" id="rgDiscard">Discard this draft</button></div>
       <p class="muted">Seven short steps. Only the first one is needed to save; the rest can be filled in later from the card. The draft stays in this browser while you work.</p>
-      <ol class="rg-steps">${STEPS.map((n, i) => `<li><button type="button" data-rs="${i}" class="${i === step ? "on" : i < step ? "past" : ""}"${i === step ? ' aria-current="step"' : ""}><span>${i + 1}</span>${esc(n)}</button></li>`).join("")}</ol>
-      <form id="rgF" class="panel rg-body" novalidate>${body()}
+      <ol class="rg-steps" id="rgSteps">${stepsHtml()}</ol>
+      <div class="rg-layout"><form id="rgF" class="panel rg-body" novalidate>${body()}
         <p class="l-warn" id="rgMsg" hidden></p>
         <div class="row rg-nav">${step > 0 ? '<button class="btn ghost" type="button" id="rgBack">Back</button>' : ""}<span class="l-sp"></span>
-          ${step < STEPS.length - 1 ? '<button class="btn" type="submit">Next</button>' : '<button class="btn" type="submit">Save the VTS</button>'}</div></form>`;
+          ${step < STEPS.length - 1 ? '<button class="btn" type="submit">Next</button>' : '<button class="btn" type="submit">Save the VTS</button>'}</div></form>
+        <aside class="rg-prev" aria-label="Preview of the card"><p class="l-src">The card, as it fills in</p><div id="rgPrev">${preview()}</div></aside></div>`;
     K().bar();
     wire();
+    /* the card on the right and the step counts follow what is typed */
+    const F = q("#rgF"), live = () => { read(); q("#rgPrev").innerHTML = preview(); q("#rgSteps").innerHTML = stepsHtml(); wireSteps(); };
+    F.addEventListener("input", live); F.addEventListener("change", live);
+  }
+  /* how much of each step is filled: [filled, of] (of = null when it is just a count) */
+  function filled(i) {
+    const has = x => x !== undefined && x !== null && String(x).trim() !== "";
+    if (i === 0) return [[st.type, st.name, st.project_owner, st.year_built, st.drainage].filter(has).length, 5];
+    if (i === 1) return [[st.location, st.huc12].filter(has).length, 2];
+    if (i === 2) { const d = st.design.length ? st.design : (DESIGN[st.type] || []).map(l => ({label: l, value: ""})); return [d.filter(x => has(x.value)).length, d.length]; }
+    if (i === 3) { const f = fields(); return [f.filter(x => { const v = st.params[kindOf(x.field)[1]]; return v !== undefined && v !== null && v !== ""; }).length, f.length]; }
+    if (i === 4) return [st.documents.length, null];
+    return [1, 1];
+  }
+  function stepsHtml() {
+    return STEPS.map((n, i) => {
+      const [a, b] = i < 6 ? filled(i) : [0, 0], done = i < 6 && (b === null ? a > 0 : a === b && b > 0);
+      const note = i >= 5 ? "" : b === null ? `${a} added` : `${a} of ${b} filled`;
+      return `<li><button type="button" data-rs="${i}" class="${i === step ? "on" : done ? "past" : ""}"${i === step ? ' aria-current="step"' : ""}><span>${done ? "✓" : i + 1}</span>${esc(n)}${note ? `<small class="rg-cnt">${note}</small>` : ""}${done ? '<span class="vh"> (complete)</span>' : ""}</button></li>`;
+    }).join("");
+  }
+  /* the same layout as the VTS card (header, Design, Site Conditions, Documents, Sharing); empty fields say "Not set" */
+  function preview() {
+    const ns = '<span class="rg-ns">Not set</span>', val = x => x === undefined || x === null || String(x).trim() === "" ? ns : esc(x);
+    const c = st.type ? K().COLOR[st.type] : "#6B8574";
+    const design = [["Year built", st.year_built], ["Drainage area", st.drainage ? st.drainage + " acres" : ""], ...(st.design.length ? st.design : (DESIGN[st.type] || []).map(l => ({label: l, value: ""}))).map(d => [d.label, d.value])];
+    return `<div class="t-card"><div class="t-band" style="background:${c}"><span>${st.type ? esc(K().NAME[st.type]) : "System type not chosen"}</span><span class="l-sp"></span><span class="l-chip">Draft</span></div>
+      <div class="t-head"><h3 style="margin:0">${st.name ? esc(st.name) : ns}</h3><p class="muted">Project owner: ${val(st.project_owner)} · ${st.huc12 ? esc(st.huc12) : "Sub-watershed not set"}</p><p class="l-src">${st.location ? `Placed on the map at ${st.location.lat}, ${st.location.lon}` : "Not placed on the map yet"}</p></div>
+      <div class="rg-pbody">
+        <div class="l-box"><b>Design</b><div><table class="t-kv">${design.map(([k, v]) => `<tr><th>${esc(k)}</th><td>${val(v)}</td></tr>`).join("")}</table></div></div>
+        <div class="l-box"><b>Site Conditions</b><div>${st.type ? `<table class="t-kv">${fields().map(f => `<tr><th>${esc(f.field)}</th><td>${val(show(st.params[kindOf(f.field)[1]]))}</td></tr>`).join("")}</table>` : `<p class="l-src">Choose the system type first.</p>`}</div></div>
+        <div class="l-box"><b>Documents</b><div>${st.documents.length ? st.documents.map(d => `<p>${val(d.title)} <span class="l-src">${esc(d.kind)}${d.date ? " · " + esc(d.date) : ""}</span></p>`).join("") : '<p class="rg-ns">None yet</p>'}</div></div>
+        <div class="l-box"><b>Sharing</b><div><table class="t-kv">${[["Location", st.privacy.location], ["Documents", st.privacy.documents], ["Status", st.privacy.status]].map(([k, v]) => `<tr><th>${k}</th><td>${esc(v[0].toUpperCase() + v.slice(1))}</td></tr>`).join("")}</table></div></div>
+      </div></div>`;
   }
 
   function body() {
@@ -178,9 +213,10 @@ window.ToolRegister = (function () {
   }
   function go(n) { step = Math.max(0, Math.min(STEPS.length - 1, n)); save(); page(); window.scrollTo({top: q(".rg-steps").getBoundingClientRect().top + window.scrollY - 90, behavior: "smooth"}); }
 
+  function wireSteps() { qa("[data-rs]").forEach(b => b.onclick = () => { read(); const e = check(); if (e && +b.dataset.rs > step) return msg(e); go(+b.dataset.rs); }); }
   function wire() {
     const F = q("#rgF");
-    qa("[data-rs]").forEach(b => b.onclick = () => { read(); const e = check(); if (e && +b.dataset.rs > step) return msg(e); go(+b.dataset.rs); });
+    wireSteps();
     if (q("#rgBack")) q("#rgBack").onclick = () => { read(); go(step - 1); };
     q("#rgDiscard").onclick = () => { if (confirm("Discard this draft? What you typed will be lost.")) { clear(); st = blank(); step = 0; page(); } };
     F.onsubmit = e => {

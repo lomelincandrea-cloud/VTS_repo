@@ -143,7 +143,7 @@
     const s = St.site(id);
     if (!s) { view().innerHTML = `<p>VTS not found. <a href="#tool/vts">Back to My VTS</a></p>`; return; }
     const lv = lastVisit(id), pv = lastPhotoVisit(id), np = nextPlanned(id), p = s.params || {}, off = s.status === "decommissioned";
-    const conds = (L.siteParams && L.siteParams[s.type] || []).map(f => [f.field, paramValue(p, f.field)]);
+    const conds = (L.siteParams && L.siteParams[s.type] || []).filter(f => !/^(year built|drainage area)/i.test(f.field)).map(f => [f.field, paramValue(p, f.field)]);   /* year built and drainage area are in Design */
     const hist = St.revisionsOf(id).slice().reverse();
     view().innerHTML = `
       <p><a href="#tool/vts">← My VTS</a></p>
