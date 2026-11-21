@@ -11,7 +11,7 @@ window.ToolDash = (function () {
     "IND-06": "Plant cover", "IND-07": "Repairs before Oct 1", "IND-08": "Problems fixed", "IND-09": "Visits as planned", "IND-10": "Photo points"};
   const MARK = {met: ["✓", "g"], not_met: ["✕", "r"], not_due: ["…", "y"], target_not_set: ["○", ""], no_data: ["–", "n"], not_rated: ["◇", "b"], not_applicable: ["n/a", "n"]};
   const filt = {site: "", type: "", year: null};
-  let indicators = null, env = null;
+  let indicators = null, env = null, dmap = null, sel = null;
 
   const thisYear = () => +K().today().slice(0, 4);
   function period(year) { const end = `${year}-12-31`, t = K().today(); return {start: `${year}-01-01`, end: end < t ? end : t}; }
@@ -42,51 +42,161 @@ window.ToolDash = (function () {
         <label class="l-lab">Year <select id="dYear">${years.map(y => `<option${y === filt.year ? " selected" : ""}>${y}</option>`).join("")}</select></label>
         <span class="l-src">Period: ${esc(p.start)} to ${esc(p.end)}. Sample data.</span>
       </div>
-      ${!models.length ? `<div class="panel">No VTS of this type.</div>` : one ? single(one) : rollup(models)}
+      ${!models.length ? `<div class="panel">No VTS of this type.</div>` : band(models) + charts(models) + (one ? single(one) : rollup(models))}
       ${reports(models, one)}
       ${history(sites)}`;
     K().bar();
     wire(models);
+    if (models.length) drawMap(models);
   }
 
-  function tiles(models) {
-    const sum = k => models.reduce((a, m) => a + m.w.plain[k], 0);
-    const lab = models.filter(m => m.w.plain.nitrate_applies && ["met", "not_met"].includes(m.w.indicators[4].status)), labMet = lab.filter(m => m.w.indicators[4].status === "met").length;
-    const noLab = models.filter(m => m.w.plain.nitrate_applies).length - lab.length;
-    return `<div class="d-tiles">
-      <div class="d-tile"><b>${models.length}</b><span>VTS shown</span></div>
-      <div class="d-tile"><b>${sum("done")} of ${sum("planned")}</b><span>planned visits done so far</span></div>
-      <div class="d-tile"><b>${sum("open")}</b><span>repairs open or with the supervisor</span><a href="#tool/corrective${filt.site ? "/" + filt.site : ""}">Corrective log</a></div>
-      <div class="d-tile"><b>${lab.length ? `${labMet} of ${lab.length}` : "–"}</b><span>laboratory nitrate checks inside the target${noLab ? ` (${noLab} VTS without a result or a target)` : ""}</span></div></div>`;
+  /* ---------- top band: map of the VTS with floating KPI tiles and a detail card ---------- */
+  const worst = w => w.indicators.some(i => i.status === "not_met") ? ["!", "late", "Something is below its target"] : w.indicators.some(i => i.status === "met") ? ["✓", "done", "All targets with data are met"] : ["○", "plan", "Not enough data"];
+  function kpis(models) {
+    const sum = k => models.reduce((a, m) => a + m.w.plain[k], 0), below = models.reduce((a, m) => a + m.w.indicators.filter(i => i.status === "not_met").length, 0);
+    return `<div class="d-kpis">
+      <div class="d-kpi"><b>${models.length}</b><span>VTS shown</span></div>
+      <div class="d-kpi"><b>${sum("done")} of ${sum("planned")}</b><span>planned visits done so far</span></div>
+      <div class="d-kpi"><b>${sum("open")}</b><span>repairs open or with the supervisor</span><a href="#tool/log${filt.site ? "/" + filt.site : ""}">Maintenance log →</a></div>
+      <div class="d-kpi"><b>${below}</b><span>indicator results below target (✕ in the table)</span></div></div>`;
+  }
+  function band(models) {
+    if (!sel || !models.some(m => m.s.id === sel)) sel = (models[0] || {}).s && models[0].s.id;
+    return `<section class="d-band" aria-labelledby="dBandT"><h3 id="dBandT" class="vh">Your systems at a glance</h3>
+      <div class="d-mapwrap"><div id="dMap" class="d-map" aria-label="Map of your VTS (sample sites)"></div>${kpis(models)}
+        <div class="d-detail" id="dDetail" aria-live="polite">${detail(models.find(m => m.s.id === sel))}</div></div>
+      <p class="l-src">Sample sites in made-up places. Pin colour: system type; symbol: ✓ all targets with data met, ! something below its target, ○ not enough data. Select a pin or a VTS in the list.</p>
+      <div class="d-pick" role="group" aria-label="Choose a VTS">${models.map(({s, w}) => { const [sy] = worst(w); return `<button type="button" data-dsel="${s.id}" aria-pressed="${s.id === sel}"><span class="sdot" style="background:${K().COLOR[s.type]}"></span>${esc(s.name)} <span aria-hidden="true">${sy}</span></button>`; }).join("")}</div></section>`;
+  }
+  function detail(m) {
+    if (!m) return "";
+    const {s, w} = m, lv = K().lastVisit(s.id), nv = K().nextPlanned(s.id), [sy, , txt] = worst(w);
+    return `<div class="l-row"><span class="sdot" style="background:${K().COLOR[s.type]}"></span><b>${esc(s.name)}</b></div><p class="l-src">${esc(K().NAME[s.type])} · ${sy} ${esc(txt)}</p>
+      <ul class="d-syms">${w.indicators.map(i => { const [mk, c] = MARK[i.status]; return `<li><span class="d-dot d-${c || "o"}" aria-hidden="true">${mk}</span><span>${esc(SHORT[i.id])}<span class="vh">: ${esc(i.status_text)}</span></span></li>`; }).join("")}</ul>
+      <table class="t-kv"><tr><th>Last visit</th><td>${lv ? esc(lv.date + " · " + lv.type) : "None yet"}</td></tr><tr><th>Next visit</th><td>${nv ? esc(nv.date + " · " + nv.type) : "Not planned"}</td></tr></table>
+      <a class="btn" href="#tool/vts/${s.id}/history">Open Site History</a>`;
+  }
+  function drawMap(models) {
+    if (dmap) { dmap.remove(); dmap = null; }
+    const box = q("#dMap"); if (!box) return;
+    if (!(window.L && window.L.map)) { box.innerHTML = `<p class="muted" style="padding:1rem">The map could not load. The list below still works.</p>`; return; }
+    dmap = window.L.map(box, {scrollWheelZoom: false, zoomControl: false}); window.L.control.zoom({position: "bottomleft"}).addTo(dmap);
+    window.L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 18, attribution: "© OpenStreetMap contributors"}).addTo(dmap);
+    const pts = [];
+    models.filter(m => m.s.location).forEach(({s, w}) => {
+      const ll = [s.location.lat, s.location.lon], [sy] = worst(w); pts.push(ll);
+      window.L.marker(ll, {title: s.name, icon: window.L.divIcon({className: "d-pin", iconSize: [40, 40], iconAnchor: [20, 20], html: `<span style="background:${K().COLOR[s.type]}"${s.id === sel ? ' class="on"' : ""}>${sy}</span>`})})
+        .addTo(dmap).on("click", () => pick(s.id, models));
+    });
+    const wide = innerWidth >= 1024;
+    if (pts.length) dmap.fitBounds(pts, wide ? {paddingTopLeft: [40, 150], paddingBottomRight: [380, 40], maxZoom: 12} : {padding: [30, 30], maxZoom: 12}); else dmap.setView([36.7, -121.6], 9);
+    setTimeout(() => dmap && dmap.invalidateSize(), 60);
+  }
+  function pick(id, models) {
+    sel = id;
+    q("#dDetail").innerHTML = detail(models.find(m => m.s.id === id));
+    qa("[data-dsel]").forEach(b => b.setAttribute("aria-pressed", b.dataset.dsel === id));
+    qa(".d-pin span").forEach(x => x.classList.remove("on"));
+    const c = q("#dCharts"); if (c) c.outerHTML = charts(models);
+  }
+
+  /* ---------- indicators as small charts (plain SVG), built only from the recorded results; no data, no chart ---------- */
+  const num = t => { const m = String(t || "").match(/-?\d+(?:\.\d+)?/); return m ? +m[0] : null; };
+  const yearsOf = t => [...String(t || "").matchAll(/(\d{4}): (?:max )?(-?\d+(?:\.\d+)?)/g)].map(m => [m[1], +m[2]]);
+  const W = "var(--water)", G = "#D3DDD3", INK = "#12261A";
+  function ring(pct, sub, label) {
+    const r = 40, C = 2 * Math.PI * r, f = Math.max(0, Math.min(100, pct)) / 100;
+    return `<svg viewBox="0 0 120 120" class="d-svg d-ring" role="img" aria-label="${esc(label)}"><circle cx="60" cy="60" r="${r}" fill="none" stroke="${G}" stroke-width="12"/>
+      <circle cx="60" cy="60" r="${r}" fill="none" stroke="${W}" stroke-width="12" stroke-dasharray="${(C * f).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 60 60)" stroke-linecap="butt"/>
+      <line x1="60" y1="8" x2="60" y2="26" stroke="${INK}" stroke-width="2"/><text x="60" y="64" text-anchor="middle" font-size="22" font-weight="700" fill="${INK}">${Math.round(pct)}%</text>
+      <text x="60" y="82" text-anchor="middle" font-size="10" fill="#44574B">${esc(sub)}</text></svg>`;
+  }
+  function gauges(rps, warn, clean, unit) {
+    const max = Math.max(clean || 0, ...rps.map(r => r[1])) * 1.2 || 1, H = 120, y = v => 10 + H - v / max * H, bw = 34, gap = 30, w0 = 70;
+    const width = w0 + rps.length * (bw + gap) + 40;
+    return `<svg viewBox="0 0 ${width} 150" class="d-svg" role="img" aria-label="Sediment depth by reference point: ${rps.map(r => `${r[0]} ${r[1]} ${unit}`).join(", ")}${warn ? `; warning level ${warn} ${unit}` : ""}${clean ? `; cleanout level ${clean} ${unit}` : ""}">
+      ${rps.map((r, i) => { const x = w0 + i * (bw + gap); return `<rect x="${x}" y="10" width="${bw}" height="${H}" fill="#F1F5EA" stroke="${G}"/><rect x="${x}" y="${y(r[1]).toFixed(1)}" width="${bw}" height="${(10 + H - y(r[1])).toFixed(1)}" fill="#8B5E3C"/>
+        <text x="${x + bw / 2}" y="${(y(r[1]) - 4).toFixed(1)}" text-anchor="middle" font-size="11" font-weight="700" fill="${INK}">${r[1]}</text><text x="${x + bw / 2}" y="146" text-anchor="middle" font-size="11" fill="${INK}">${esc(r[0])}</text>`; }).join("")}
+      ${warn ? `<line x1="${w0 - 6}" x2="${width - 30}" y1="${y(warn).toFixed(1)}" y2="${y(warn).toFixed(1)}" stroke="#7A5A00" stroke-width="2" stroke-dasharray="5 3"/><text x="2" y="${(y(warn) + 4).toFixed(1)}" font-size="10" fill="#7A5A00">warning ${warn}</text>` : ""}
+      ${clean ? `<line x1="${w0 - 6}" x2="${width - 30}" y1="${y(clean).toFixed(1)}" y2="${y(clean).toFixed(1)}" stroke="#B4361F" stroke-width="2"/><text x="2" y="${(y(clean) + 4).toFixed(1)}" font-size="10" fill="#B4361F">cleanout ${clean}</text>` : ""}</svg>`;
+  }
+  function inout(a, b, unit, note) {
+    const max = Math.max(a, b) * 1.15 || 1, L = 200, x0 = 60, bar = (v, yy, lab, col) => `<text x="0" y="${yy + 15}" font-size="12" fill="${INK}">${lab}</text><rect x="${x0}" y="${yy}" width="${(v / max * L).toFixed(1)}" height="22" fill="${col}"/><text x="${x0 + v / max * L + 6}" y="${yy + 15}" font-size="12" font-weight="700" fill="${INK}">${v}</text>`;
+    return `<svg viewBox="0 0 320 80" class="d-svg" role="img" aria-label="Nitrate ${unit}: inlet ${a}, outlet ${b}, ${(a - b).toFixed(1)} lower at the outlet${note ? " (" + note + ")" : ""}">
+      ${bar(a, 6, "Inlet", "#8B5E3C")}${bar(b, 40, "Outlet", "#3FA3B8")}</svg>`;
+  }
+  function cover(pct, target, inv) {
+    const L = 240, x = v => 10 + v / 100 * L;
+    return `<svg viewBox="0 0 280 70" class="d-svg" role="img" aria-label="Plant cover ${pct} %${target ? `, target at least ${target} %` : ""}; ${inv} invasive species">
+      <rect x="10" y="20" width="${L}" height="22" fill="#F1F5EA" stroke="${G}"/><rect x="10" y="20" width="${(pct / 100 * L).toFixed(1)}" height="22" fill="#2F7D4A"/>
+      <text x="${Math.min(x(pct) - 4, 245)}" y="36" text-anchor="end" font-size="12" font-weight="700" fill="#fff">${pct} %</text>
+      ${target ? `<line x1="${x(target)}" x2="${x(target)}" y1="12" y2="50" stroke="${INK}" stroke-width="2.5"/><text x="${x(target)}" y="64" text-anchor="middle" font-size="11" fill="${INK}">target ${target} %</text>` : ""}
+      <text x="10" y="12" font-size="11" fill="#44574B">${inv} invasive species found</text></svg>`;
+  }
+  function pair(a, b, la, lb) {
+    const max = Math.max(a, b, 1), H = 62, bar = (v, x, lab) => `<rect x="${x}" y="${18 + H - v / max * H}" width="40" height="${v / max * H}" fill="${W}"/><text x="${x + 20}" y="${14 + H - v / max * H}" text-anchor="middle" font-size="12" font-weight="700" fill="${INK}">${v}</text><text x="${x + 20}" y="${H + 26}" text-anchor="middle" font-size="11" fill="${INK}">${lab}</text>`;
+    return `<svg viewBox="0 0 200 104" class="d-svg" role="img" aria-label="${a} ${la}, ${b} ${lb}">${bar(a, 30, la)}${bar(b, 120, lb)}<line x1="20" x2="180" y1="80" y2="80" stroke="${G}"/></svg>`;
+  }
+  function jars(ans) {
+    const jar = (x, col, lab) => `<path d="M${x} 24 h30 v6 q6 4 6 12 v34 q0 6 -6 6 h-30 q-6 0 -6 -6 v-34 q0 -8 6 -12z" fill="${col}" stroke="${INK}" stroke-width="2"/><text x="${x + 15}" y="100" text-anchor="middle" font-size="11" fill="${INK}">${lab}</text>`;
+    const yes = /^yes/i.test(ans);
+    return `<svg viewBox="0 0 160 108" class="d-svg" role="img" aria-label="Jar test: outlet clearer than inlet: ${esc(ans)}">${jar(24, "#A9825A", "Inlet")}${jar(96, yes ? "#CFEAF2" : "#B99470", "Outlet")}</svg>`;
+  }
+  function spark(pts, unit) {
+    if (pts.length < 2) return "";
+    const vs = pts.map(p => p[1]), mn = Math.min(...vs), mx = Math.max(...vs), X = i => 14 + i * (172 / (pts.length - 1)), Y = v => 42 - (mx === mn ? 12 : (v - mn) / (mx - mn) * 24);
+    return `<svg viewBox="0 0 200 62" class="d-spark" role="img" aria-label="Last values: ${pts.map(p => `${p[0]} ${p[1]}${unit}`).join(", ")}"><polyline points="${pts.map((p, i) => `${X(i)},${Y(p[1])}`).join(" ")}" fill="none" stroke="${W}" stroke-width="2"/>
+      ${pts.map((p, i) => `<circle cx="${X(i)}" cy="${Y(p[1])}" r="3" fill="${W}"/><text x="${X(i)}" y="${Y(p[1]) - 6}" text-anchor="middle" font-size="9" fill="${INK}">${p[1]}</text><text x="${X(i)}" y="60" text-anchor="middle" font-size="9" fill="#44574B">${p[0]}</text>`).join("")}</svg>`;
+  }
+  function chartOf(i, s, w) {
+    const r = i.result || "", nd = /^No data|^Not measured|^No laboratory/i.test(r);
+    if (["no_data", "not_applicable"].includes(i.status) && nd) return "";
+    switch (i.id) {
+      case "IND-01": case "IND-09": { const v = num(r); return v === null ? "" : ring(v, i.id === "IND-01" ? "of visits" : "planned done", `${SHORT[i.id]}: ${r}. Target: ${i.target}`); }
+      case "IND-10": { const m = r.match(/(\d+) of (\d+)/); return m ? ring(+m[1] / +m[2] * 100, `${m[1]} of ${m[2]} visits`, `${SHORT[i.id]}: ${r}`) : ""; }
+      case "IND-02": { const rps = [...r.matchAll(/(RP\d+): (\d+(?:\.\d+)?) (\w+)/g)].map(m => [m[1], +m[2], m[3]]); const p = s.params || {};
+        return rps.length ? gauges(rps, p.warning_level_sediment && p.warning_level_sediment.value, p.cleanout_level_sediment && p.cleanout_level_sediment.value, rps[0][2]) : ""; }
+      case "IND-05": { const rows = (w.lab && w.lab.rows) || [], a = rows.filter(x => x.point === "inlet").pop(), b = rows.filter(x => x.point === "outlet").pop();
+        return a && b ? inout(num(a.value), num(b.value), "mg/L NO3-N", "laboratory") : ""; }
+      case "IND-04": { const rows = (w.field && w.field.rows) || [], blk = x => num((String(x.detail).match(/block: ([\d.]+)/) || [])[1] ?? x.value), a = rows.filter(x => x.point === "inlet").pop(), b = rows.filter(x => x.point === "outlet").pop();
+        return a && b ? inout(blk(a), blk(b), "mg/L NO3-N", "field check only, closest colour blocks") : ""; }
+      case "IND-06": { const v = num(r), inv = num((r.match(/(\d+) invasive/) || [])[1]) || 0, t = num(i.target); return v === null ? "" : cover(v, t, inv); }
+      case "IND-07": { const m = r.match(/(\d+) findings?; (\d+) repaired/); return m ? pair(+m[1], +m[2], "found", "fixed by Oct 1") : ""; }
+      case "IND-08": { const m = r.match(/(\d+) opened, (\d+) closed/); return m ? pair(+m[1], +m[2], "opened", "closed") : ""; }
+      case "IND-03": return /^(yes|no)/i.test(r) ? jars(r) : "";
+    }
+    return "";
+  }
+  function charts(models) {
+    const m = models.find(x => x.s.id === sel) || models[0]; if (!m) return "";
+    const {s, w} = m;
+    return `<section class="stack" id="dCharts" aria-labelledby="dChartsT"><h3 id="dChartsT" style="margin:0">Indicators of ${esc(s.name)}</h3>
+      <p class="l-src">Each chart is drawn only from what the crews recorded (sample data), with its target as a line or mark. Where there is no value or no target, the card says so instead of drawing.</p>
+      <div class="d-ccards">${w.indicators.map(i => { const c = chartOf(i, s, w), tr = yearsOf(i.trend);
+        return `<article class="d-ccard d-c-${i.status}"><header><span class="d-id">${esc(i.id)}</span><h4>${esc(SHORT[i.id])}</h4>${chip(i.status)}</header>
+          ${c || `<p class="d-nochart">${esc(i.result || RM().NO_DATA)}</p>`}
+          ${c ? `<p class="d-res2">${esc(i.result)}</p>` : ""}<p class="l-src">Target: ${esc(i.target)}</p>
+          ${i.id === "IND-04" && c ? `<p class="l-src"><b>Field check only.</b> Test strips give a range, not a value.</p>` : ""}${spark(tr, i.id === "IND-02" ? " in" : "")}</article>`; }).join("")}</div></section>`;
   }
   const legend = () => `<p class="d-legend">${Object.keys(MARK).map(k => chip(k)).join(" ")}</p>`;
 
   function rollup(models) {
-    return `${tiles(models)}
-      <div class="panel stack"><h3 style="margin:0">All indicators at a glance</h3>
+    return `<div class="panel stack"><h3 style="margin:0">All indicators at a glance</h3>
         <p class="l-src">One row per VTS, one column per indicator. Tap a VTS for its details and reports.</p>
         <div class="scroll"><table class="d-mx"><thead><tr><th>VTS</th>${models[0].w.indicators.map(i => `<th title="${esc(i.indicator)}"><span>${esc(i.id)}</span>${esc(SHORT[i.id])}</th>`).join("")}</tr></thead>
         <tbody>${models.map(({s, w}) => `<tr><th><a href="#tool/dashboard/${s.id}"><span class="sdot" style="background:${s.status === "decommissioned" ? "#9AA7B5" : K().COLOR[s.type]}"></span>${esc(s.name)}</a></th>
           ${w.indicators.map(i => { const [m, c] = MARK[i.status]; return `<td><span class="d-dot d-${c || "o"}" title="${esc(i.id + ": " + i.status_text + ". " + i.result)}">${m}</span></td>`; }).join("")}</tr>`).join("")}</tbody></table></div>
-        ${legend()}</div>
-      <div class="d-cards">${models[0].w.indicators.map((ind, k) => `<article class="panel d-card"><header><span class="d-id">${esc(ind.id)}</span><h3>${esc(SHORT[ind.id])}</h3></header>
-        <p class="l-src">${esc(ind.goal)}. ${esc(ind.indicator)}.</p>
-        <ul class="d-rows">${models.map(({s, w}) => { const i = w.indicators[k]; return `<li><a href="#tool/dashboard/${s.id}">${esc(s.name)}</a>${chip(i.status)}<span class="d-res">${esc(i.result)}</span></li>`; }).join("")}</ul></article>`).join("")}</div>`;
+        ${legend()}</div>`;
   }
 
   function single({s, w}) {
     const c = w.charts;
-    return `${tiles([{s, w}])}
-      <div class="panel stack"><div class="l-row"><span class="sdot" style="background:${K().COLOR[s.type]}"></span><h3 style="margin:0">${esc(s.name)}</h3><span class="l-src">${esc(K().NAME[s.type])}</span><span class="l-sp"></span>
+    return `<div class="panel stack"><div class="l-row"><span class="sdot" style="background:${K().COLOR[s.type]}"></span><h3 style="margin:0">${esc(s.name)}</h3><span class="l-src">${esc(K().NAME[s.type])}</span><span class="l-sp"></span>
         <a href="#tool/vts/${s.id}">Card</a><a href="#tool/vts/${s.id}/history/${filt.year}">Site History</a><a href="#tool/plan/${s.id}/${filt.year}">Yearly plan</a></div>
         <p>${w.plain.visits} visits recorded; ${w.plain.done} of the ${w.plain.planned} planned visits done so far. Outlet jar clearer at the spring visit: ${esc(w.plain.jar)}.
         ${w.plain.nitrate_applies ? `Laboratory check of nitrate: ${esc(w.plain.lab)}.` : "A sediment basin is not built to remove nitrate; nitrate is not measured."} ${w.plain.open} repair(s) open or with the supervisor.</p>
         ${legend()}</div>
-      <div class="d-cards">${w.indicators.map(i => `<article class="panel d-card d-c-${i.status}"><header><span class="d-id">${esc(i.id)}</span><h3>${esc(SHORT[i.id])}</h3>${chip(i.status)}</header>
-        <p class="l-src">${esc(i.goal)}. ${esc(i.indicator)}.</p>
-        <table class="t-kv"><tr><th>Target</th><td>${esc(i.target)}</td></tr><tr><th>Result</th><td>${esc(i.result)}</td></tr><tr><th>Date</th><td>${esc(i.date)}</td></tr>
-          <tr><th>Method</th><td>${esc(i.method)}</td></tr><tr><th>Over the years</th><td>${esc(i.trend)}</td></tr></table></article>`).join("")}</div>
-      <div class="panel stack"><h3 style="margin:0">Charts</h3><p class="l-src">Each point is one measurement on its date. Points are not joined. Laboratory and field checks are separate charts.</p>
+      <div class="panel stack"><h3 style="margin:0">Report charts</h3><p class="l-src">The charts of the Water Summary. Each point is one measurement on its date. Points are not joined. Laboratory and field checks are separate charts.</p>
         <div class="d-charts">${[["lab", "Laboratory nitrate, mg/L NO3-N"], ["field", "Field checks of nitrate (strip spans, photometer points)"], ["sediment", "Sediment depth by reference point, with warning and cleanout levels"]]
           .map(([k, t]) => `<figure class="d-chart">${c[k] || '<p class="muted">No data recorded</p>'}<figcaption>${esc(t)}</figcaption></figure>`).join("")}</div>
         <p class="l-src">${esc(w.conversion_note)}</p></div>`;
@@ -197,6 +307,7 @@ window.ToolDash = (function () {
       report(b.dataset.rep, b.dataset.s).catch(e => msg("The report could not be made: " + e.message)).finally(() => { b.disabled = false; b.textContent = t; });
     });
     const sites = models.map(m => m.s);
+    qa("[data-dsel]").forEach(b => b.onclick = () => { pick(b.dataset.dsel, models); if (dmap) drawMap(models); });
     if (q("#dCsv")) q("#dCsv").onclick = () => download(fileBase() + "_change_history.csv", csv(historyRows(sites)), "text/csv;charset=utf-8");
     if (q("#dHpdf")) q("#dHpdf").onclick = () => viewer(`Change history · ${filt.year}`, historyDoc(historyRows(sites)), fileBase() + "_change_history");
   }

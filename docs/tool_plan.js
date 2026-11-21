@@ -727,7 +727,7 @@ window.ToolPlan = (function () {
       <div class="scroll"><table class="c-tab lg-tab"><thead><tr><th>Date</th><th>VTS</th><th>Kind</th><th>What</th><th>Result</th><th>Status</th><th><span class="vh">Links</span></th></tr></thead><tbody>
         ${list.map((r, i) => {
           const open = r.c && LOGF.open === r.c.id;
-          const links = r.c ? `<button class="btn ghost sm" type="button" data-lgo="${r.c.id}" aria-expanded="${open}">${open ? "Hide details" : "Details and actions"}</button>`
+          const links = r.c ? `<button class="btn ghost sm" type="button" data-lgo="${r.c.id}" aria-expanded="${open}">${open ? "Hide details" : "Details"}</button>`
             : r.link ? `<a href="${r.link}">${esc(r.linkText)} →</a>` : "";
           return `<tr class="${r.kind === "Corrective" ? "lg-cor" : ""}${open ? " lg-open" : ""}"><td>${esc(r.date)}</td><td><span class="sdot" style="background:${K().COLOR[r.s.type]}"></span><a href="#tool/vts/${r.s.id}/history">${esc(r.s.name)}</a></td>
             <td>${r.kind === "Preventive" ? "Preventive visit" : "Corrective repair"}</td><td>${esc(r.what)}</td><td>${esc(r.result)}</td><td>${stChip(r.status)}</td><td>${links}</td></tr>
