@@ -111,7 +111,7 @@ GENERAL = dict(
     august=["Vegetation maintenance", "Test and clear control structures", "Sediment monitoring", "Condition check", "Safety and skills refresher"],
     post=["Routine Visual Inspection after rain of 0.5 in or more in 24 h", "Checklist items marked A"],
     routine=["Routine Visual Inspection with the Visit Sheet (F04)", "Remove Trash and Debris", "overview photos"],
-    as_needed=["sediment removal (finish before October 1)", "woodchip top-off", "repairs found at inspections (chapter 4)"],
+    as_needed=["sediment removal (best around April, only if the post-storm visits show it is needed)", "woodchip top-off", "repairs found at inspections (chapter 4)"],
 )
 
 
