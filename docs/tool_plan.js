@@ -311,6 +311,30 @@ window.ToolPlan = (function () {
     return null;
   }
 
+
+  /* ---------- the Visit Sheet as the F04 of its system: header, Site Conditions, inspection checklist, tasks, crew ---------- */
+  const NR = '<span class="muted">Not recorded</span>';
+  const show = x => x === null || x === undefined || String(x).trim() === "" ? NR : esc(x);
+  /* the checklist items of a system in the F04 order (by section, as in the Excel), each with its F04 number */
+  function f04Items(sys) {
+    const all = L.checklist.filter(i => i.sys === sys), secs = [...new Set(all.map(i => i.sec))];
+    return secs.flatMap(sc => all.filter(i => i.sec === sc)).map((i, k) => ({...i, n: k + 1}));
+  }
+  const chkTypeOf = v => v.type === "Spring" ? "Routine" : v.type;   /* the F04 marks items R / A / P; the spring visit uses the routine items */
+  const itemsFor = (s, v) => v.type === "January review" ? [] : f04Items(s.type).filter(i => i.vis.includes(chkTypeOf(v)));
+  function siteConditions(s) {
+    const p = s.params || {}, rows = ((L.siteParams || {})[s.type] || []).map(f => {
+      const k = f.field.toLowerCase();
+      const val = k.startsWith("year built") ? s.year_built : k.startsWith("drainage area") ? (s.drainage_area ? `${s.drainage_area.value} ${s.drainage_area.unit}` : "") : K().paramValue(p, f.field);
+      return `<tr><th>${esc(f.field)}</th><td>${show(val)}</td></tr>`; }).join("");
+    return `<section class="f04-b"><h3>Site Conditions <span class="l-src">filled in by the supervisor from the design or the Annual plan</span></h3><table class="t-kv">${rows}</table>
+      <p class="l-src"><a href="#tool/vts/${s.id}">Change them in the VTS record →</a></p></section>`;
+  }
+  const f04File = s => (L.downloads || []).find(d => d.code === `${s.type}_F04`);
+  function f04Top(s) {
+    const x = f04File(s);
+    return `<div class="row f04-act no-print"><button class="btn ghost sm" type="button" onclick="window.print()">Print / Save as PDF</button>${x ? `<a class="btn ghost sm" href="${x.file}" download>Download Excel (blank F04)</a>` : ""}</div>`;
+  }
   /* ================= Visit Sheet ================= */
   function startVisit(s, pv) {
     const id = `V-${s.id.replace(/^S-/, "")}-${pv.date}-${Date.now().toString(36).slice(-4)}`;
@@ -330,26 +354,24 @@ window.ToolPlan = (function () {
   function renderForm(s, v, o) {
     const id = v.id, phone = o.mode === "phone";
     const f = v.form = v.form || {items: {}, water: {kit: "strip-n"}};
-    const chkType = v.type === "Spring" ? "Routine" : v.type;
-    const items = L.checklist.filter(i => i.sys === s.type && i.vis.includes(chkType));
+    const items = itemsFor(s, v);
     const nitrate = nitrateSys(s.type), kit = KITS[f.water.kit || "strip-n"], pp = (s.params || {}).photo_points;
     const mowTask = v.tasks_planned.some(t => /_T03$/.test(t) && /Vegetation Maintenance/.test((taskBy(t) || {}).name || ""));
     let sec = "";
     o.box().innerHTML = `
       ${phone ? "" : `<p><a href="#tool/plan/${s.id}/${v.date.slice(0, 4)}">← Annual plan</a> · <a href="#tool/visits">← Next visits</a></p>`}
-      <div class="t-card"><div class="t-band" style="background:${K().COLOR[s.type]}"><span>Visit Sheet · ${esc(s.type)}_F04</span><span class="l-sp"></span><span class="l-chip y">${phone ? "On this phone" : "Draft"}</span></div>
+      <div class="t-card"><div class="t-band" style="background:${K().COLOR[s.type]}"><span>Visit Sheet (F04) · ${esc(s.type)}_F04</span><span class="l-sp"></span><span class="l-chip y">${phone ? "On this phone" : "Open"}</span></div>
       <form id="vf" class="t-head stack" novalidate>
-        <h2 class="l-title" style="margin:0">${esc(s.name)}</h2>
+        <h2 class="l-title" style="margin:0">${esc(s.name)} <span class="l-src">${esc(s.id)}</span></h2>
+        ${phone ? "" : f04Top(s)}
         <div class="grid3"><div class="f"><label>Date</label><input type="date" name="date" value="${v.date}"></div>
           <div class="f"><label>Visit type</label><select name="type">${TYPES.map(t => `<option value="${t}"${t === v.type ? " selected" : ""}>${VT(t)}</option>`).join("")}</select></div>
           <div class="f"><label>Last rain (date, inches)</label><div class="l-row"><input type="date" name="rain_date" value="${v.last_rain?.date || ""}" style="flex:1"><input type="number" step="0.1" min="0" name="rain_in" value="${v.last_rain?.amount_in ?? ""}" style="width:6rem" aria-label="Rain amount, inches"></div></div></div>
+        <div class="grid2"><div class="f"><label>Inspector</label><input name="inspector" value="${esc(v.inspector || "")}"></div><div class="f"><label>Weather</label><input name="weather" value="${esc(v.weather || "")}" placeholder="for example, sunny, light rain"></div></div>
+        ${siteConditions(s)}
         ${ON_SITE.includes(v.type) ? `<fieldset><legend>Did water reach the inlet and move through the whole system, with no shortcuts?</legend>${yn("water_at_inlet", f.water_at_inlet)}</fieldset>` : ""}
-        <fieldset><legend>Tasks of this visit (mark what was done)</legend>${v.tasks_planned.map(t => `<label class="check"><input type="checkbox" name="task" value="${esc(t)}"${v.tasks_done.includes(t) ? " checked" : ""}> ${t[0] === "+" ? `<span class="l-chip y">Extra</span> ${esc(t.slice(1))}` : taskLink(t)}</label>`).join("") || '<p class="l-src">No tasks planned.</p>'}</fieldset>
-        ${mowTask ? `<fieldset><legend>Mowing record</legend><p class="l-src">Designated mowing areas: ${esc((s.params || {}).designated_mowing_areas || "not set in Site Conditions")}</p>
-          <div class="f"><label>Areas mowed</label><input name="mow_areas" value="${esc((v.mowing?.areas || []).join("; "))}" placeholder="Berms, access paths, other"></div>
-          <p>At the target height?</p>${yn("mow_target", v.mowing?.at_target_height)}<label class="check"><input type="checkbox" name="mow_photo"${v.mowing?.photo ? " checked" : ""}> Photo taken (the area looks different from the last visit)</label></fieldset>` : ""}
-        ${items.length ? `<h3>Visual inspection checklist</h3>${items.map(i => { const a = f.items[i.id] || {}; const head = i.sec !== sec ? `<h4 class="t-sec">${esc(sec = i.sec)}</h4>` : "";
-          return head + `<div class="t-item-q${a.a === "abnormal" ? " ab" : ""}" data-item="${i.id}"><p><b>${esc(i.q)}</b> <span class="l-src">${i.id}</span></p><p class="l-src">${esc(i.look)}</p>
+        ${items.length ? `<h3>Inspection checklist <span class="l-src">${items.length} items for this visit</span></h3>${items.map(i => { const a = f.items[i.id] || {}; const head = i.sec !== sec ? `<h4 class="t-sec">${esc(sec = i.sec)}</h4>` : "";
+          return head + `<div class="t-item-q${a.a === "abnormal" ? " ab" : ""}" data-item="${i.id}"><p><b>${i.n}. ${esc(i.q)}</b> <span class="l-src">${i.id}${f.items[i.id] && f.items[i.id].a ? "" : " · not answered"}</span></p><p class="l-src">${esc(i.look)}</p>
             <div class="t-seg" role="group" aria-label="Answer">${[["ok", "OK"], ["abnormal", "Abnormal"], ["na", "N/A"]].map(([k, n]) => `<button type="button" data-ans="${k}" aria-pressed="${a.a === k}">${n}</button>`).join("")}</div>
             ${a.a === "abnormal" ? `<p class="l-warn"><b>If abnormal:</b> ${esc(i.ab)}</p><div class="grid2"><div class="f"><label>Location in the system</label><input data-k="loc" value="${esc(a.loc || "")}"></div><div class="f"><label>Notes</label><input data-k="note" value="${esc(a.note || "")}"></div></div>
               <label class="check"><input type="checkbox" data-k="photo"${a.photo ? " checked" : ""}> Photo taken${i.photo ? " (required for this item)" : ""}</label><label class="check"><input type="checkbox" data-k="fixed"${a.fixed ? " checked" : ""}> Fixed now (small fix)</label>
@@ -369,6 +391,10 @@ window.ToolPlan = (function () {
               <label class="check"><input type="checkbox" name="${pt}_photo"${f.water[pt + "_photo"] ? " checked" : ""}> Photo ${kit.blocks ? "of the strip next to its color scale" : "of the reading"} (required)</label></div>`).join("")}</div>
             <p class="l-src">Method: ${esc(kit.method)}. Do not convert units in the field. NO3 = NO3-N × 4.43.</p>
             <div class="f"><label>Laboratory pair this year (once a year)</label><select name="lab">${["", "sent", "not done this year"].map(o => `<option${f.water.lab === o ? " selected" : ""}>${o}</option>`).join("")}</select></div>` : `<p class="l-src">A sediment basin is not built to remove nitrate: flow and clarity only.</p>`}</fieldset>` : ""}
+        <fieldset><legend>Tasks of this visit (mark what was done)</legend>${v.tasks_planned.map(t => `<label class="check"><input type="checkbox" name="task" value="${esc(t)}"${v.tasks_done.includes(t) ? " checked" : ""}> ${t[0] === "+" ? `<span class="l-chip y">Extra</span> ${esc(t.slice(1))}` : taskLink(t)}</label>`).join("") || '<p class="l-src">No tasks planned.</p>'}</fieldset>
+        ${mowTask ? `<fieldset><legend>Mowing record</legend><p class="l-src">Designated mowing areas: ${esc((s.params || {}).designated_mowing_areas || "not set in Site Conditions")}</p>
+          <div class="f"><label>Areas mowed</label><input name="mow_areas" value="${esc((v.mowing?.areas || []).join("; "))}" placeholder="Berms, access paths, other"></div>
+          <p>At the target height?</p>${yn("mow_target", v.mowing?.at_target_height)}<label class="check"><input type="checkbox" name="mow_photo"${v.mowing?.photo ? " checked" : ""}> Photo taken (the area looks different from the last visit)</label></fieldset>` : ""}
         <fieldset><legend>Before you leave</legend>
           ${ON_SITE.includes(v.type) ? `<label class="check"><input type="checkbox" name="pp"${v.all_photo_points_taken ? " checked" : ""}> Overview photos taken from all photo points${pp ? ` (${pp.count}: ${esc(pp.where)})` : ""} <span class="l-chip r">Required</span></label>` : ""}
           <div class="grid3"><div class="f"><label>Crew size</label><input type="number" min="1" name="crew" value="${v.crew_size ?? ""}"></div><div class="f"><label>Hours on site</label><input type="number" min="0" step="0.25" name="hours" value="${v.hours_on_site ?? ""}"></div></div>
@@ -400,6 +426,7 @@ window.ToolPlan = (function () {
   function readForm(v, form) {
     const val = n => form.elements[n] ? form.elements[n].value : undefined, chk = n => form.elements[n] ? form.elements[n].checked : undefined;
     v.date = val("date") || v.date; v.type = val("type") || v.type;
+    v.inspector = val("inspector") || null; v.weather = val("weather") || null;
     v.last_rain = val("rain_date") ? {date: val("rain_date"), amount_in: parseFloat(val("rain_in")) || 0} : null;
     v.tasks_done = qa("input[name=task]", form).filter(c => c.checked).map(c => c.value);
     if (form.elements.mow_areas) v.mowing = {...(v.mowing || {}), areas: val("mow_areas").split(";").map(x => x.trim()).filter(Boolean), photo: chk("mow_photo") ? `PH-${v.id}-mow` : null, at_target_height: v.mowing?.at_target_height ?? null};
@@ -459,27 +486,49 @@ window.ToolPlan = (function () {
     const i = St.data.visits.findIndex(x => x.id === v.id); St.data.visits[i] = v; St.persist();
   }
 
-  /* ---------- closed visit: read-only, corrections with a reason ---------- */
+  /* ---------- closed visit: the whole F04, read-only; corrections with a reason ---------- */
   function closedView(s, v) {
     const obs = St.data.observations.filter(o => o.visit === v.id), ms = St.data.measurements.filter(m => m.visit === v.id), cor = St.data.corrective_entries.filter(c => c.visit === v.id);
     const lab = v.type === "Spring" && nitrateSys(s.type) ? St.data.laboratory_samples.find(l => l.site === s.id && l.year === +v.date.slice(0, 4)) : null;
-    const fields = [["crew_size", "Crew size", v.crew_size], ["hours_on_site", "Hours on site", v.hours_on_site], ["notes", "Notes", v.notes]];
+    const ANS = {ok: "OK", abnormal: "Abnormal", na: "N/A"}, items = itemsFor(s, v);
+    const fix = k => `<button class="btn ghost sm no-print" type="button" data-fix="${k}">Correct</button>`;
+    let sec = "";
+    const rows = items.map(i => {
+      const o = obs.find(x => x.item === i.id), ab = o && o.answer === "abnormal";
+      const head = i.sec !== sec ? `<tr class="f04-sec"><th colspan="7" scope="colgroup">${esc(sec = i.sec)}</th></tr>` : "";
+      return head + `<tr class="${ab ? "f04-ab" : o ? "" : "f04-na"}"><td>${i.n}</td><td><b>${esc(i.q)}</b><br><span class="l-src">${esc(i.look)} · ${i.id}</span></td>
+        <td>${o ? esc(ANS[o.answer] || o.answer) : '<span class="muted">Not answered</span>'}${o && o.burrows ? `<br><span class="l-src">${esc(o.burrows.count_range)}, ${esc(o.burrows.in_use)}, ${esc(o.burrows.trend)}</span>` : ""}</td>
+        <td>${ab ? esc(i.ab) : ""}</td><td>${i.go.map(taskLink).join("<br>")}</td><td>${o && o.photo ? "Yes" : ""}</td><td>${esc([o && o.location_in_system, o && o.note].filter(Boolean).join(" · "))}${o && o.fixed_now ? " <span class='l-chip g'>Fixed now</span>" : ""}</td></tr>`; }).join("");
+    const answered = items.filter(i => obs.some(o => o.item === i.id)).length;
     K().view().innerHTML = `
-      <p><a href="#tool/plan/${s.id}/${v.date.slice(0, 4)}">← Annual plan</a></p>
-      <div class="t-card"><div class="t-band" style="background:${K().COLOR[s.type]}"><span>Visit Sheet · ${esc(s.type)}_F04</span><span class="l-sp"></span><span class="l-chip g">Closed ${esc(v.sign_off?.date || "")}</span></div>
-      <div class="t-head stack"><h2 class="l-title" style="margin:0">${esc(s.name)}</h2><p class="muted">${esc(v.date)} · ${esc(VT(v.type))}${v.last_rain ? ` · last rain ${esc(v.last_rain.date)}, ${v.last_rain.amount_in} in` : ""}</p>
+      <p class="no-print"><a href="#tool/plan/${s.id}/${v.date.slice(0, 4)}">← Annual plan</a> · <a href="#tool/sheets">← Visit Sheets</a></p>
+      <div class="t-card f04"><div class="t-band" style="background:${K().COLOR[s.type]}"><span>Visit Sheet (F04) · ${esc(s.type)}_F04</span><span class="l-sp"></span><span class="l-chip g">Closed ${esc(v.sign_off?.date || "")}</span></div>
+      <div class="t-head stack"><h2 class="l-title" style="margin:0">${esc(s.name)}</h2>
+        <p class="t-intro">Closed. It is now in the <a href="#tool/log/${s.id}">Site History →</a></p>
+        ${f04Top(s)}
+        <section class="f04-b"><h3>Visit</h3><table class="t-kv">
+          <tr><th>Site / VTS ID</th><td>${esc(s.name)} <span class="l-src">${esc(s.id)}</span></td></tr><tr><th>Date</th><td>${esc(v.date)}</td></tr>
+          <tr><th>Inspector</th><td>${show(v.inspector)}</td></tr><tr><th>Visit type</th><td>${esc(VT(v.type))}</td></tr>
+          <tr><th>Last rain (date / amount)</th><td>${v.last_rain ? `${esc(v.last_rain.date)} / ${esc(v.last_rain.amount_in)} in` : NR}</td></tr><tr><th>Weather</th><td>${show(v.weather)}</td></tr></table></section>
+        ${siteConditions(s)}
+        <section class="f04-b"><h3>Inspection checklist <span class="l-src">${items.length ? `${answered} of ${items.length} items answered · items of the ${esc(VT(chkTypeOf(v)).toLowerCase())} visit (${{"Routine": "R", "After storm": "A", "Pre-storm": "P"}[chkTypeOf(v)] || ""} column of the F04)` : ""}</span></h3>
+          ${items.length ? `<div class="scroll"><table class="c-tab f04-tab"><thead><tr><th>#</th><th>Item</th><th>Answer</th><th>If abnormal</th><th>Go to task</th><th>Photo</th><th>Notes</th></tr></thead><tbody>${rows}</tbody></table></div>` : `<p class="l-src">Office review: no checklist.</p>`}</section>
+        <section class="f04-b"><h3>Tasks performed, measurements and photos</h3><table class="t-kv">
+          <tr><th>Tasks performed</th><td>${(v.tasks_done || []).map(t => t[0] === "+" ? esc(t.slice(1)) : taskLink(t)).join("<br>") || NR}</td></tr>
+          ${v.mowing ? `<tr><th>Mowing</th><td>${esc((v.mowing.areas || []).join("; ") || "areas not recorded")}; at target height: ${v.mowing.at_target_height === null || v.mowing.at_target_height === undefined ? "not recorded" : v.mowing.at_target_height ? "yes" : "no"}</td></tr>` : ""}
+          <tr><th>Photos</th><td>${v.all_photo_points_taken ? `Overview photos taken (${(v.photos || []).length})` : v.all_photo_points_taken === false ? "Overview photos not taken" : NR}</td></tr></table>
+          ${ms.length ? `<div class="scroll"><table><thead><tr><th>Indicator</th><th>Point</th><th>Value as entered</th><th>Method</th><th></th></tr></thead><tbody>${ms.map(m => `<tr><td>${esc(m.indicator)} ${esc(m.parameter)}</td><td>${esc(m.point || "")}</td><td>${esc(m.value_as_entered)} ${esc(m.unit_as_entered || "")}</td><td>${esc(m.method)}${m.instrument_or_kit ? "<br><span class='l-src'>" + esc(m.instrument_or_kit.name || m.instrument_or_kit.laboratory || "") + "</span>" : ""}</td><td><button class="btn ghost sm no-print" type="button" data-mfix="${m.id}">Correct</button></td></tr>`).join("")}</tbody></table></div>` : `<p class="l-src">No measurements at this visit.</p>`}
+          ${lab ? `<div class="panel"><b>Laboratory pair ${v.date.slice(0, 4)}:</b> ${esc(lab.status)}${lab.status !== "result received" && lab.status !== "not done this year" ? ` <button class="btn sm no-print" type="button" id="vLab">Add the laboratory results</button>` : ""}</div>` : ""}</section>
+        <section class="f04-b"><h3>Crew, notes and sign-off</h3><table class="t-kv">
+          <tr><th>Crew members</th><td>${show(v.crew_size)} ${fix("crew_size")}</td></tr><tr><th>Hours on site</th><td>${show(v.hours_on_site)} ${fix("hours_on_site")}</td></tr>
+          <tr><th>Hours (crew total)</th><td>${show(v.hours_crew_total)}</td></tr><tr><th>Notes</th><td>${show(v.notes)} ${fix("notes")}</td></tr>
+          <tr><th>Corrective Maintenance Log (F05) entries</th><td>${cor.length ? cor.map(c => `<a href="#tool/log/${s.id}">${esc(c.finding)}</a> <span class="l-chip ${c.status === "open" ? "y" : "g"}">${esc(c.status)}</span>`).join("<br>") : "None from this visit"}</td></tr>
+          <tr><th>Supervisor sign-off</th><td>${v.sign_off ? `${esc(v.sign_off.initials)}, ${esc(v.sign_off.date)}` : NR}</td></tr></table></section>
         <p class="l-src">A closed visit is not overwritten. Each correction asks for a reason and stays in the change history.</p>
-        <table class="t-kv">${fields.map(([k, n, x]) => `<tr><th>${n}</th><td>${x === null || x === "" || x === undefined ? '<span class="muted">Not recorded</span>' : esc(x)} <button class="btn ghost sm" type="button" data-fix="${k}">Correct</button></td></tr>`).join("")}
-          <tr><th>Tasks done</th><td>${(v.tasks_done || []).map(t => t[0] === "+" ? esc(t.slice(1)) : taskLink(t)).join("<br>") || "None marked"}</td></tr>
-          <tr><th>Photo points</th><td>${v.all_photo_points_taken ? `all taken (${v.photos.length} photos)` : "not recorded"}</td></tr>
-          ${v.mowing ? `<tr><th>Mowing</th><td>${esc((v.mowing.areas || []).join("; ") || "areas not recorded")}; at target height: ${v.mowing.at_target_height === null ? "not recorded" : v.mowing.at_target_height ? "yes" : "no"}</td></tr>` : ""}</table>
-        ${ms.length ? `<h3>Measurements</h3><div class="scroll"><table><thead><tr><th>Indicator</th><th>Point</th><th>Value as entered</th><th>Method</th><th></th></tr></thead><tbody>${ms.map(m => `<tr><td>${esc(m.indicator)} ${esc(m.parameter)}</td><td>${esc(m.point || "")}</td><td>${esc(m.value_as_entered)} ${esc(m.unit_as_entered || "")}</td><td>${esc(m.method)}${m.instrument_or_kit ? "<br><span class='l-src'>" + esc(m.instrument_or_kit.name || m.instrument_or_kit.laboratory || "") + "</span>" : ""}</td><td><button class="btn ghost sm" type="button" data-mfix="${m.id}">Correct</button></td></tr>`).join("")}</tbody></table></div>` : ""}
-        ${lab ? `<div class="panel"><b>Laboratory pair ${v.date.slice(0, 4)}:</b> ${esc(lab.status)}${lab.status !== "result received" && lab.status !== "not done this year" ? ` <button class="btn sm" type="button" id="vLab">Add the laboratory results</button>` : ""}</div>` : ""}
-        ${obs.length ? `<h3>Checklist answers</h3><div class="scroll"><table><thead><tr><th>Item</th><th>Answer</th><th>Location / notes</th><th>Photo</th></tr></thead><tbody>${obs.map(o => `<tr><td>${esc(o.item)}</td><td>${esc(o.answer)}${o.burrows ? `<br><span class="l-src">${esc(o.burrows.count_range)}, ${esc(o.burrows.in_use)}, ${esc(o.burrows.trend)}</span>` : ""}</td><td>${esc([o.location_in_system, o.note].filter(Boolean).join(" · "))}</td><td>${o.photo ? "yes" : ""}</td></tr>`).join("")}</tbody></table></div>` : ""}
-        ${cor.length ? `<h3>Corrective Maintenance Log (F05) entries from this visit</h3>${cor.map(c => `<p>${esc(c.finding)} <span class="l-chip ${c.status === "open" ? "y" : "g"}">${esc(c.status)}</span></p>`).join("")}` : ""}
         ${histOf([v.id, ...ms.map(m => m.id)])}
       </div></div>`;
-    qa("[data-fix]").forEach(b => b.onclick = () => correct(`Correct: ${b.closest("tr").firstChild.textContent}`, v[b.dataset.fix], b.dataset.fix === "notes" ? "text" : "number", (val, reason, cat) => {
+    const LBL = {crew_size: "Crew members", hours_on_site: "Hours on site", notes: "Notes"};
+    qa("[data-fix]").forEach(b => b.onclick = () => correct(`Correct: ${LBL[b.dataset.fix]}`, v[b.dataset.fix], b.dataset.fix === "notes" ? "text" : "number", (val, reason, cat) => {
       const patch = {[b.dataset.fix]: b.dataset.fix === "notes" ? val : (val === "" ? null : +val)};
       if (b.dataset.fix !== "notes") { const c = b.dataset.fix === "crew_size" ? patch.crew_size : v.crew_size, h = b.dataset.fix === "hours_on_site" ? patch.hours_on_site : v.hours_on_site; patch.hours_crew_total = c && h ? Math.round(c * h * 100) / 100 : null; }
       St.update("visits", v.id, patch, reason, cat); visit(v.id); }));

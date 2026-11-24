@@ -772,3 +772,19 @@ dialog.t-side::backdrop{background:rgba(18,38,26,.35)}
 /* R8.2 form codes next to step names */
 .t-code{font:600 .68rem var(--body);letter-spacing:.03em;color:var(--muted);margin-left:.25rem}
 .t-step[aria-current] .t-code,.t-step.on .t-code{color:inherit;opacity:.8}
+
+/* R8.3 Visit Sheet = F04 */
+.f04-b{margin:1rem 0;padding-top:.6rem;border-top:1px solid var(--line)}
+.f04-b h3{margin:0 0 .4rem;display:flex;flex-wrap:wrap;gap:.2rem .6rem;align-items:baseline}
+.f04-tab td:first-child{width:2.2rem;text-align:right;font-weight:600}
+.f04-tab tr.f04-sec th{background:var(--ground);color:var(--water);text-align:left;font-weight:700}
+.f04-tab tr.f04-ab td{background:#FDF0ED}
+.f04-tab tr.f04-na td:nth-child(3){color:var(--muted)}
+.f04-act{gap:.5rem;flex-wrap:wrap}
+@media print{
+  header.top,footer,.t-stepbar,.t-hintbar,.no-print,.skip,#toolHelp,.proto-bar,.banner,nav[aria-label="Tool steps"]{display:none!important}
+  body{background:#fff}.t-card{box-shadow:none;border:1px solid #999}.f04-tab{min-width:0;font-size:9pt}.scroll{overflow:visible}
+  .f04-b{break-inside:avoid-page}.f04-tab tr{break-inside:avoid}
+}
+.f04-tab{min-width:760px}.f04-tab td:nth-child(2){min-width:15rem}
+@media print{.proto,#toolGate,.t-hint,#v-tool > .wrap > .stack:first-child{display:none!important}.f04-tab{min-width:0}}
