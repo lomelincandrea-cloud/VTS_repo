@@ -788,3 +788,6 @@ dialog.t-side::backdrop{background:rgba(18,38,26,.35)}
 }
 .f04-tab{min-width:760px}.f04-tab td:nth-child(2){min-width:15rem}
 @media print{.proto,#toolGate,.t-hint,#v-tool > .wrap > .stack:first-child{display:none!important}.f04-tab{min-width:0}}
+
+/* R8.4 Site History (F06) columns, F05 detail */
+.lg-tab{min-width:1180px}.lg-tab td{vertical-align:top}.f05-tab{min-width:900px;margin-bottom:.6rem}.f05-tab caption{text-align:left;padding:.3rem 0}

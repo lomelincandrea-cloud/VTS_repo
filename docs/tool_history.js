@@ -33,9 +33,9 @@ window.ToolHistory = (function () {
       const dv = doneVisit(s, pv);
       if (dv) { used.add(dv.id); out.push(visitEv(s, dv, "done", pv)); return; }
       const draft = visits.find(v => v.planned_id === pv.id && v.status !== "closed");
-      if (pv.date < today) out.push({date: pv.date, kind: "missed", title: `${VT(pv.type)} visit`, text: draft ? "Started on the Visit Sheet but not closed." : "In the plan, but no visit was recorded for this date.",
+      if (pv.date < today) out.push({pvType: pv.type, date: pv.date, kind: "missed", title: `${VT(pv.type)} visit`, text: draft ? "Started on the Visit Sheet but not closed." : "In the plan, but no visit was recorded for this date.",
         link: draft ? `#tool/visit/${draft.id}` : `#tool/plan/${s.id}/${p.year}`, linkText: draft ? "Finish the Visit Sheet" : "See the plan"});
-      else out.push({date: pv.date, kind: "planned", title: `${VT(pv.type)} visit`, text: `In the ${p.year} plan (${p.status}).`, link: `#tool/plan/${s.id}/${p.year}`, linkText: "See the plan", link2: "#tool/visits", link2Text: "Next visits"});
+      else out.push({pvType: pv.type, date: pv.date, kind: "planned", title: `${VT(pv.type)} visit`, text: `In the ${p.year} plan (${p.status}).`, link: `#tool/plan/${s.id}/${p.year}`, linkText: "See the plan", link2: "#tool/visits", link2Text: "Next visits"});
     }));
     visits.filter(v => v.status === "closed" && !used.has(v.id)).forEach(v => out.push(visitEv(s, v, plans.some(p => p.year === +v.date.slice(0, 4)) ? "extra" : "noplan")));
     St.data.corrective_entries.filter(c => c.site === s.id).forEach(c => {
@@ -64,7 +64,7 @@ window.ToolHistory = (function () {
     const meas = St.data.measurements.filter(m => m.visit === v.id).length, rep = St.data.corrective_entries.filter(c => c.visit === v.id).length;
     const nt = (v.tasks_done || []).length, np = (v.photos || []).length;
     const bits = [nt && pl(nt, "task"), bad ? pl(bad, "problem") + " found" : "no problems found", meas && pl(meas, "measurement"), np && pl(np, "photo"), rep && pl(rep, "repair") + " logged"];
-    return {date: v.date, kind, title: `${VT(v.type)} visit`, text: bits.filter(Boolean).join(" · ") + (pv && pv.date !== v.date ? ` · planned for ${pv.date}` : ""), link: `#tool/visit/${v.id}`, linkText: "Open the Visit Sheet"};
+    return {date: v.date, kind, title: `${VT(v.type)} visit`, text: bits.filter(Boolean).join(" · ") + (pv && pv.date !== v.date ? ` · planned for ${pv.date}` : ""), link: `#tool/visit/${v.id}`, linkText: "Open the Visit Sheet", v};
   }
 
   function render(siteId, yearArg) {

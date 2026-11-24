@@ -666,7 +666,7 @@ window.ToolPlan = (function () {
     const open = all.filter(v => v.status !== "closed").length;
     K().view().innerHTML = `<div class="l-row"><h2 style="margin:0">Visit Sheets (F04)</h2><span class="l-sp"></span>
         <label class="l-lab">VTS <select id="vsSite"><option value="">All</option>${St.sites().map(s => `<option value="${s.id}"${s.id === sheetSite ? " selected" : ""}>${esc(s.name)}</option>`).join("")}</select></label></div>
-      <p class="t-intro">The record of each visit: open ones first. A visit counts in the reports only once it is closed.</p>
+      <p class="t-intro">A Visit Sheet is the form for one visit. Once closed, it becomes a line in the Site History.</p><p class="l-src">Open ones first. A visit counts in the reports only once it is closed.</p>
       <p class="l-src">${open} open, ${all.length - open} closed. Start a new Visit Sheet from Next visits or from a visit in the Annual plan.</p>
       <div class="scroll"><table><thead><tr><th>Date</th><th>VTS</th><th>Visit</th><th>Tasks done</th><th>Status</th><th><span class="vh">Open</span></th></tr></thead><tbody>
         ${all.map(v => { const s = St.site(v.site) || {name: v.site, type: "SB"}, closed = v.status === "closed";
@@ -757,10 +757,14 @@ window.ToolPlan = (function () {
   function logRows() {
     const rows = [];
     St.sites().forEach(s => {
-      (window.ToolHistory ? window.ToolHistory.events(s) : []).filter(e => VSTAT[e.kind]).forEach(e => rows.push({date: e.date, s, kind: "Preventive", what: e.title, result: e.text, status: VSTAT[e.kind], link: e.link, linkText: e.linkText}));
+      (window.ToolHistory ? window.ToolHistory.events(s) : []).filter(e => VSTAT[e.kind]).forEach(e => { const v = e.v || null;
+        rows.push({date: e.date, s, kind: "Preventive", vtype: VT(v ? v.type : e.pvType || ""), crew: v ? v.crew_size : null, hours: v ? v.hours_crew_total : null, tasks: v ? (v.tasks_done || []) : [],
+          notes: v ? v.notes : e.text, f05: v ? St.data.corrective_entries.filter(c => c.visit === v.id) : [], initials: v && v.sign_off ? v.sign_off.initials : null,
+          what: e.title, result: e.text, status: VSTAT[e.kind], link: e.link, linkText: e.linkText}); });
       St.data.corrective_entries.filter(c => c.site === s.id).forEach(c => {
         const o = c.observation && St.data.observations.find(x => x.id === c.observation);
-        rows.push({date: c.date, s, kind: "Corrective", what: c.finding + (o && !c.finding.includes(o.item) ? ` (${o.item})` : ""), result: c.action_taken || "No action recorded yet", status: c.status[0].toUpperCase() + c.status.slice(1), c});
+        rows.push({date: c.date, s, kind: "Corrective", vtype: "Corrective", crew: null, hours: c.hours, tasks: c.task ? [c.task] : [], notes: c.finding + (o && !c.finding.includes(o.item) ? ` (${o.item})` : ""), f05: [c], initials: null,
+          what: c.finding, result: c.action_taken || "No action recorded yet", status: c.status[0].toUpperCase() + c.status.slice(1), c});
       });
     });
     return rows.sort((a, b) => b.date.localeCompare(a.date));
@@ -775,8 +779,8 @@ window.ToolPlan = (function () {
     const sts = Object.keys(SYMS).filter(t => base.some(r => r.status === t));
     const nPrev = list.filter(r => r.kind === "Preventive").length, nCor = list.length - nPrev;
     K().view().innerHTML = `<div class="l-row"><h2 style="margin:0">Site History (F06)</h2><span class="l-sp"></span><button class="btn" type="button" id="cNew">Add a finding</button></div>
-      <p class="t-intro">Everything that was done or found: planned visits and repairs in one table. Filter by kind, system or year, and download it.</p>
-      <p class="l-src">Site History (F06) and Corrective Maintenance Log (F05) in one table.</p>
+      <p class="t-intro">A Visit Sheet is the form for one visit. The Site History is the running record of all visits and repairs, one line each.</p>
+      <p class="l-src">Columns of the Site History (F06). A repair is its own line; open it to see the columns of the Corrective Maintenance Log (F05).</p>
       <div class="l-row lg-filters">
         <label class="l-lab">Kind <select id="lgK">${[["all", "All"], ["Preventive", "Preventive visits"], ["Corrective", "Corrective repairs"]].map(([v, t]) => `<option value="${v}"${LOGF.kind === v ? " selected" : ""}>${t}</option>`).join("")}</select></label>
         <label class="l-lab">VTS <select id="lgS"><option value="">All</option>${St.sites().map(s => `<option value="${s.id}"${s.id === LOGF.site ? " selected" : ""}>${esc(s.name)}</option>`).join("")}</select></label>
@@ -784,15 +788,18 @@ window.ToolPlan = (function () {
         <span class="l-sp"></span><button class="btn ghost sm" type="button" id="lgCsv">Download CSV</button></div>
       <div class="l-pills" role="group" aria-label="Status"><button type="button" class="l-pill${!LOGF.status ? " on" : ""}" data-ls="" aria-pressed="${!LOGF.status}">All <small>${base.length}</small></button>${sts.map(t => `<button type="button" class="l-pill${LOGF.status === t ? " on" : ""}" data-ls="${t}" aria-pressed="${LOGF.status === t}">${SYMS[t][0]} ${t} <small>${base.filter(r => r.status === t).length}</small></button>`).join("")}</div>
       <p class="l-src">${list.length} rows: ${nPrev} preventive visit${nPrev === 1 ? "" : "s"}, ${nCor} corrective repair${nCor === 1 ? "" : "s"}. Newest first.</p>
-      <div class="scroll"><table class="c-tab lg-tab"><thead><tr><th>Date</th><th>VTS</th><th>Kind</th><th>What</th><th>Result</th><th>Status</th><th><span class="vh">Links</span></th></tr></thead><tbody>
+      <div class="scroll"><table class="c-tab lg-tab"><thead><tr><th>Date</th><th>VTS</th><th>Visit type</th><th>Crew members</th><th>Hours (crew total)</th><th>Tasks performed</th><th>Notes</th><th>Corrective maintenance (F05 entry)</th><th>Supervisor initials</th><th>Status</th><th><span class="vh">Links</span></th></tr></thead><tbody>
         ${list.map((r, i) => {
           const mo = `${MONTHS[+r.date.slice(5, 7) - 1]} ${r.date.slice(0, 4)}`, sep = !i || mo !== `${MONTHS[+list[i - 1].date.slice(5, 7) - 1]} ${list[i - 1].date.slice(0, 4)}`;
           const open = r.c && LOGF.open === r.c.id;
           const links = r.c ? `<button class="btn ghost sm" type="button" data-lgo="${r.c.id}" aria-expanded="${open}">${open ? "Hide details" : "Details"}</button>`
             : r.link ? `<a href="${r.link}">${esc(r.linkText)} →</a>` : "";
-          return `${sep ? `<tr class="lg-month"><th colspan="7" scope="colgroup">${mo}</th></tr>` : ""}<tr class="${r.kind === "Corrective" ? "lg-cor" : ""}${open ? " lg-open" : ""}"><td>${esc(r.date)}</td><td><span class="sdot" style="background:${K().COLOR[r.s.type]}"></span><a href="#tool/vts/${r.s.id}/history">${esc(r.s.name)}</a></td>
-            <td>${r.kind === "Preventive" ? "Preventive visit" : "Corrective repair"}</td><td>${esc(r.what)}</td><td>${esc(r.result)}</td><td>${stChip(r.status)}</td><td>${links}</td></tr>
-            ${open ? `<tr class="lg-detail"><td colspan="7">${corCard(r.c)}</td></tr>` : ""}`; }).join("") || `<tr><td colspan="7">Nothing here with these filters.</td></tr>`}
+          const vlink = r.c && r.c.visit ? ` <a href="#tool/visit/${r.c.visit}">Visit Sheet →</a>` : "";
+          const dash = '<span class="muted">—</span>', f05 = r.f05.map(c => `${esc(c.id)}: ${esc(c.action_taken || c.status)}`).join("<br>");
+          return `${sep ? `<tr class="lg-month"><th colspan="11" scope="colgroup">${mo}</th></tr>` : ""}<tr class="${r.kind === "Corrective" ? "lg-cor" : ""}${open ? " lg-open" : ""}"><td>${esc(r.date)}</td><td><span class="sdot" style="background:${K().COLOR[r.s.type]}"></span><a href="#tool/vts/${r.s.id}/history">${esc(r.s.name)}</a></td>
+            <td>${esc(r.vtype)}${r.kind === "Corrective" ? "" : '<br><span class="l-src">Preventive</span>'}</td><td>${r.crew ?? dash}</td><td>${r.hours ?? dash}</td>
+            <td>${r.tasks.map(t => t[0] === "+" ? esc(t.slice(1)) : `<span title="${esc((taskBy(t) || {}).name || t)}">${esc(t)}</span>`).join(", ") || dash}</td><td>${esc(r.notes || "") || dash}</td><td>${f05 || dash}</td><td>${esc(r.initials || "") || dash}</td><td>${stChip(r.status)}</td><td>${links}${vlink}</td></tr>
+            ${open ? `<tr class="lg-detail"><td colspan="11">${f05Table(r.c)}${corCard(r.c)}</td></tr>` : ""}`; }).join("") || `<tr><td colspan="11">Nothing here with these filters.</td></tr>`}
       </tbody></table></div>`;
     q("#lgK").onchange = e => { LOGF.kind = e.target.value; LOGF.status = ""; log(); };
     q("#lgS").onchange = e => { LOGF.site = e.target.value; log(); };
@@ -805,9 +812,20 @@ window.ToolPlan = (function () {
     qa("[data-cact]").forEach(b => b.onclick = () => actionDlg(cors.find(c => c.id === b.dataset.cact)));
     q("#lgCsv").onclick = () => {
       const cell = x => `"${String(x ?? "").replace(/"/g, '""')}"`;
-      const csv = "\ufeff" + [["Date", "VTS", "Kind", "What", "Result", "Status"], ...list.map(r => [r.date, r.s.name, r.kind === "Preventive" ? "Preventive visit" : "Corrective repair", r.what, r.result, r.status])].map(r => r.map(cell).join(",")).join("\r\n");
+      const F05 = c => c ? [c.finding, c.location, c.likely_cause, c.action_taken, c.urgency, c.materials_used, c.hours, c.status === "resolved" ? "resolved " + (c.resolved_date || "") : c.status, (c.photos || []).join(" ")] : ["", "", "", "", "", "", "", "", ""];
+      const csv = "\ufeff" + [["Date", "VTS", "Visit type", "Crew members", "Hours (crew total)", "Tasks performed", "Notes", "Corrective maintenance (F05 entry)", "Supervisor initials", "Status",
+                                "Finding (from the checklist)", "Location", "Likely cause", "Action taken", "Urgency", "Materials used", "Hours", "Resolved / escalated", "Photos (before / after)"],
+        ...list.map(r => [r.date, r.s.name, r.vtype, r.crew ?? "", r.hours ?? "", r.tasks.join("; "), r.notes || "", r.f05.map(c => c.id).join("; "), r.initials || "", r.status, ...F05(r.c)])].map(r => r.map(cell).join(",")).join("\r\n");
       const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv], {type: "text/csv"})); a.download = `maintenance_log${LOGF.site ? "_" + LOGF.site : ""}${LOGF.year ? "_" + LOGF.year : ""}.csv`; a.click();
     };
+  }
+  /* the open repair line shows the columns of the Corrective Maintenance Log (F05) */
+  function f05Table(c) {
+    const NRx = '<span class="muted">Not recorded</span>', val = x => x === null || x === undefined || x === "" ? NRx : esc(x);
+    const res = c.status === "resolved" ? `Resolved${c.resolved_date ? " " + c.resolved_date : ""}` : c.status === "escalated" ? "Escalated" : "Open";
+    const cols = [["Date", c.date], ["Finding (from the checklist)", c.finding], ["Location", c.location], ["Likely cause", c.likely_cause], ["Action taken", c.action_taken], ["Urgency", c.urgency],
+                  ["Materials used", c.materials_used], ["Hours", c.hours], ["Resolved / escalated", res], ["Photos (before / after)", (c.photos || []).join(", ")]];
+    return `<div class="scroll"><table class="c-tab f05-tab"><caption class="l-src">Corrective Maintenance Log (F05) · ${esc(c.id)}${c.visit ? ` · <a href="#tool/visit/${c.visit}">Open the Visit Sheet →</a>` : ""}</caption><thead><tr>${cols.map(([h]) => `<th>${h}</th>`).join("")}</tr></thead><tbody><tr>${cols.map(([, x]) => `<td>${val(x)}</td>`).join("")}</tr></tbody></table></div>`;
   }
   function corCard(c) {
     const s = St.site(c.site) || {name: c.site, type: "SB"}, t = c.task && taskBy(c.task), v = c.visit && St.visit(c.visit);
