@@ -206,7 +206,7 @@ def header(R, report):
     s = R.site
     return {"report": report, "site_name": s["name"], "type": SYS_NAME[s["type"]], "type_code": s["type"], "period_start": R.start, "period_end": R.end,
             "generated": date.today().isoformat(), "generated_by": R.d["organization"]["name"], "sample": R.d["meta"].get("sample", False),
-            "source_line": "Generated from the Visit Sheets, Site History and Corrective Log of this site."}
+            "source_line": "Generated from the Visit Sheets, Site History and Corrective Maintenance Log of this site."}
 
 
 def lab_block(R, year):

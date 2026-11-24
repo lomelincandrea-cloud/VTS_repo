@@ -166,7 +166,7 @@ window.VTSReport = (function () {
     const s = R.site;
     return {report, site_name: s.name, type: SYS_NAME[s.type], type_code: s.type, period_start: R.start, period_end: R.end,
       generated: todayIso(), generated_by: R.d.organization.name, sample: get(R.d.meta, "sample", false),
-      source_line: "Generated from the Visit Sheets, Site History and Corrective Log of this site."};
+      source_line: "Generated from the Visit Sheets, Site History and Corrective Maintenance Log of this site."};
   }
   function labBlock(R, year) {
     const labs = R.meas({ind: "IND-05", par: "nitrate", year, method: "laboratory"}), turb = R.meas({ind: "IND-05", par: "turbidity", year, method: "laboratory"});

@@ -45,3 +45,13 @@ Rule: if the site differs, the site changes. If the manual sources disagree amon
 | Task ids and titles (SB_T01…WB_T09, COR_T01…COR_T07) | F02, F03, F04 Task index and `learn_data.js` come from the same manual source; ids and titles equal. |
 | Visits per system and months | F03: Routine (every visit), Spring (Apr), Pre-storm (Aug), January review (Jan), When needed. Same in `learn_data.js` and in the Tool plan rows (built from it). |
 | F01 names of forms and documents | Used as written in the downloads table. |
+
+## D. Found during R8 (for Andrea)
+
+| Item | Detail | What R8 did |
+|---|---|---|
+| Indicators of the reports and the Dashboard | `tools/report_templates/indicators.json` (and `docs/tool/indicators.json`) still hold the 1.4 Monitoring framework table from before batch A: 10 rows, with the separate laboratory row and "Overview photos from the same photo points". The manual (Topic_Sections TOP-07.S05) now has 9 rows with new wording. `render_reports.py` reports this as a failed check. Rebuilding `indicators.json` renumbers the indicators and changes both reports and the Dashboard. | Not rebuilt; the reports and the Dashboard keep the old indicators. Needs your decision together with the pending 1.4 table items. |
+| Annual plan Excel note (R8.5) | The Tool plan has the same tasks, visits and months as F03, but F03 and the manual PDF disagree on sediment removal (see B), so the condition for the note is not met. | Note left out. |
+| "Who does them" on the visit card (R8.5) | The plan has no assignee field; the card shows the planned crew size and hours, or "Crew and hours not set yet". | As described. |
+| Field Guide sections (R8.7) | Online: How to use (stop list, 7), Signs of problems (17), Parts of a system (11), Invasive plants (4 + watchlist 29), Look-alikes (5), Native plants (53), Wildlife (8; "How to recognize it" is "To be written with a biologist" in the workbook, shown as In progress), Icon key (codes), References. Coming soon: Plants to ask about (no entries in the workbook), Photos (no files yet). | As listed. |
+| Visit types in the sample data | Stored value "After storm" in `sample_data.json` and in the reports (report_model.py / .js). | Shown as "Post-storm" in the Tool; reports unchanged (they mirror the Python model). |
