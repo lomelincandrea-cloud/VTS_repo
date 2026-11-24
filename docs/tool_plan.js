@@ -52,10 +52,33 @@ window.ToolPlan = (function () {
   }
   /* rows of the Gantt: every non-routine task in any visit, plus rows added with + */
   function ganttRows(s, p) {
-    const set = new Set(p.rows || []);
-    p.planned_visits.forEach(pv => { chosen(s.type, pv).forEach(id => { if (!isRoutine(id)) set.add(id); }); pv.extra_tasks.forEach(x => set.add(keyOf(x))); });
-    return [...set].sort((a, b) => (a[0] === "+") - (b[0] === "+") || a.localeCompare(b));
+    const base = L.tasks.filter(t => t.sys === s.type).sort((a, b) => a.no - b.no).map(t => t.id), set = new Set(p.rows || []);
+    p.planned_visits.forEach(pv => { chosen(s.type, pv).forEach(id => set.add(id)); pv.extra_tasks.forEach(x => set.add(keyOf(x))); });
+    const more = [...set].filter(k => !base.includes(k)).sort((a, b) => (a[0] === "+") - (b[0] === "+") || a.localeCompare(b));
+    return [...base, ...more];
   }
+  const plainText = h => String(h || "").replace(/<[^>]+>/g, "");
+  const trimTo = (t, n) => (t = plainText(t).trim()).length <= n ? t : t.slice(0, n).replace(/\s+\S*$/, "") + "…";
+  /* the floating card of a planned visit: title, tasks with codes, who, materials and cost, status */
+  function visitCard(s, pv) {
+    const ts = [...chosen(s.type, pv), ...pv.extra_tasks.map(keyOf)], c = estCost(pv), m = pv.materials || [], st = vStatus(s, pv);
+    const who = pv.est_crew || pv.est_hours ? `Crew of ${pv.est_crew ?? "–"} people, ${pv.est_hours ?? "–"} h on site` : "Crew and hours not set yet";
+    return `<p class="g-card-t">${esc(VT(pv.type))} visit, ${esc(shortDate(pv.date))}</p>
+      <ul>${ts.map(k => `<li>${k[0] === "+" ? esc(k.slice(1)) : `${esc((taskBy(k) || {}).name || k)} <span class="l-src">${esc(k)}</span>`}</li>`).join("") || "<li>No tasks</li>"}</ul>
+      <p><b>Who:</b> ${esc(who)}</p>
+      <p><b>Materials:</b> ${m.length ? m.map(x => esc(`${x.qty} ${x.unit || ""} ${x.item}`)).join(", ") : "none"} · <b>Estimated cost:</b> ${money(c.total)}</p>
+      <p><b>Status:</b> ${{done: "Done", plan: "Planned", late: "Overdue"}[st] || esc(st)}</p>
+      <p class="g-card-f">Click to open the record</p>`;
+  }
+  let cardFor = null, touchArmed = null;
+  function showCard(btn, html) {
+    let c = document.getElementById("gCard");
+    if (!c) { c = document.createElement("div"); c.id = "gCard"; c.className = "g-card"; c.setAttribute("role", "tooltip"); document.body.appendChild(c); }
+    c.innerHTML = html; c.hidden = false; cardFor = btn; btn.setAttribute("aria-describedby", "gCard");
+    const r = btn.getBoundingClientRect(), w = Math.min(320, window.innerWidth - 24);
+    c.style.width = w + "px"; c.style.left = Math.max(12, Math.min(window.scrollX + r.left, window.scrollX + window.innerWidth - w - 12)) + "px"; c.style.top = (window.scrollY + r.bottom + 8) + "px";
+  }
+  function hideCard() { const c = document.getElementById("gCard"); if (c) c.hidden = true; if (cardFor) cardFor.removeAttribute("aria-describedby"); cardFor = null; }
   const visitHas = (s, pv, k) => k[0] === "+" ? pv.extra_tasks.some(x => keyOf(x) === k) : chosen(s.type, pv).includes(k) || pv.extra_tasks.some(x => x.task === k);
   const doneVisit = (s, pv) => St.visitsOf(s.id).find(v => v.status === "closed" && (v.planned_id === pv.id || v.date === pv.date));
 
@@ -97,38 +120,50 @@ window.ToolPlan = (function () {
       return `<button type="button" class="g-cellb g-tipb" data-ed="mat" data-pv="${pv.id}" aria-label="Materials, ${esc(VT(pv.type))} ${esc(pv.date)}: ${m.length ? m.map(x => `${x.qty} ${x.unit || ""} ${x.item}`).join(", ") : "none"}">${m.length} item${m.length === 1 ? "" : "s"}<span class="o-tip" aria-hidden="true">${m.length ? m.map(x => `${esc(x.qty)} ${esc(x.unit || "")} ${esc(x.item)}${x.unit_cost ? " · $" + esc(x.unit_cost) : ""}`).join("<br>") : "No materials yet. Select to add."}</span></button>`;
     };
     const yearCost = pvs.reduce((a, pv) => a + estCost(pv).total, 0), yearHours = pvs.reduce((a, pv) => a + (+pv.est_hours || 0), 0);
-    const cell = (k, m) => {
-      const hits = byMonth(m).filter(pv => visitHas(s, pv, k));
-      if (!hits.length) return `<td class="g-c${editMode ? " g-add" : ""}${m === selM ? " g-sel" : ""}" data-k="${esc(k)}" data-m="${m}">${editMode ? '<span class="g-plus">+</span>' : ""}</td>`;
-      return `<td class="g-c on${m === selM ? " g-sel" : ""}" data-k="${esc(k)}" data-m="${m}">${hits.map(pv => { const dv = doneVisit(s, pv), done = dv && (dv.tasks_done || []).includes(k);
+    const cell = (k, m, need) => {
+      const hits = byMonth(m).filter(pv => visitHas(s, pv, k)), nm = k[0] === "+" ? k.slice(1) : (taskBy(k) || {}).name || k;
+      if (!hits.length) return `<td class="g-c g-add${m === selM ? " g-sel" : ""}" data-k="${esc(k)}" data-m="${m}" tabindex="0" role="button" aria-label="Add ${esc(nm)} in ${MON_LONG[m]}"><span class="g-plus" aria-hidden="true">+</span>${need && m === 3 ? '<span class="g-need">as needed</span>' : ""}</td>`;
+      return `<td class="g-c on${m === selM ? " g-sel" : ""}" data-k="${esc(k)}" data-m="${m}" data-open="${hits[0].id}" tabindex="0" role="button" aria-label="${esc(nm)}, ${MON_LONG[m]}: open the record">${hits.map(pv => { const dv = doneVisit(s, pv), done = dv && (dv.tasks_done || []).includes(k);
         const cls = done ? "done" : dv ? "miss" : "plan", sym = done ? "✓" : dv ? "–" : "✕", note = done ? " · done" : dv ? " · visit closed, task not marked done" : "";
         return `<span class="g-mark ${cls}" title="${esc(pv.date)} · ${esc(VT(pv.type))}${note}">${sym}<small>${+pv.date.slice(8)}</small></span>`; }).join("")}</td>`;
     };
     K().view().innerHTML = head + `
-      <div class="t-bar"><span>${approved ? `<span class="l-chip g">Approved</span> Changes ask for a reason.` : `<span class="l-chip y">Draft</span> Changes are saved as you go.`}</span><span class="l-sp"></span>
-        <button class="btn ${editMode ? "" : "ghost "}sm" type="button" id="pEdit" aria-pressed="${editMode}">${editMode ? "Done editing" : "Edit the plan"}</button>
+      <details class="g-help" id="gHelp"${helpOpen() ? " open" : ""}><summary>How to use this page</summary><ul>
+        <li><b>Add:</b> click an empty month in a task's row (a + appears), or use "+ Add task" and choose the task and the day.</li>
+        <li><b>Edit:</b> click a planned visit (✕ or a date in the Visits row) to open its record, then "Move to another month" or "Change tasks". Crew, hours and materials are edited in their rows.</li>
+        <li><b>Remove:</b> open the visit and choose "Remove from plan", or use "Remove" to take a task or a visit out. On an approved plan every change asks for a reason.</li>
+        <li><b>Colours and symbols:</b> ✕ planned · ✓ done (from the Site History) · – visit closed but the task was not marked done · the number is the day of the month · ● routine task, done at every visit · "as needed" tasks are scheduled only when needed.</li></ul></details>
+      <div class="t-bar g-bar"><span>${approved ? `<span class="l-chip g">Approved</span> Changes ask for a reason.` : `<span class="l-chip y">Draft</span> Changes are saved as you go.`}</span><span class="l-sp"></span>
+        <button class="btn sm" type="button" id="pAddT">+ Add task</button>
+        <button class="btn ghost sm" type="button" id="pEdit" aria-pressed="${editMode}">${sel ? "Edit" : editMode ? "Done editing" : "Edit"}</button>
+        <button class="btn ghost sm" type="button" id="pRemove">Remove</button>
         ${approved ? "" : `<button class="btn ghost sm" type="button" id="pApprove">Approve the plan</button>`}</div>
-      ${editMode ? `<p class="l-banner">Editing: click an empty month to schedule a task and choose the exact day. Click a ✕ to move it or take it out. Use + to add a task, and the bin to remove one (it asks why).</p>` : ""}
+      ${editMode && !sel ? `<p class="l-banner">Editing: use the bin next to a task to take it out of the whole plan (it asks why). Click any month to schedule or move a task.</p>` : ""}
       <div class="g-act" id="gAct" aria-live="polite">${sel ? actBar(s, sel) : `<span class="l-src">Select a visit date in the Visits row to see its actions.</span>`}</div>
       <div class="scroll g-wrap"><table class="g-tab">
-        <thead><tr><th class="g-t">Task</th>${MONTHS.map((m, i) => `<th${sc(i)}>${m}</th>`).join("")}<th>Year</th></tr></thead>
+        <thead><tr><th class="g-t">Frequency · Task · Component</th>${MONTHS.map((m, i) => `<th${sc(i)}>${m}</th>`).join("")}<th>Year</th><th class="g-notes">Notes</th></tr></thead>
         <tbody>
-          <tr class="g-visits"><th class="g-t">Visits <span class="l-src">select one</span></th>${MONTHS.map((_, m) => `<td${sc(m)}>${byMonth(m).map(pv => { const dv = doneVisit(s, pv);
+          <tr class="g-visits"><th class="g-t">Planned visits <span class="l-src">select one</span></th>${MONTHS.map((_, m) => `<td${sc(m)}>${byMonth(m).map(pv => { const dv = doneVisit(s, pv);
             return `<button type="button" class="g-v ${dv ? "done" : ""}" data-pv="${pv.id}" aria-pressed="${pv.id === openRec}" title="${esc(VT(pv.type))} visit, ${esc(pv.date)}">${+pv.date.slice(8)}<small>${esc(pv.type.split(" ")[0])}</small></button>`; }).join("")}
-            ${extraDone.filter(v => +v.date.slice(5, 7) - 1 === m).map(v => `<a class="g-v done extra" href="#tool/visit/${v.id}" title="${esc(VT(v.type))} visit, ${esc(v.date)} (not in the plan)">${+v.date.slice(8)}<small>${esc(v.type.split(" ")[0])}</small></a>`).join("")}</td>`).join("")}<td></td></tr>
-          <tr class="g-rout"><th class="g-t">Routine tasks, at every visit<br>${routine.map(id => `<span class="l-src">${esc((taskBy(id) || {}).name || id)}</span>`).join("<br>")}</th>${MONTHS.map((_, m) => `<td${sc(m)}>${byMonth(m).length ? '<span class="g-dot" title="At every visit">●</span>' : ""}</td>`).join("")}<td></td></tr>
-          ${rows.map(k => `<tr><th class="g-t">${k[0] !== "+" ? `<a href="#learn/task/${k}">${label(k)}</a>` : `<span class="l-chip y">Extra</span> ${label(k)}`}${editMode ? ` <button type="button" class="g-del" data-del="${esc(k)}" aria-label="Remove this task from the plan">🗑</button>` : ""}</th>${MONTHS.map((_, m) => cell(k, m)).join("")}<td></td></tr>`).join("")}
-          <tr class="g-res"><th class="g-t">Crew and hours <span class="l-src">people · hours on site</span></th>${MONTHS.map((_, m) => `<td${sc(m)}>${byMonth(m).map(pv => res("crew", pv)).join("")}</td>`).join("")}<td>${yearHours ? yearHours + " h" : ""}</td></tr>
-          <tr class="g-res"><th class="g-t">Materials</th>${MONTHS.map((_, m) => `<td${sc(m)}>${byMonth(m).map(pv => res("mat", pv)).join("")}</td>`).join("")}<td></td></tr>
-          <tr class="g-res g-cost"><th class="g-t">Estimated cost <span class="l-chip r">Sample data</span>${rate() ? "" : `<br><a class="l-src" href="#tool/plan/all/${year}">Set a labor rate</a> <span class="l-src">to add labor</span>`}</th>${MONTHS.map((_, m) => `<td${sc(m)}>${byMonth(m).map(pv => `<span class="g-money">${money(estCost(pv).total)}</span>`).join("")}</td>`).join("")}<td><b>${money(yearCost)}</b></td></tr>
-          <tr class="g-addrow"><th class="g-t" colspan="14"><div class="l-row"><span class="g-plusbig">+</span><select id="gAddSel" aria-label="Add a task"><option value="">Add a task…</option>
+            ${extraDone.filter(v => +v.date.slice(5, 7) - 1 === m).map(v => `<a class="g-v done extra" href="#tool/visit/${v.id}" title="${esc(VT(v.type))} visit, ${esc(v.date)} (not in the plan)">${+v.date.slice(8)}<small>${esc(v.type.split(" ")[0])}</small></a>`).join("")}</td>`).join("")}<td></td><td class="g-notes"><span class="l-src">Routine tasks are done at every visit.</span></td></tr>
+          ${rows.map(k => { const t = k[0] === "+" ? null : taskBy(k), rout = isRoutine(k), need = t && t.visit === "When needed";
+            return `<tr class="${rout ? "g-rout" : ""}"><th class="g-t">${t ? `<span class="g-freq">${esc(t.visit === "Corrective" || t.sys === "COR" ? "Corrective" : t.visit)}</span><a href="#learn/task/${k}">${label(k)}</a>${t.component ? ` <span class="g-comp">${esc(t.component)}</span>` : ""}` : `<span class="l-chip y">Extra</span> ${label(k)}`}${editMode && !rout ? ` <button type="button" class="g-del" data-del="${esc(k)}" aria-label="Remove this task from the plan">🗑</button>` : ""}</th>
+              ${rout ? MONTHS.map((_, m) => `<td${sc(m)}>${byMonth(m).length ? '<span class="g-dot" title="At every visit">●</span>' : ""}</td>`).join("") : MONTHS.map((_, m) => cell(k, m, need)).join("")}<td></td>
+              <td class="g-notes">${t ? esc(trimTo(t.when, 120)) : ""}</td></tr>`; }).join("")}
+          <tr class="g-res"><th class="g-t">Crew and hours <span class="l-src">people · hours on site</span></th>${MONTHS.map((_, m) => `<td${sc(m)}>${byMonth(m).map(pv => res("crew", pv)).join("")}</td>`).join("")}<td>${yearHours ? yearHours + " h" : ""}</td><td></td></tr>
+          <tr class="g-res"><th class="g-t">Materials</th>${MONTHS.map((_, m) => `<td${sc(m)}>${byMonth(m).map(pv => res("mat", pv)).join("")}</td>`).join("")}<td></td><td></td></tr>
+          <tr class="g-res g-cost"><th class="g-t">Estimated cost <span class="l-chip r">Sample data</span>${rate() ? "" : `<br><a class="l-src" href="#tool/plan/all/${year}">Set a labor rate</a> <span class="l-src">to add labor</span>`}</th>${MONTHS.map((_, m) => `<td${sc(m)}>${byMonth(m).map(pv => `<span class="g-money">${money(estCost(pv).total)}</span>`).join("")}</td>`).join("")}<td><b>${money(yearCost)}</b></td><td></td></tr>
+          <tr class="g-addrow"><th class="g-t" colspan="15"><div class="l-row"><span class="g-plusbig">+</span><select id="gAddSel" aria-label="Add a task"><option value="">Add a task…</option>
             ${L.tasks.filter(t => (t.sys === s.type || t.sys === "COR") && !rows.includes(t.id) && !routine.includes(t.id)).map(t => `<option value="${t.id}">${esc(t.id + " " + t.name)}</option>`).join("")}<option value="+">Another task (write it)</option></select>
             <input id="gAddTxt" placeholder="Describe the task" hidden><button class="btn ghost sm" type="button" id="gAdd">Add</button></div></th></tr>
         </tbody></table></div>
       <p class="l-src">✕ planned · ✓ done (from the Site History) · – visit closed but the task was not marked done · the number is the day of the month · ● routine tasks, done at every visit. Crew, hours, materials and the labor rate are set by the supervisor; crews do not record costs.</p>
       ${histOf([p.id])}`;
     wire();
-    q("#pEdit").onclick = () => { editMode = !editMode; plan(s.id, year); };
+    q("#pEdit").onclick = () => { if (sel) return tasksDlg(s, p, sel); editMode = !editMode; plan(s.id, year); };
+    q("#pAddT").onclick = () => addTaskDlg(s, p, year);
+    q("#pRemove").onclick = () => removeDlg(s, p, year, sel);
+    q("#gHelp").ontoggle = e => { if (!e.target.open) try { localStorage.setItem("vts_plan_help_seen", "1"); } catch (x) {} };
     if (q("#pApprove")) q("#pApprove").onclick = () => { p.status = "approved"; p.approved = K().today(); St.persist(); plan(s.id, year); };
     q("#gAddSel").onchange = e => { q("#gAddTxt").hidden = e.target.value !== "+"; };
     q("#gAdd").onclick = () => {
@@ -144,8 +179,18 @@ window.ToolPlan = (function () {
         St.update("annual_plans", p.id, {planned_visits: next}, `Task removed: ${k}. ${reason}`, cat); plan(s.id, year);
       }, null, true);
     });
-    qa("td.g-c").forEach(td => td.onclick = () => { if (editMode) cellDlg(s, p, td.dataset.k, +td.dataset.m, year); });
-    qa("[data-pv].g-v").forEach(b => b.onclick = () => { openRec = openRec === b.dataset.pv ? null : b.dataset.pv; const y = window.scrollY; plan(s.id, year); window.scrollTo(0, y); });
+    const openIt = id => { openRec = id; hideCard(); const y = window.scrollY; plan(s.id, year); window.scrollTo(0, y); const a = q("#gAct"); if (a) a.scrollIntoView({block: "nearest"}); };
+    qa("td.g-c").forEach(td => { const go = () => td.dataset.open ? openIt(td.dataset.open) : cellDlg(s, p, td.dataset.k, +td.dataset.m, year);
+      td.onclick = go; td.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } }; });
+    qa("[data-pv].g-v").forEach(b => {
+      const pv = p.planned_visits.find(x => x.id === b.dataset.pv), card = () => showCard(b, visitCard(s, pv));
+      b.onmouseenter = card; b.onfocus = card; b.onmouseleave = hideCard; b.onblur = hideCard;
+      b.onkeydown = e => { if (e.key === "Escape") hideCard(); };
+      b.onpointerdown = e => { b._touch = e.pointerType === "touch"; };
+      b.onclick = e => { if (b._touch && touchArmed !== b) { e.preventDefault(); touchArmed = b; card(); return; }   /* touch: first tap shows the card, second opens */
+        touchArmed = null; openIt(openRec === b.dataset.pv ? null : b.dataset.pv); };
+    });
+    document.onkeydown = e => { if (e.key === "Escape") hideCard(); };
     qa("[data-ed]").forEach(b => b.onclick = e => { e.stopPropagation(); openPop(s, p, b, year); });
     wireAct(s, p, year);
     if (popOpen) { const b = q(`[data-ed="${popOpen.kind}"][data-pv="${popOpen.pv}"]`); popOpen = null; if (b) openPop(s, p, b, year); }
@@ -155,7 +200,8 @@ window.ToolPlan = (function () {
     const dv = St.visitsOf(s.id).find(v => v.planned_id === pv.id || v.date === pv.date);
     return `<b>${esc(VT(pv.type))} visit · ${esc(shortDate(pv.date))}</b>${chipOf(vStatus(s, pv))}<span class="l-sp"></span>
       ${dv ? `<a class="btn sm" href="#tool/visit/${dv.id}">Open the Visit Sheet</a>` : `<button class="btn sm" type="button" data-act="open">Open the Visit Sheet</button>`}
-      <button class="btn ghost sm" type="button" data-act="send">Send to phone</button><button class="btn ghost sm" type="button" data-act="edit">Edit</button>
+      <button class="btn ghost sm" type="button" data-act="send">Send to phone</button><button class="btn ghost sm" type="button" data-act="move">Move to another month</button>
+      <button class="btn ghost sm" type="button" data-act="tasks">Change tasks</button>${dv ? "" : `<button class="btn ghost sm" type="button" data-act="rm">Remove from plan</button>`}
       <button class="btn ghost sm" type="button" data-act="close" aria-label="Clear the selection">×</button>`;
   }
   function wireAct(s, p, year) {
@@ -164,9 +210,11 @@ window.ToolPlan = (function () {
     if (b("open")) b("open").onclick = () => { const v = startVisit(s, pv); location.hash = "#tool/visit/" + v.id; };
     b("send").onclick = () => sendDlg(s, {date: pv.date, type: pv.type, planned_id: pv.id, tasks_planned: [...chosen(s.type, pv), ...pv.extra_tasks.map(keyOf)]});
     b("close").onclick = () => { openRec = null; const y = window.scrollY; plan(s.id, year); window.scrollTo(0, y); };
-    b("edit").onclick = () => {
+    b("tasks").onclick = () => tasksDlg(s, p, pv);
+    if (b("rm")) b("rm").onclick = () => { openRec = null; changePlan(s, p, clone(p.planned_visits).filter(v => v.id !== pv.id), `${VT(pv.type)} visit of ${pv.date} removed from the plan`, true); };
+    b("move").onclick = () => {
       const dv = St.visitsOf(s.id).find(v => v.planned_id === pv.id || v.date === pv.date);
-      K().openDlg(`<h3>Edit the visit</h3><form id="geF" class="stack"><div class="grid2">
+      K().openDlg(`<h3>Move the visit to another month</h3><p class="l-src">All the tasks of this visit move with it.</p><form id="geF" class="stack"><div class="grid2">
           <div class="f"><label for="geD">Date</label><input type="date" id="geD" value="${pv.date}" required></div>
           <div class="f"><label for="geT">Type</label><select id="geT">${TYPES.map(t => `<option value="${t}"${t === pv.type ? " selected" : ""}>${VT(t)}</option>`).join("")}</select></div>
           <div class="f"><label for="geC">Crew (people)</label><input type="number" min="0" id="geC" value="${pv.est_crew ?? ""}"></div>
@@ -181,6 +229,47 @@ window.ToolPlan = (function () {
       if (q("#geRm")) q("#geRm").onclick = () => { q("#toolDlg").close(); openRec = null; changePlan(s, p, clone(p.planned_visits).filter(v => v.id !== pv.id), "Visit removed", true); };
     };
   }
+  function addTaskDlg(s, p, year) {
+    const opts = L.tasks.filter(t => t.sys === s.type || t.sys === "COR").sort((a, b) => (a.sys === "COR") - (b.sys === "COR") || a.no - b.no);
+    K().openDlg(`<h3>Add a task to the ${year} plan</h3><form id="atF" class="stack">
+      <div class="f"><label for="atT">Task</label><select id="atT" required><option value="">Choose a task…</option>${opts.map(t => `<option value="${t.id}">${esc(t.id + " " + t.name)}</option>`).join("")}<option value="+">Another task (write it)</option></select></div>
+      <div class="f" id="atTxtF" hidden><label for="atTxt">Describe the task</label><input id="atTxt"></div>
+      <div class="f"><label for="atD">Day</label><input type="date" id="atD" min="${year}-01-01" max="${year}-12-31" value="${year}-${String(new Date().getMonth() + 1).padStart(2, "0")}-15" required></div>
+      <p class="l-src">If another visit is planned that day, the task joins it; otherwise a new visit is added.</p>
+      <div class="row"><button class="btn" type="submit">Add</button><button class="btn ghost" type="button" data-close>Cancel</button></div></form>`);
+    q("#atT").onchange = e => { q("#atTxtF").hidden = e.target.value !== "+"; };
+    q("#atF").onsubmit = e => { e.preventDefault(); const v = q("#atT").value, txt = q("#atTxt").value.trim(), k = v === "+" ? (txt ? "+" + txt : "") : v, day = q("#atD").value;
+      if (!k || !day) return; q("#toolDlg").close(); p.rows = [...new Set([...(p.rows || []), k])];
+      changePlan(s, p, addTo(s, clone(p.planned_visits), k, day, p), `${k[0] === "+" ? k.slice(1) : (taskBy(k) || {}).name || k} added on ${day}`, false); };
+  }
+  function removeDlg(s, p, year, sel) {
+    const pvs = p.planned_visits.slice().sort((a, b) => a.date.localeCompare(b.date)).filter(pv => !St.visitsOf(s.id).some(v => v.status === "closed" && (v.planned_id === pv.id || v.date === pv.date)));
+    const rows = ganttRows(s, p).filter(k => !isRoutine(k) && p.planned_visits.some(pv => visitHas(s, pv, k)));
+    K().openDlg(`<h3>Remove from the ${year} plan</h3><form id="rmF" class="stack">
+      <fieldset><legend>What do you want to remove?</legend><label class="check"><input type="radio" name="rmK" value="visit" checked> A visit, with all its tasks</label><label class="check"><input type="radio" name="rmK" value="task"> A task, from every month</label></fieldset>
+      <div class="f" id="rmVF"><label for="rmV">Visit</label><select id="rmV">${pvs.map(pv => `<option value="${pv.id}"${sel && sel.id === pv.id ? " selected" : ""}>${esc(pv.date)} · ${esc(VT(pv.type))}</option>`).join("")}</select></div>
+      <div class="f" id="rmTF" hidden><label for="rmT">Task</label><select id="rmT">${rows.map(k => `<option value="${esc(k)}">${k[0] === "+" ? esc(k.slice(1)) : esc(k + " " + ((taskBy(k) || {}).name || ""))}</option>`).join("")}</select></div>
+      <p class="l-src">Visits already done stay: they are in the Site History. It asks for a reason.</p>
+      <div class="row"><button class="btn" type="submit">Remove</button><button class="btn ghost" type="button" data-close>Cancel</button></div></form>`);
+    qa("[name=rmK]").forEach(r => r.onchange = () => { const t = q("[name=rmK]:checked").value === "task"; q("#rmVF").hidden = t; q("#rmTF").hidden = !t; });
+    q("#rmF").onsubmit = e => { e.preventDefault(); q("#toolDlg").close();
+      if (q("[name=rmK]:checked").value === "visit") { const id = q("#rmV").value, pv = p.planned_visits.find(x => x.id === id); if (!pv) return; openRec = null;
+        changePlan(s, p, clone(p.planned_visits).filter(v => v.id !== id), `${VT(pv.type)} visit of ${pv.date} removed from the plan`, true); }
+      else { const k = q("#rmT").value; if (!k) return; p.rows = (p.rows || []).filter(r => r !== k);
+        changePlan(s, p, removeFrom(s, clone(p.planned_visits), k, p.planned_visits.map(x => x.id)), `Task removed: ${k}`, true); } };
+  }
+  function tasksDlg(s, p, pv) {
+    const opts = L.tasks.filter(t => t.sys === s.type || t.sys === "COR").sort((a, b) => (a.sys === "COR") - (b.sys === "COR") || a.no - b.no), free = pv.extra_tasks.filter(x => !x.task);
+    K().openDlg(`<h3>Change tasks · ${esc(VT(pv.type))} visit, ${esc(shortDate(pv.date))}</h3><form id="ctF" class="stack"><div class="g-ctl">
+      ${opts.map(t => `<label class="check"><input type="checkbox" value="${t.id}"${visitHas(s, pv, t.id) || isRoutine(t.id) ? " checked" : ""}${isRoutine(t.id) ? " disabled" : ""}> ${esc(t.name)} <span class="l-src">${t.id}${isRoutine(t.id) ? " · at every visit" : ""}</span></label>`).join("")}
+      ${free.map(x => `<label class="check"><input type="checkbox" value="+${esc(x.text)}" checked> ${esc(x.text)} <span class="l-chip y">Extra</span></label>`).join("")}</div>
+      <div class="row"><button class="btn" type="submit">Save</button><button class="btn ghost" type="button" data-close>Cancel</button></div></form>`);
+    q("#ctF").onsubmit = e => { e.preventDefault(); const on = qa("#ctF input:checked:not(:disabled)").map(i => i.value); q("#toolDlg").close();
+      const next = clone(p.planned_visits).map(v => v.id !== pv.id ? v : {...v, tasks: on.filter(k => k[0] !== "+" && (taskBy(k) || {}).sys === s.type),
+        extra_tasks: [...on.filter(k => (taskBy(k) || {}).sys === "COR").map(k => ({task: k, text: taskBy(k).name})), ...on.filter(k => k[0] === "+").map(k => ({task: null, text: k.slice(1)}))]});
+      changePlan(s, p, next, `Tasks of the visit of ${pv.date} changed`, false); };
+  }
+  const helpOpen = () => { try { return !localStorage.getItem("vts_plan_help_seen"); } catch (e) { return true; } };
   /* small editors that open in place, inside the cell: crew and hours, or the list of materials */
   let popOpen = null;
   function openPop(s, p, btn, year) {
