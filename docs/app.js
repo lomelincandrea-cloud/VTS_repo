@@ -50,14 +50,14 @@ function placeRibbon(){/* put the four buttons on the ribbon and scatter the sed
     for(let i=0;i<46;i++){const t=.02+r()*.5,p=m.getPointAtLength(L*t),a=(r()-.5)*44;h+='<circle cx="'+(p.x+(vert?a:0)).toFixed(0)+'" cy="'+(p.y+(vert?0:a)).toFixed(0)+'" r="'+(1.8+r()*3.2).toFixed(1)+'" fill="#6F4526" opacity="'+(.9-t*1.5).toFixed(2)+'"/>'}
     if(sp)sp.innerHTML=h;g.dataset.done="1";});}
 function selSys(k){curSys=k;
-  $$(".h-st").forEach(e=>e.setAttribute("aria-pressed",e.dataset.k===k));
   $$("#sysPick button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.k===k));
   const s=SYS[k],nx=NEXT[k],c=$("#sysCard");
   c.classList.remove("h-in");void c.offsetWidth;c.classList.add("h-in");
   c.innerHTML=`<h3>${esc(s.n)}</h3><p class="h-short">${esc(s.s)}</p><div class="grid2"><p>${esc(s.what)}</p><p><strong>Looking after it:</strong> ${esc(s.upkeep)}</p></div>
     <p class="h-next">Next, the water enters ${nx?"the "+esc(SYS[nx].n.toLowerCase()):"Monterey Bay"}.</p><div class="row"><a class="btn" href="#learn/manual/${k}">Read the manual: ${esc(s.n)}</a></div>`;}
 function stations(){const box=$("#sysPick");box.innerHTML="";ORDER.forEach(k=>{const b=el("button",{type:"button","data-k":k,"aria-pressed":k===curSys},esc(SYS[k].n));b.onclick=()=>selSys(k);box.append(b)});
-  $$(".h-st").forEach(g=>{g.onclick=()=>selSys(g.dataset.k);g.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();selSys(g.dataset.k)}}});
+  /* the stations on the ribbon are a still illustration (R8.8): no clicks; the hero link scrolls to the doors */
+  const go=$("#hGo");if(go)go.onclick=e=>{e.preventDefault();const d=$("#hdoors");d.scrollIntoView({block:"start"});d.focus({preventScroll:true})};
   placeRibbon();selSys(curSys);}
 /* sections fade in once when they reach the screen (off with reduced motion) */
 function fadeIn(){if(!("IntersectionObserver" in window)||calm())return;document.documentElement.classList.add("fx");

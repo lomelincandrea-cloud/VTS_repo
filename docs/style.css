@@ -855,3 +855,8 @@ dialog.t-side::backdrop{background:rgba(18,38,26,.35)}
 .l-soon{opacity:.85;border-style:dashed}
 .m-soon details summary{cursor:pointer;min-height:44px;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
 .m-soont{width:100%;margin-top:.4rem}
+
+/* R8.8 Home: still stations, a pointer to the doors */
+.h-st.h-still{cursor:default;pointer-events:none}
+.h-go{margin:.6rem 0 0}.h-go a{font-weight:700;color:var(--water);display:inline-flex;align-items:center;gap:.35rem;min-height:44px}
+#hdoors:focus{outline:none}
