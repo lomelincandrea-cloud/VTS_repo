@@ -768,3 +768,7 @@ dialog.t-side::backdrop{background:rgba(18,38,26,.35)}
 .g-rec{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;min-width:44px;min-height:44px;margin:1px;padding:0 .35rem;font:600 .85rem var(--body);color:var(--ink)}
 .g-rec small{font-size:.66rem;font-weight:500;color:var(--muted)}
 .lg-tab tr.lg-month th{background:var(--ground);color:var(--water);font:700 .95rem var(--body);text-align:left;padding:.45rem .6rem;border-top:2px solid var(--line)}
+
+/* R8.2 form codes next to step names */
+.t-code{font:600 .68rem var(--body);letter-spacing:.03em;color:var(--muted);margin-left:.25rem}
+.t-step[aria-current] .t-code,.t-step.on .t-code{color:inherit;opacity:.8}

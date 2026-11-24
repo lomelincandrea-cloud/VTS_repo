@@ -57,7 +57,7 @@ window.ToolDash = (function () {
     return `<div class="d-kpis">
       <div class="d-kpi"><b>${models.length}</b><span>VTS shown</span></div>
       <div class="d-kpi"><b>${sum("done")} of ${sum("planned")}</b><span>planned visits done so far</span></div>
-      <div class="d-kpi"><b>${sum("open")}</b><span>repairs open or with the supervisor</span><a href="#tool/log${filt.site ? "/" + filt.site : ""}">Maintenance log →</a></div>
+      <div class="d-kpi"><b>${sum("open")}</b><span>repairs open or with the supervisor</span><a href="#tool/log${filt.site ? "/" + filt.site : ""}">Site History →</a></div>
       <div class="d-kpi"><b>${below}</b><span>indicator results below target (✕ in the table)</span></div></div>`;
   }
   function band(models) {
@@ -192,7 +192,7 @@ window.ToolDash = (function () {
   function single({s, w}) {
     const c = w.charts;
     return `<div class="panel stack"><div class="l-row"><span class="sdot" style="background:${K().COLOR[s.type]}"></span><h3 style="margin:0">${esc(s.name)}</h3><span class="l-src">${esc(K().NAME[s.type])}</span><span class="l-sp"></span>
-        <a href="#tool/vts/${s.id}">Card</a><a href="#tool/vts/${s.id}/history/${filt.year}">Site History</a><a href="#tool/plan/${s.id}/${filt.year}">Yearly plan</a></div>
+        <a href="#tool/vts/${s.id}">Card</a><a href="#tool/vts/${s.id}/history/${filt.year}">Site History</a><a href="#tool/plan/${s.id}/${filt.year}">Annual plan</a></div>
         <p>${w.plain.visits} visits recorded; ${w.plain.done} of the ${w.plain.planned} planned visits done so far. Outlet jar clearer at the spring visit: ${esc(w.plain.jar)}.
         ${w.plain.nitrate_applies ? `Laboratory check of nitrate: ${esc(w.plain.lab)}.` : "A sediment basin is not built to remove nitrate; nitrate is not measured."} ${w.plain.open} repair(s) open or with the supervisor.</p>
         ${legend()}</div>

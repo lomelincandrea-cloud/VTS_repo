@@ -64,7 +64,7 @@
       <a class="l-feat" href="#learn/plants">${label("Plants")}<b>Field Guide: find a plant</b><span>Drag the seedling along the bank to a zone, then filter. ${natives} native plants, with how to recognize each one.</span></a>`;
     qa("[data-jump]").forEach(x => x.onclick = e => { e.preventDefault(); const t = q("#" + x.dataset.jump); t.scrollIntoView({block: "start"}); t.setAttribute("tabindex", "-1"); t.focus({preventScroll: true}); });
   }
-  const CYCLE = [["1", "Plan", "January, in the office", "#tool/plan", "Yearly plan in the Tool"],
+  const CYCLE = [["1", "Plan", "January, in the office", "#tool/plan", "Annual plan in the Tool"],
     ["2", "Visit", "Routine, spring, pre-storm", "#learn/downloads", "Visit Sheet download"],
     ["3", "Look and recognize", "Every visit", "#learn/plants", "Field Guide"],
     ["4", "Fix", "Quick fix or scheduled repair", "#learn/topic/TOP-16", "Corrective Maintenance"],
@@ -76,7 +76,7 @@
     ["January review (office)", "January review", "January, in the office", t => t.visit === "January review (office)", [0]],
     ["Spring visit", "Spring visit", "April", t => t.visit === "Spring visit", [3]],
     ["Pre-storm visit", "Pre-storm visit", "August", t => t.visit === "Pre-storm visit", [7]],
-    ["After storms", "After storms", "October to April, within 48 hours", t => t.freq.some(f => /^(After storm|Post-storm)/i.test(f)), RAINY],
+    ["Post-storm visit", "Post-storm visit", "October to April 30, within 48 hours of a storm", t => t.freq.some(f => /^(After storm|Post-storm)/i.test(f)), RAINY],
     ["When needed", "When needed", "No fixed month", t => t.visit === "When needed", null]];
   const HOW = {SB: ["Water comes in muddy", "Soil settles", "Clearer water leaves"], VD: ["Plants slow the water", "Roots and stems hold soil", "Water moves on"],
     WB: ["Nitrate-rich water enters the buried woodchips", "Microbes turn nitrate into nitrogen gas", "Water leaves with less nitrate"], TW: ["Water spreads and slows", "Plants and microbes work", "Water leaves"]};
@@ -163,7 +163,7 @@
     truck: '<path d="M2 6h11v9H2z"/><path d="M13 9h4l3 3v3h-7z"/><circle cx="6" cy="17" r="1.8"/><circle cx="16.5" cy="17" r="1.8"/>',
     bag: '<path d="M5 8h14l-1 12H6z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>',
     form: '<path d="M6 3h9l3 3v15H6z"/><path d="M15 3v3h3"/><path d="M9 11h6M9 15h6"/>'};
-  /* "Forms for this task": the Visit Sheet, Site History, Corrective Log, Site Card or Field Guide the task names */
+  /* "Forms for this task": the Visit Sheet, Site History, Corrective Maintenance Log, Site Card or Field Guide the task names */
   const size = kb => kb >= 1024 ? (kb / 1024).toFixed(1) + " MB" : kb + " KB";
   function formsHtml(t) {
     const a = t.annexes || []; if (!a.length) return "";

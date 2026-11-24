@@ -172,7 +172,7 @@ window.ToolRegister = (function () {
     return `<h3>7. Review and save</h3>
       ${m.length ? `<div class="l-warn"><b>Not filled in yet:</b> ${m.map(([t, s]) => `<button type="button" class="rg-jump" data-rs="${s}">${esc(t)}</button>`).join(", ")}. You can save now and add them later from the card.${!pp ? " Photo points are needed before the first visit." : ""}</div>` : '<p class="l-chip g">Everything is filled in.</p>'}
       <table class="t-kv">${rows.map(([k, v]) => `<tr><th>${esc(k)}</th><td>${esc(v)}</td></tr>`).join("")}</table>
-      <label class="check"><input type="checkbox" id="rgPlan" checked> Also start the ${planYear()} yearly plan, with the visits the manual fixes that are still ahead</label>`;
+      <label class="check"><input type="checkbox" id="rgPlan" checked> Also start the ${planYear()} annual plan, with the visits the manual fixes that are still ahead</label>`;
   }
   /* the plan year: this year while a fixed visit (last one: pre-storm, Aug 19) is still ahead, otherwise next year */
   const planYear = () => { const t = K().today(), y = +t.slice(0, 4); return t <= `${y}-08-19` ? y : y + 1; };

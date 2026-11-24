@@ -1,13 +1,14 @@
-/* Tool: Yearly plan (overview grid of all VTS, and the editable plan of one VTS), the Visit Sheet (F04) form,
-   the list of Visit Sheets, Next visits (calendar and table), Send to phone and the Corrective log.
+/* Tool: Annual plan (overview grid of all VTS, and the editable plan of one VTS), the Visit Sheet (F04) form,
+   the list of Visit Sheets, Next visits (calendar and table), Send to phone and the Corrective Maintenance Log.
    Routes: #tool/plan (overview), #tool/plan/all/<year>, #tool/plan/<site>/<year> (edit one VTS), #tool/visit/<visit id>, #tool/sheets, #tool/visits. Uses window.ToolKit (tool.js), VTSStore (store.js), VTS_LEARN (learn_data.js).
    Rules: a draft is saved freely; an approved plan or a closed visit is changed only with a reason (edit history). */
 window.ToolPlan = (function () {
   "use strict";
   const St = window.VTSStore, L = window.VTS_LEARN || {tasks: [], checklist: []};
   const K = () => window.ToolKit;
-  const MV = {"Routine": "Routine visit", "After storm": "After storms", "Spring": "Spring visit", "Pre-storm": "Pre-storm visit", "January review": "January review (office)", "When needed": "When needed", "Corrective": "Corrective"};
+  const MV = {"Routine": "Routine visit", "After storm": "Post-storm visit", "Spring": "Spring visit", "Pre-storm": "Pre-storm visit", "January review": "January review (office)", "When needed": "When needed", "Corrective": "Corrective"};
   const TYPES = Object.keys(MV);
+  const VT = t => t === "After storm" ? "Post-storm" : t;   /* stored value "After storm" (older records) is shown as the manual's post-storm visit */
   const ON_SITE = ["Routine", "After storm", "Spring", "Pre-storm"];
   const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   const BURROW_ITEMS = ["SB-CL-13", "SB-CL-18", "VD-CL-14", "TW-CL-12", "WB-CL-02", "WB-CL-07", "WB-CL-14"];
@@ -32,7 +33,7 @@ window.ToolPlan = (function () {
   const chosen = (sys, pv) => pv.tasks ? pv.tasks : suggested(sys, pv.type);
   const taskLink = id => { const t = taskBy(id); return `<a href="#learn/task/${id}">${esc(t ? t.name : id)}</a> <span class="l-src">${id}</span>`; };
 
-  /* ================= Yearly plan: Gantt ================= */
+  /* ================= Annual plan: Gantt ================= */
   const FIXED = [[1, 14, "January review"], [4, 15, "Spring"], [8, 19, "Pre-storm"]];
   const MON_LONG = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   const isRoutine = id => (taskBy(id) || {}).visit === "Routine visit";
@@ -67,7 +68,7 @@ window.ToolPlan = (function () {
     const years = [...new Set([...St.data.annual_plans.filter(p => p.site === s.id).map(p => p.year), yearNow(), yearNow() + 1])].sort();
     const year = +yearArg || yearNow();
     const p = St.planOf(s.id, year);
-    const head = `<p><a href="#tool/plan/all/${year}">← All VTS in ${year}</a></p><div class="l-row"><h2 style="margin:0">Plan of one VTS</h2><span class="l-sp"></span>
+    const head = `<p><a href="#tool/plan/all/${year}">← All VTS in ${year}</a></p><div class="l-row"><h2 style="margin:0">Annual plan (F03) of one VTS</h2><span class="l-sp"></span>
         <label class="l-lab">VTS <select id="pSite">${active.map(x => `<option value="${x.id}"${x.id === s.id ? " selected" : ""}>${esc(x.name)}</option>`).join("")}</select></label>
         <label class="l-lab">Year <select id="pYear">${years.map(y => `<option${y === year ? " selected" : ""}>${y}</option>`).join("")}</select></label><a class="btn ghost sm" href="#tool/vts/${s.id}/history/${year}">Site History</a></div><p class="t-intro">The year of one system on one page: which visits, which tasks, who goes, what it needs and what it costs. Select a month to open its Visit Sheet or send it to a phone.</p>`;
     if (!p) {
@@ -90,10 +91,10 @@ window.ToolPlan = (function () {
         const dv = doneVisit(s, pv);
         if (dv) return `<span class="g-rec" title="Recorded on the closed Visit Sheet of ${esc(dv.date)}: crew size · total crew hours">${dv.crew_size ?? "–"} · ${dv.hours_crew_total ?? "–"} h<small>recorded</small></span>`;
         const set = pv.est_crew != null || pv.est_hours != null;
-        return `<button type="button" class="g-cellb" data-ed="crew" data-pv="${pv.id}" aria-label="Crew and hours, ${esc(pv.type)} ${esc(pv.date)}${set ? "" : ", not set"}">${set ? `${pv.est_crew ?? "–"} · ${pv.est_hours ?? "–"} h` : "Add"}</button>`;
+        return `<button type="button" class="g-cellb" data-ed="crew" data-pv="${pv.id}" aria-label="Crew and hours, ${esc(VT(pv.type))} ${esc(pv.date)}${set ? "" : ", not set"}">${set ? `${pv.est_crew ?? "–"} · ${pv.est_hours ?? "–"} h` : "Add"}</button>`;
       }
       const m = pv.materials || [];
-      return `<button type="button" class="g-cellb g-tipb" data-ed="mat" data-pv="${pv.id}" aria-label="Materials, ${esc(pv.type)} ${esc(pv.date)}: ${m.length ? m.map(x => `${x.qty} ${x.unit || ""} ${x.item}`).join(", ") : "none"}">${m.length} item${m.length === 1 ? "" : "s"}<span class="o-tip" aria-hidden="true">${m.length ? m.map(x => `${esc(x.qty)} ${esc(x.unit || "")} ${esc(x.item)}${x.unit_cost ? " · $" + esc(x.unit_cost) : ""}`).join("<br>") : "No materials yet. Select to add."}</span></button>`;
+      return `<button type="button" class="g-cellb g-tipb" data-ed="mat" data-pv="${pv.id}" aria-label="Materials, ${esc(VT(pv.type))} ${esc(pv.date)}: ${m.length ? m.map(x => `${x.qty} ${x.unit || ""} ${x.item}`).join(", ") : "none"}">${m.length} item${m.length === 1 ? "" : "s"}<span class="o-tip" aria-hidden="true">${m.length ? m.map(x => `${esc(x.qty)} ${esc(x.unit || "")} ${esc(x.item)}${x.unit_cost ? " · $" + esc(x.unit_cost) : ""}`).join("<br>") : "No materials yet. Select to add."}</span></button>`;
     };
     const yearCost = pvs.reduce((a, pv) => a + estCost(pv).total, 0), yearHours = pvs.reduce((a, pv) => a + (+pv.est_hours || 0), 0);
     const cell = (k, m) => {
@@ -101,7 +102,7 @@ window.ToolPlan = (function () {
       if (!hits.length) return `<td class="g-c${editMode ? " g-add" : ""}${m === selM ? " g-sel" : ""}" data-k="${esc(k)}" data-m="${m}">${editMode ? '<span class="g-plus">+</span>' : ""}</td>`;
       return `<td class="g-c on${m === selM ? " g-sel" : ""}" data-k="${esc(k)}" data-m="${m}">${hits.map(pv => { const dv = doneVisit(s, pv), done = dv && (dv.tasks_done || []).includes(k);
         const cls = done ? "done" : dv ? "miss" : "plan", sym = done ? "✓" : dv ? "–" : "✕", note = done ? " · done" : dv ? " · visit closed, task not marked done" : "";
-        return `<span class="g-mark ${cls}" title="${esc(pv.date)} · ${esc(pv.type)}${note}">${sym}<small>${+pv.date.slice(8)}</small></span>`; }).join("")}</td>`;
+        return `<span class="g-mark ${cls}" title="${esc(pv.date)} · ${esc(VT(pv.type))}${note}">${sym}<small>${+pv.date.slice(8)}</small></span>`; }).join("")}</td>`;
     };
     K().view().innerHTML = head + `
       <div class="t-bar"><span>${approved ? `<span class="l-chip g">Approved</span> Changes ask for a reason.` : `<span class="l-chip y">Draft</span> Changes are saved as you go.`}</span><span class="l-sp"></span>
@@ -113,8 +114,8 @@ window.ToolPlan = (function () {
         <thead><tr><th class="g-t">Task</th>${MONTHS.map((m, i) => `<th${sc(i)}>${m}</th>`).join("")}<th>Year</th></tr></thead>
         <tbody>
           <tr class="g-visits"><th class="g-t">Visits <span class="l-src">select one</span></th>${MONTHS.map((_, m) => `<td${sc(m)}>${byMonth(m).map(pv => { const dv = doneVisit(s, pv);
-            return `<button type="button" class="g-v ${dv ? "done" : ""}" data-pv="${pv.id}" aria-pressed="${pv.id === openRec}" title="${esc(pv.type)} visit, ${esc(pv.date)}">${+pv.date.slice(8)}<small>${esc(pv.type.split(" ")[0])}</small></button>`; }).join("")}
-            ${extraDone.filter(v => +v.date.slice(5, 7) - 1 === m).map(v => `<a class="g-v done extra" href="#tool/visit/${v.id}" title="${esc(v.type)} visit, ${esc(v.date)} (not in the plan)">${+v.date.slice(8)}<small>${esc(v.type.split(" ")[0])}</small></a>`).join("")}</td>`).join("")}<td></td></tr>
+            return `<button type="button" class="g-v ${dv ? "done" : ""}" data-pv="${pv.id}" aria-pressed="${pv.id === openRec}" title="${esc(VT(pv.type))} visit, ${esc(pv.date)}">${+pv.date.slice(8)}<small>${esc(pv.type.split(" ")[0])}</small></button>`; }).join("")}
+            ${extraDone.filter(v => +v.date.slice(5, 7) - 1 === m).map(v => `<a class="g-v done extra" href="#tool/visit/${v.id}" title="${esc(VT(v.type))} visit, ${esc(v.date)} (not in the plan)">${+v.date.slice(8)}<small>${esc(v.type.split(" ")[0])}</small></a>`).join("")}</td>`).join("")}<td></td></tr>
           <tr class="g-rout"><th class="g-t">Routine tasks, at every visit<br>${routine.map(id => `<span class="l-src">${esc((taskBy(id) || {}).name || id)}</span>`).join("<br>")}</th>${MONTHS.map((_, m) => `<td${sc(m)}>${byMonth(m).length ? '<span class="g-dot" title="At every visit">●</span>' : ""}</td>`).join("")}<td></td></tr>
           ${rows.map(k => `<tr><th class="g-t">${k[0] !== "+" ? `<a href="#learn/task/${k}">${label(k)}</a>` : `<span class="l-chip y">Extra</span> ${label(k)}`}${editMode ? ` <button type="button" class="g-del" data-del="${esc(k)}" aria-label="Remove this task from the plan">🗑</button>` : ""}</th>${MONTHS.map((_, m) => cell(k, m)).join("")}<td></td></tr>`).join("")}
           <tr class="g-res"><th class="g-t">Crew and hours <span class="l-src">people · hours on site</span></th>${MONTHS.map((_, m) => `<td${sc(m)}>${byMonth(m).map(pv => res("crew", pv)).join("")}</td>`).join("")}<td>${yearHours ? yearHours + " h" : ""}</td></tr>
@@ -152,7 +153,7 @@ window.ToolPlan = (function () {
   /* the slim bar of actions for the selected visit */
   function actBar(s, pv) {
     const dv = St.visitsOf(s.id).find(v => v.planned_id === pv.id || v.date === pv.date);
-    return `<b>${esc(pv.type)} visit · ${esc(shortDate(pv.date))}</b>${chipOf(vStatus(s, pv))}<span class="l-sp"></span>
+    return `<b>${esc(VT(pv.type))} visit · ${esc(shortDate(pv.date))}</b>${chipOf(vStatus(s, pv))}<span class="l-sp"></span>
       ${dv ? `<a class="btn sm" href="#tool/visit/${dv.id}">Open the Visit Sheet</a>` : `<button class="btn sm" type="button" data-act="open">Open the Visit Sheet</button>`}
       <button class="btn ghost sm" type="button" data-act="send">Send to phone</button><button class="btn ghost sm" type="button" data-act="edit">Edit</button>
       <button class="btn ghost sm" type="button" data-act="close" aria-label="Clear the selection">×</button>`;
@@ -167,7 +168,7 @@ window.ToolPlan = (function () {
       const dv = St.visitsOf(s.id).find(v => v.planned_id === pv.id || v.date === pv.date);
       K().openDlg(`<h3>Edit the visit</h3><form id="geF" class="stack"><div class="grid2">
           <div class="f"><label for="geD">Date</label><input type="date" id="geD" value="${pv.date}" required></div>
-          <div class="f"><label for="geT">Type</label><select id="geT">${TYPES.map(t => `<option${t === pv.type ? " selected" : ""}>${t}</option>`).join("")}</select></div>
+          <div class="f"><label for="geT">Type</label><select id="geT">${TYPES.map(t => `<option value="${t}"${t === pv.type ? " selected" : ""}>${VT(t)}</option>`).join("")}</select></div>
           <div class="f"><label for="geC">Crew (people)</label><input type="number" min="0" id="geC" value="${pv.est_crew ?? ""}"></div>
           <div class="f"><label for="geH">Hours on site</label><input type="number" min="0" step="0.5" id="geH" value="${pv.est_hours ?? ""}"></div></div>
         <div class="row"><button class="btn" type="submit">Save</button>${dv ? "" : `<button class="btn ghost" type="button" id="geRm">Remove the visit</button>`}<button class="btn ghost" type="button" data-close>Cancel</button></div></form>`);
@@ -188,13 +189,13 @@ window.ToolPlan = (function () {
     const box = document.createElement("div"); box.className = "g-pop"; box.setAttribute("role", "dialog"); box.setAttribute("aria-label", kind === "crew" ? "Crew and hours" : "Materials");
     const save = (fn, what) => { popOpen = {pv: pv.id, kind}; changePlan(s, p, clone(p.planned_visits).map(v => v.id === pv.id ? fn(clone(v)) : v), what, false); };
     if (kind === "crew") {
-      box.innerHTML = `<b>${esc(pv.type)} · ${esc(shortDate(pv.date))}</b><label class="l-lab">Crew (people) <input type="number" min="0" data-c value="${pv.est_crew ?? ""}" style="width:5rem"></label>
+      box.innerHTML = `<b>${esc(VT(pv.type))} · ${esc(shortDate(pv.date))}</b><label class="l-lab">Crew (people) <input type="number" min="0" data-c value="${pv.est_crew ?? ""}" style="width:5rem"></label>
         <label class="l-lab">Hours on site <input type="number" min="0" step="0.5" data-h value="${pv.est_hours ?? ""}" style="width:5rem"></label>
         <div class="row"><button class="btn sm" type="button" data-ok>Save</button><button class="btn ghost sm" type="button" data-x>Close</button></div>`;
       q("[data-ok]", box).onclick = () => { const n = sel => q(sel, box).value === "" ? null : +q(sel, box).value; popOpen = null; changePlan(s, p, clone(p.planned_visits).map(v => v.id === pv.id ? {...v, est_crew: n("[data-c]"), est_hours: n("[data-h]")} : v), `Crew and hours of the visit of ${pv.date} changed`, false); };
     } else {
       const m = pv.materials || [];
-      box.innerHTML = `<b>Materials · ${esc(pv.type)} · ${esc(shortDate(pv.date))}</b>
+      box.innerHTML = `<b>Materials · ${esc(VT(pv.type))} · ${esc(shortDate(pv.date))}</b>
         <ul class="g-matl">${m.map((x, i) => `<li><span>${esc(x.qty)} ${esc(x.unit || "")} ${esc(x.item)}${x.unit_cost ? ` · $${esc(x.unit_cost)} each` : ""}</span><button class="btn ghost sm" type="button" data-rm="${i}" aria-label="Remove ${esc(x.item)}">Remove</button></li>`).join("") || "<li class='l-src'>No materials yet.</li>"}</ul>
         <div class="g-matadd"><input data-mi="item" placeholder="Item" aria-label="Item"><input data-mi="qty" type="number" min="0" step="any" placeholder="Qty" aria-label="Quantity"><input data-mi="unit" placeholder="Unit" aria-label="Unit"><input data-mi="unit_cost" type="number" min="0" step="any" placeholder="$ each" aria-label="Unit cost"></div>
         <div class="row"><button class="btn sm" type="button" data-add>Add</button><button class="btn ghost sm" type="button" data-x>Close</button></div>`;
@@ -226,7 +227,7 @@ window.ToolPlan = (function () {
     const t = taskBy(k);
     if (!t) return "When needed";
     if (t.sys === "COR") return "Corrective";
-    return {"Spring visit": "Spring", "Pre-storm visit": "Pre-storm", "January review (office)": "January review", "After storms": "After storm"}[t.visit] || "When needed";
+    return {"Spring visit": "Spring", "Pre-storm visit": "Pre-storm", "January review (office)": "January review", "Post-storm visit": "After storm", "After storms": "After storm"}[t.visit] || "When needed";
   }
   /* click on a month cell in edit mode */
   function cellDlg(s, p, k, m, year) {
@@ -234,10 +235,10 @@ window.ToolPlan = (function () {
     const inMonth = p.planned_visits.filter(pv => +pv.date.slice(5, 7) - 1 === m), here = inMonth.filter(pv => visitHas(s, pv, k));
     const name = k[0] === "+" ? k.slice(1) : (taskBy(k) || {}).name || k;
     K().openDlg(`<h3>${esc(name)} · ${MON_LONG[m]} ${year}</h3>
-      ${here.length ? `<p>Scheduled on ${here.map(pv => `<b>${esc(pv.date)}</b> (${esc(pv.type)})`).join(", ")}.</p>` : ""}
+      ${here.length ? `<p>Scheduled on ${here.map(pv => `<b>${esc(pv.date)}</b> (${esc(VT(pv.type))})`).join(", ")}.</p>` : ""}
       <form id="gcF" class="stack">
         <div class="f"><label for="gcD">${here.length ? "Move it to" : "Which day?"}</label><input type="date" id="gcD" min="${first}" max="${lastD}" value="${here[0] ? here[0].date : (inMonth[0] ? inMonth[0].date : `${year}-${String(m + 1).padStart(2, "0")}-15`)}" required></div>
-        ${inMonth.length ? `<p class="l-src">Visits already planned this month: ${inMonth.map(pv => `${esc(pv.date)} (${esc(pv.type)})`).join(", ")}. Choose one of those days to do the task in the same visit.</p>` : ""}
+        ${inMonth.length ? `<p class="l-src">Visits already planned this month: ${inMonth.map(pv => `${esc(pv.date)} (${esc(VT(pv.type))})`).join(", ")}. Choose one of those days to do the task in the same visit.</p>` : ""}
         <div class="row"><button class="btn" type="submit">${here.length ? "Move" : "Schedule"}</button>${here.length ? `<button class="btn ghost" type="button" id="gcRm">Take it out of ${MON_LONG[m]}</button>` : ""}<button class="btn ghost" type="button" data-close>Cancel</button></div></form>`);
     q("#gcF").onsubmit = e => {
       e.preventDefault(); const day = q("#gcD").value; if (!day) return;
@@ -261,7 +262,7 @@ window.ToolPlan = (function () {
     return list.map(pv => { if (!ids.includes(pv.id)) return pv; pv.tasks = chosen(s.type, pv).filter(t => t !== k); pv.extra_tasks = pv.extra_tasks.filter(x => keyOf(x) !== k); return pv; })
                .filter(pv => FIXED.some(f => f[2] === pv.type) || pv.type === "Routine" || pv.type === "After storm" || chosen(s.type, pv).length || pv.extra_tasks.length);
   }
-  /* ================= Yearly plan: overview of all VTS (rows) by month ================= */
+  /* ================= Annual plan: overview of all VTS (rows) by month ================= */
   const SYM = {done: "✓", plan: "○", late: "!"}, WORD = {done: "Done", plan: "Planned", late: "Overdue"};
   function vStatus(s, pv) { return doneVisit(s, pv) ? "done" : pv.date < K().today() ? "late" : "plan"; }
   const chipOf = st => `<span class="o-key o-${st}"><span aria-hidden="true">${SYM[st]}</span> ${WORD[st]}</span>`;
@@ -280,14 +281,14 @@ window.ToolPlan = (function () {
       pvs.forEach(pv => {
         const st = vStatus(s, pv), c = estCost(pv), n = [...chosen(s.type, pv), ...pv.extra_tasks].length, m = +pv.date.slice(5, 7) - 1;
         count[st]++; monthCost[m] += c.total;
-        const sum = `${pv.type} visit · ${shortDate(pv.date)} · ${n} task${n === 1 ? "" : "s"} · ${rate() ? "estimated " + money(c.total) : "Set a labor rate to see the cost"}`;
+        const sum = `${VT(pv.type)} visit · ${shortDate(pv.date)} · ${n} task${n === 1 ? "" : "s"} · ${rate() ? "estimated " + money(c.total) : "Set a labor rate to see the cost"}`;
         cells[m].push(`<button type="button" class="o-chip o-${st}" data-site="${s.id}" data-pv="${pv.id}" aria-label="${esc(WORD[st] + ": " + sum)}"><span aria-hidden="true">${SYM[st]} ${+pv.date.slice(8)}</span><span class="o-tip" aria-hidden="true">${esc(WORD[st])} · ${esc(sum)}</span></button>`);
       });
-      extra.forEach(v => { count.done++; cells[+v.date.slice(5, 7) - 1].push(`<a class="o-chip o-done o-extra" href="#tool/visit/${v.id}" aria-label="${esc(`Done: ${v.type} visit · ${shortDate(v.date)} · not in the plan`)}"><span aria-hidden="true">✓ ${+v.date.slice(8)}</span><span class="o-tip" aria-hidden="true">Done · ${esc(v.type)} visit · ${esc(shortDate(v.date))} · not in the plan</span></a>`); });
+      extra.forEach(v => { count.done++; cells[+v.date.slice(5, 7) - 1].push(`<a class="o-chip o-done o-extra" href="#tool/visit/${v.id}" aria-label="${esc(`Done: ${VT(v.type)} visit · ${shortDate(v.date)} · not in the plan`)}"><span aria-hidden="true">✓ ${+v.date.slice(8)}</span><span class="o-tip" aria-hidden="true">Done · ${esc(VT(v.type))} visit · ${esc(shortDate(v.date))} · not in the plan</span></a>`); });
       rowsHtml += `<tr><th class="g-t" scope="row"><span class="sdot" style="background:${K().COLOR[s.type]}"></span><a href="#tool/vts/${s.id}">${esc(s.name)}</a><br><span class="l-src">${esc(K().NAME[s.type])}${p ? (p.status === "approved" ? " · approved" : " · draft") : ""}</span>
           ${p ? "" : `<br><a class="l-src" href="#tool/plan/${s.id}/${year}">No plan for ${year}. Create it →</a>`}</th>${cells.map(c => `<td class="o-c">${c.join("")}</td>`).join("")}</tr>`;
     });
-    K().view().innerHTML = `<div class="l-row"><h2 style="margin:0">Yearly plan</h2><span class="l-sp"></span>
+    K().view().innerHTML = `<div class="l-row"><h2 style="margin:0">Annual plan (F03)</h2><span class="l-sp"></span>
         <label class="l-lab">Year <select id="oYear">${years.map(y => `<option${y === year ? " selected" : ""}>${y}</option>`).join("")}</select></label>
         <label class="l-lab">Labor rate <input type="number" min="0" step="1" id="pRate" value="${rate() ?? ""}" placeholder="$ per person-hour" style="width:9rem"></label></div>
       <p class="t-intro">All your systems by month: ✓ done, ○ planned, ! overdue. Select a visit to open the plan of that system with the visit selected.</p>
@@ -335,12 +336,12 @@ window.ToolPlan = (function () {
     const mowTask = v.tasks_planned.some(t => /_T03$/.test(t) && /Vegetation Maintenance/.test((taskBy(t) || {}).name || ""));
     let sec = "";
     o.box().innerHTML = `
-      ${phone ? "" : `<p><a href="#tool/plan/${s.id}/${v.date.slice(0, 4)}">← Yearly plan</a> · <a href="#tool/visits">← Next visits</a></p>`}
+      ${phone ? "" : `<p><a href="#tool/plan/${s.id}/${v.date.slice(0, 4)}">← Annual plan</a> · <a href="#tool/visits">← Next visits</a></p>`}
       <div class="t-card"><div class="t-band" style="background:${K().COLOR[s.type]}"><span>Visit Sheet · ${esc(s.type)}_F04</span><span class="l-sp"></span><span class="l-chip y">${phone ? "On this phone" : "Draft"}</span></div>
       <form id="vf" class="t-head stack" novalidate>
         <h2 class="l-title" style="margin:0">${esc(s.name)}</h2>
         <div class="grid3"><div class="f"><label>Date</label><input type="date" name="date" value="${v.date}"></div>
-          <div class="f"><label>Visit type</label><select name="type">${TYPES.map(t => `<option${t === v.type ? " selected" : ""}>${t}</option>`).join("")}</select></div>
+          <div class="f"><label>Visit type</label><select name="type">${TYPES.map(t => `<option value="${t}"${t === v.type ? " selected" : ""}>${VT(t)}</option>`).join("")}</select></div>
           <div class="f"><label>Last rain (date, inches)</label><div class="l-row"><input type="date" name="rain_date" value="${v.last_rain?.date || ""}" style="flex:1"><input type="number" step="0.1" min="0" name="rain_in" value="${v.last_rain?.amount_in ?? ""}" style="width:6rem" aria-label="Rain amount, inches"></div></div></div>
         ${ON_SITE.includes(v.type) ? `<fieldset><legend>Did water reach the inlet and move through the whole system, with no shortcuts?</legend>${yn("water_at_inlet", f.water_at_inlet)}</fieldset>` : ""}
         <fieldset><legend>Tasks of this visit (mark what was done)</legend>${v.tasks_planned.map(t => `<label class="check"><input type="checkbox" name="task" value="${esc(t)}"${v.tasks_done.includes(t) ? " checked" : ""}> ${t[0] === "+" ? `<span class="l-chip y">Extra</span> ${esc(t.slice(1))}` : taskLink(t)}</label>`).join("") || '<p class="l-src">No tasks planned.</p>'}</fieldset>
@@ -464,9 +465,9 @@ window.ToolPlan = (function () {
     const lab = v.type === "Spring" && nitrateSys(s.type) ? St.data.laboratory_samples.find(l => l.site === s.id && l.year === +v.date.slice(0, 4)) : null;
     const fields = [["crew_size", "Crew size", v.crew_size], ["hours_on_site", "Hours on site", v.hours_on_site], ["notes", "Notes", v.notes]];
     K().view().innerHTML = `
-      <p><a href="#tool/plan/${s.id}/${v.date.slice(0, 4)}">← Yearly plan</a></p>
+      <p><a href="#tool/plan/${s.id}/${v.date.slice(0, 4)}">← Annual plan</a></p>
       <div class="t-card"><div class="t-band" style="background:${K().COLOR[s.type]}"><span>Visit Sheet · ${esc(s.type)}_F04</span><span class="l-sp"></span><span class="l-chip g">Closed ${esc(v.sign_off?.date || "")}</span></div>
-      <div class="t-head stack"><h2 class="l-title" style="margin:0">${esc(s.name)}</h2><p class="muted">${esc(v.date)} · ${esc(v.type)}${v.last_rain ? ` · last rain ${esc(v.last_rain.date)}, ${v.last_rain.amount_in} in` : ""}</p>
+      <div class="t-head stack"><h2 class="l-title" style="margin:0">${esc(s.name)}</h2><p class="muted">${esc(v.date)} · ${esc(VT(v.type))}${v.last_rain ? ` · last rain ${esc(v.last_rain.date)}, ${v.last_rain.amount_in} in` : ""}</p>
         <p class="l-src">A closed visit is not overwritten. Each correction asks for a reason and stays in the change history.</p>
         <table class="t-kv">${fields.map(([k, n, x]) => `<tr><th>${n}</th><td>${x === null || x === "" || x === undefined ? '<span class="muted">Not recorded</span>' : esc(x)} <button class="btn ghost sm" type="button" data-fix="${k}">Correct</button></td></tr>`).join("")}
           <tr><th>Tasks done</th><td>${(v.tasks_done || []).map(t => t[0] === "+" ? esc(t.slice(1)) : taskLink(t)).join("<br>") || "None marked"}</td></tr>
@@ -576,12 +577,12 @@ window.ToolPlan = (function () {
           <div class="scroll"><table class="c-tab"><thead><tr><th>Date</th><th>VTS</th><th>Visit</th><th>Tasks</th><th>Who</th><th>Status</th><th><span class="vh">Actions</span></th></tr></thead><tbody>
             ${list.map(x => { const tasks = [...chosen(x.s.type, x.pv), ...x.pv.extra_tasks.map(e => e.task || "+" + e.text)];
               return `<tr><td>${esc(shortDate(x.pv.date))}<br><span class="l-src">${esc(x.pv.date.slice(0, 4))}</span></td><td><span class="sdot" style="background:${K().COLOR[x.s.type]}"></span><a href="#tool/vts/${x.s.id}">${esc(x.s.name)}</a></td>
-                <td>${esc(x.pv.type)}${x.p.status === "draft" ? '<br><span class="l-src">plan still a draft</span>' : ""}</td>
+                <td>${esc(VT(x.pv.type))}${x.p.status === "draft" ? '<br><span class="l-src">plan still a draft</span>' : ""}</td>
                 <td><details><summary>${tasks.length} task${tasks.length === 1 ? "" : "s"}</summary><ul class="t-tasks">${tasks.map(k => `<li>${k[0] === "+" ? esc(k.slice(1)) : taskLink(k)}</li>`).join("")}</ul></details></td>
                 <td><span class="l-src">Not assigned</span></td>
                 <td><span class="o-key ${x.status === "Overdue" ? "o-late" : x.status === "In progress" ? "o-prog" : "o-plan"}">${x.status === "Overdue" ? '<span aria-hidden="true">!</span> ' : ""}${x.status}</span></td>
                 <td><div class="row" style="gap:.4rem"><button class="btn sm" type="button" data-open="${x.pv.id}">${x.rec ? "Continue the Visit Sheet" : "Open the Visit Sheet"}</button><button class="btn ghost sm" type="button" data-send="${x.pv.id}">Send to phone</button></div></td></tr>`; }).join("")
-              || `<tr><td colspan="7">${cal.day ? "No open visits that day." : "No visits in the next four months."} <a href="#tool/plan">See the yearly plan</a>.</td></tr>`}
+              || `<tr><td colspan="7">${cal.day ? "No open visits that day." : "No visits in the next four months."} <a href="#tool/plan">See the annual plan</a>.</td></tr>`}
           </tbody></table></div>
           <p class="l-src">"Who" stays empty until visits can be assigned to a person or crew.</p></div></div>`;
     q("#nSite").onchange = e => { cal.day = null; next(e.target.value); };
@@ -614,13 +615,13 @@ window.ToolPlan = (function () {
     const all = St.data.visits.filter(v => !sheetSite || v.site === sheetSite).slice()
       .sort((a, b) => (a.status === "closed") - (b.status === "closed") || b.date.localeCompare(a.date));
     const open = all.filter(v => v.status !== "closed").length;
-    K().view().innerHTML = `<div class="l-row"><h2 style="margin:0">Visit Sheets</h2><span class="l-sp"></span>
+    K().view().innerHTML = `<div class="l-row"><h2 style="margin:0">Visit Sheets (F04)</h2><span class="l-sp"></span>
         <label class="l-lab">VTS <select id="vsSite"><option value="">All</option>${St.sites().map(s => `<option value="${s.id}"${s.id === sheetSite ? " selected" : ""}>${esc(s.name)}</option>`).join("")}</select></label></div>
       <p class="t-intro">The record of each visit: open ones first. A visit counts in the reports only once it is closed.</p>
-      <p class="l-src">${open} open, ${all.length - open} closed. Start a new Visit Sheet from Next visits or from a visit in the Yearly plan.</p>
+      <p class="l-src">${open} open, ${all.length - open} closed. Start a new Visit Sheet from Next visits or from a visit in the Annual plan.</p>
       <div class="scroll"><table><thead><tr><th>Date</th><th>VTS</th><th>Visit</th><th>Tasks done</th><th>Status</th><th><span class="vh">Open</span></th></tr></thead><tbody>
         ${all.map(v => { const s = St.site(v.site) || {name: v.site, type: "SB"}, closed = v.status === "closed";
-          return `<tr><td>${esc(v.date)}</td><td><span class="sdot" style="background:${K().COLOR[s.type]}"></span>${esc(s.name)}</td><td>${esc(v.type)}</td>
+          return `<tr><td>${esc(v.date)}</td><td><span class="sdot" style="background:${K().COLOR[s.type]}"></span>${esc(s.name)}</td><td>${esc(VT(v.type))}</td>
             <td>${(v.tasks_done || []).length} of ${(v.tasks_planned || []).length || "—"}</td>
             <td>${closed ? `<span class="o-key o-done"><span aria-hidden="true">✓</span> Closed</span>` : `<span class="o-key o-prog">Open</span>`}</td>
             <td><a href="#tool/visit/${v.id}">${closed ? "See the Visit Sheet" : "Continue the Visit Sheet"} →</a></td></tr>`; }).join("") || `<tr><td colspan="6">No Visit Sheets yet.</td></tr>`}
@@ -637,7 +638,7 @@ window.ToolPlan = (function () {
   function linkFor(s, v) { return location.href.split("#")[0] + "#phone/" + b64e(JSON.stringify(payload(s, v))); }
   function sendDlg(s, v) {
     const url = linkFor(s, v);
-    K().openDlg(`<h3>Send to phone</h3><p>${esc(s.name)} · ${esc(v.type)} visit · ${esc(v.date)}</p>
+    K().openDlg(`<h3>Send to phone</h3><p>${esc(s.name)} · ${esc(VT(v.type))} visit · ${esc(v.date)}</p>
       <div class="t-qr" id="sQr" aria-label="QR code with the link"></div>
       <div class="f"><label for="sUrl">Link for the operator's phone</label><input id="sUrl" readonly value="${esc(url)}"></div>
       <div class="row"><button class="btn sm" type="button" id="sCopy">Copy link</button>${navigator.share ? `<button class="btn ghost sm" type="button" id="sShare">Share…</button>` : ""}<a class="btn ghost sm" href="${esc(url)}" target="_blank" rel="noopener">Open it here</a></div>
@@ -645,7 +646,7 @@ window.ToolPlan = (function () {
         Answers stay on that phone until the operator taps "Finish and send back" and sends you the results file; then use "Import results from the phone" on this Visit Sheet.</p>`);
     q("#sUrl").onfocus = e => e.target.select();
     q("#sCopy").onclick = async () => { try { await navigator.clipboard.writeText(url); q("#sCopy").textContent = "Copied"; } catch (e) { q("#sUrl").select(); document.execCommand("copy"); q("#sCopy").textContent = "Copied"; } };
-    if (q("#sShare")) q("#sShare").onclick = () => navigator.share({title: `Visit Sheet: ${s.name}`, text: `${v.type} visit on ${v.date}`, url}).catch(() => {});
+    if (q("#sShare")) q("#sShare").onclick = () => navigator.share({title: `Visit Sheet: ${s.name}`, text: `${VT(v.type)} visit on ${v.date}`, url}).catch(() => {});
     qr(q("#sQr"), url);
   }
   function qr(box, url) {
@@ -699,7 +700,7 @@ window.ToolPlan = (function () {
   /* ================= Corrective Maintenance Log (F05), interactive ================= */
   const COR_T04_ACTIONS = ["filled an inactive burrow", "reduced cover near the berm", "stopped work (nest or possible protected species)", "passed to the supervisor"];
   const STATUS_CHIP = {open: "y", escalated: "r", resolved: "g"};
-  /* ================= Maintenance log: Site History (F06) and Corrective Maintenance Log (F05) in one table ================= */
+  /* ================= Site History: Site History (F06) and Corrective Maintenance Log (F05) in one table ================= */
   const LOGF = {kind: "all", site: "", year: "", status: "", open: null};
   const VSTAT = {done: "Done", extra: "Done", noplan: "Done", missed: "Missed", planned: "Planned"};
   const SYMS = {Done: ["✓", "o-done"], Planned: ["○", "o-plan"], Missed: ["!", "o-late"], Open: ["○", "o-prog"], Escalated: ["!", "o-late"], Resolved: ["✓", "o-done"]};
@@ -724,7 +725,7 @@ window.ToolPlan = (function () {
     const years = [...new Set(all.map(r => r.date.slice(0, 4)))].sort().reverse();
     const sts = Object.keys(SYMS).filter(t => base.some(r => r.status === t));
     const nPrev = list.filter(r => r.kind === "Preventive").length, nCor = list.length - nPrev;
-    K().view().innerHTML = `<div class="l-row"><h2 style="margin:0">Maintenance log</h2><span class="l-sp"></span><button class="btn" type="button" id="cNew">Add a finding</button></div>
+    K().view().innerHTML = `<div class="l-row"><h2 style="margin:0">Site History (F06)</h2><span class="l-sp"></span><button class="btn" type="button" id="cNew">Add a finding</button></div>
       <p class="t-intro">Everything that was done or found: planned visits and repairs in one table. Filter by kind, system or year, and download it.</p>
       <p class="l-src">Site History (F06) and Corrective Maintenance Log (F05) in one table.</p>
       <div class="l-row lg-filters">
@@ -763,7 +764,7 @@ window.ToolPlan = (function () {
     const s = St.site(c.site) || {name: c.site, type: "SB"}, t = c.task && taskBy(c.task), v = c.visit && St.visit(c.visit);
     return `<div class="t-cor ${c.status}"><div class="l-row"><span class="sdot" style="background:${K().COLOR[s.type]}"></span><b>${esc(s.name)}</b><span class="l-sp"></span><span class="l-chip ${STATUS_CHIP[c.status] || ""}">${esc(c.status)}</span></div>
       <p class="t-corf">${esc(c.finding)}</p>
-      <p class="l-src">Found ${esc(c.date)}${c.location ? " · " + esc(c.location) : ""}${c.urgency ? " · urgency: " + esc(c.urgency) : ""}${v ? ` · <a href="#tool/visit/${v.id}">from the ${esc(v.type)} visit</a>` : ""}</p>
+      <p class="l-src">Found ${esc(c.date)}${c.location ? " · " + esc(c.location) : ""}${c.urgency ? " · urgency: " + esc(c.urgency) : ""}${v ? ` · <a href="#tool/visit/${v.id}">from the ${esc(VT(v.type))} visit</a>` : ""}</p>
       ${t ? `<p>Task: <a href="#learn/task/${t.id}">${esc(t.name)}</a> <span class="l-src">${t.id}</span></p>` : ""}
       ${c.scheduled ? `<p><span class="l-chip">Scheduled ${esc(c.scheduled.date)}</span> <a href="#tool/plan/${c.site}/${c.scheduled.date.slice(0, 4)}">see the plan</a></p>` : ""}
       ${c.action_taken ? `<p><b>Action:</b> ${esc(c.action_taken)}${c.resolved_date ? ` <span class="l-src">(${esc(c.resolved_date)})</span>` : ""}</p>` : ""}
@@ -777,7 +778,7 @@ window.ToolPlan = (function () {
     K().openDlg(`<h3>Schedule the repair</h3><p>${esc(c.finding)}</p><form id="scF" class="stack">
       <div class="grid2"><div class="f"><label for="scD">Day</label><input type="date" id="scD" required value="${c.scheduled ? c.scheduled.date : K().today()}"></div>
         <div class="f"><label for="scT">Task</label><select id="scT">${cors.map(t => `<option value="${t.id}"${t.id === c.task ? " selected" : ""}>${esc(t.id + " " + t.name)}</option>`).join("")}<option value="+"${!c.task ? " selected" : ""}>Another task (the finding)</option></select></div></div>
-      <p class="l-src">It is added to the yearly plan of ${esc(s.name)} on that day (a new Corrective visit, or the visit already planned that day) and shows in Next visits.</p>
+      <p class="l-src">It is added to the annual plan of ${esc(s.name)} on that day (a new Corrective visit, or the visit already planned that day) and shows in Next visits.</p>
       <div class="row"><button class="btn" type="submit">Schedule</button><button class="btn ghost" type="button" data-close>Cancel</button></div></form>`);
     q("#scF").onsubmit = e => {
       e.preventDefault(); const day = q("#scD").value; if (!day) return;
