@@ -76,7 +76,7 @@
     ["January review (office)", "January review", "January, in the office", t => t.visit === "January review (office)", [0]],
     ["Spring visit", "Spring visit", "April", t => t.visit === "Spring visit", [3]],
     ["Pre-storm visit", "Pre-storm visit", "August", t => t.visit === "Pre-storm visit", [7]],
-    ["After storms", "After storms", "October to April, within 48 hours", t => t.freq.some(f => /^After storm/i.test(f)), RAINY],
+    ["After storms", "After storms", "October to April, within 48 hours", t => t.freq.some(f => /^(After storm|Post-storm)/i.test(f)), RAINY],
     ["When needed", "When needed", "No fixed month", t => t.visit === "When needed", null]];
   const HOW = {SB: ["Water comes in muddy", "Soil settles", "Clearer water leaves"], VD: ["Plants slow the water", "Roots and stems hold soil", "Water moves on"],
     WB: ["Nitrate-rich water enters the buried woodchips", "Microbes turn nitrate into nitrogen gas", "Water leaves with less nitrate"], TW: ["Water spreads and slows", "Plants and microbes work", "Water leaves"]};
@@ -87,7 +87,7 @@
     if (manual.last !== s) { visF = "all"; partSel = null; howStep = 0; manual.last = s; }
     const ts = L.tasks.filter(t => t.sys === s).sort((a, b) => a.no - b.no);
     const own = L.topics.filter(t => t.sys === s), general = L.topics.filter(t => !t.sys || t.sys === "General" || t.sys === "ALL");
-    const tlist = ts_ => ts_.map(t => `<p class="l-li"><a href="#learn/topic/${t.id}">${esc(t.title)}</a></p>`).join("");
+    const tlist = ts_ => ts_.map(t => `<p class="l-li"><a href="#learn/topic/${t.id}">${t.num ? `<span class="l-src">${esc(t.num)}</span> ` : ""}${esc(t.title)}</a></p>`).join("");
     const sheet = L.downloads.find(d => d.code === `${s}_F04`), parts = (L.parts || {})[s] || [];
     const vis = VISITS.filter(v => ts.some(v[3]));
     view().innerHTML = `
@@ -204,7 +204,7 @@
       <div class="l-two">
         <div>${t.flow ? `<figure class="l-flow">${t.flow}<figcaption class="l-src">Steps to ${esc(t.name.toLowerCase())}.</figcaption></figure>` : ""}
           <div class="l-box"><b>Steps</b><div><ol class="l-steps">${steps}</ol></div></div></div>
-        <div>${g && g.by[t.sys] ? box("In this system", g.by[t.sys]) : ""}${box("Responsibilities", t.resp)}${box("Safety", t.safety)}${box("Waste handling", t.waste)}${box("Escalation", t.esc, true)}${box("Notes", t.notes)}
+        <div>${box("Responsibilities", t.resp)}${g && g.by[t.sys] ? box("In this system", g.by[t.sys]) : ""}${box("Safety", t.safety)}${box("Waste handling", t.waste)}${box("Notes", t.notes)}${box("Escalation", t.esc, true)}
           ${items.length ? box("Visit Sheet items that send you here", "<ul>" + items.map(i => `<li>${esc(i.q)} <span class="l-src">${i.id}</span></li>`).join("") + "</ul>") : ""}
           ${t.basis.length ? `<p class="l-src"><b>Basis:</b> ${t.basis.map(esc).join("; ")}</p>` : ""}</div>
       </div>
@@ -223,7 +223,7 @@
   /* ---------- one topic ---------- */
   function topic(id) {
     const t = L.topics.find(x => x.id === id);
-    view().innerHTML = t ? `<p><a href="#learn/manual/SB">← Manual</a></p><h2 class="l-title">${esc(t.title)}</h2><div class="l-body">${t.html}</div>`
+    view().innerHTML = t ? `<p><a href="#learn/manual/SB">← Manual</a></p><h2 class="l-title">${t.num && t.num !== "0" ? esc(t.num) + " " : ""}${esc(t.title)}</h2><div class="l-body">${t.html}</div>`
                          : `<p>Topic not found. <a href="#learn/manual/SB">Back to the manual</a></p>`;
   }
 

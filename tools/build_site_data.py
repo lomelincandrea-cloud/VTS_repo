@@ -25,7 +25,7 @@ DOCS = ROOT / "docs"
 sys.path.insert(0, str(MB))
 import flows  # noqa: E402
 
-VISIT_ORDER = ["Routine visit", "After storms", "Spring visit", "Pre-storm visit", "January review (office)", "When needed", "Corrective"]
+VISIT_ORDER = ["Routine visit", "Post-storm visit", "Spring visit", "Pre-storm visit", "January review (office)", "When needed", "Corrective"]
 SYS_NAME = {"SB": "Sediment basin", "TW": "Treatment wetland", "VD": "Vegetated ditch", "WB": "Woodchip bioreactor", "COR": "Corrective maintenance"}
 S = lambda v: "" if v is None else str(v).strip()
 
@@ -115,16 +115,42 @@ def figure(im, caption):
             shutil.copy(f, IMG_OUT / f.name)
             return f'<figure><img src="img/manual/{f.name}" alt="{html.escape(caption)}" loading="lazy"><figcaption>{html.escape(caption)}</figcaption></figure>'
     return ""
+SED_WHEN = "Once a year and when needed: best after the storm season, around April, only if the post-storm visits show it is needed. Make sure basins have capacity before October 1."
 def visits_table():
     g = {v: {} for v in VISIT_ORDER}
     for t in tasks:
         if t["visit"] in g: g[t["visit"]].setdefault(t["name"], []).append(t)
+        if t["visit"] == "Routine visit" and t["name"].startswith("Routine Visual Inspection"): g["Post-storm visit"].setdefault(t["name"] + " (items marked A)", []).append(t)
     body = "".join(f"<tr><td>{v}</td><td>" + "<br>".join(f'<a href="#learn/task/{ts[0]["id"]}">{html.escape(n)}</a> <small>({", ".join(x["sys"] for x in ts)})</small>' for n, ts in g[v].items()) + "</td></tr>" for v in VISIT_ORDER if g[v])
     return f"<table><thead><tr><th>Visit</th><th>Tasks</th></tr></thead><tbody>{body}</tbody></table>"
 def system_table(sysid):
-    body = "".join(f"<tr><td>{v}</td><td>" + "<br>".join(f'<a href="#learn/task/{t["id"]}">{html.escape(t["name"])}</a>' for t in tasks if t["sys"] == sysid and t["visit"] == v) + "</td></tr>"
-                   for v in VISIT_ORDER if any(t["sys"] == sysid and t["visit"] == v for t in tasks))
+    """Tasks of one system by visit, as in the manual (2.2, 2.4, 2.6, 2.8): post-storm visit, and sediment removal as its own conditional row."""
+    link = lambda t: f'<a href="#learn/task/{t["id"]}">{html.escape(t["name"])}</a>'
+    own = [t for t in tasks if t["sys"] == sysid]
+    sed = [t for t in own if t["name"].startswith("Sediment Removal")]
+    rows = []
+    for v in VISIT_ORDER:
+        ts = [t for t in own if t["visit"] == v and t not in sed]
+        if v == "Post-storm visit": ts = [t for t in own if t["visit"] == "Routine visit" and t["name"].startswith("Routine Visual Inspection")]
+        if ts: rows.append(f"<tr><td>{v}</td><td>" + "<br>".join(link(t) for t in ts) + "</td></tr>")
+        if v == "When needed" and sed: rows.append(f"<tr><td>Sediment removal</td><td>{link(sed[0])}<br><small>{SED_WHEN}</small></td></tr>")
+        if v == "When needed" and sysid == "WB": rows.append("<tr><td>Sediment check</td><td>At every routine visit: check that sediment is not entering the bioreactor (inlet box and woodchip surface). If you see sediment, tell the supervisor.</td></tr>")
+    body = "".join(rows)
     return f"<table><thead><tr><th>Visit</th><th>Tasks</th></tr></thead><tbody>{body}</tbody></table>"
+# the manual's order and numbering (sheet Manual_Order): 0 About; 1.1-1.6; 2.1-2.8; 4 Corrective with its tasks, 4.4, 4.5
+MO = [(S(r["Item type"]), S(r["Ref"])) for r in rows(wb, "Manual_Order")]
+NUM, ch, sub = {}, None, 0
+for typ, ref in MO:
+    if typ == "Separator" and ref.startswith("Divider - Systems"): ch, sub = "2", 0
+    elif typ == "Separator" and ref.startswith("Divider - Tasks"): ch, sub = "3", 0
+    elif typ == "Topic":
+        if ref == "TOP-01": NUM[ref] = "0"; continue
+        if ref == "TOP-02": ch, sub = "1", 0
+        if ref == "TOP-16": ch, sub = "4", 0; NUM[ref] = "4"; continue
+        sub += 1; NUM[ref] = f"{ch}.{sub}"
+    elif typ == "Task" and ch == "4": sub += 1
+ORDER = {ref: i for i, (typ, ref) in enumerate(MO) if typ == "Topic"}
+TOP = sorted(TOP, key=lambda r: ORDER.get(S(r["Topic ID"]), 999))
 topics = []
 for tp in TOP:
     tid = S(tp["Topic ID"]); parts = [f'<div class="intro">{md(tp["Intro"])}</div>'] if S(tp["Intro"]) else []
@@ -142,7 +168,7 @@ for tp in TOP:
             if S(sc["Table data"]): parts.append(md(sc["Table data"]))
             continue
         if tx: parts.append(md(tx))
-    topics.append({"id": tid, "title": TOPN[tid], "sys": S(tp["System"]), "html": "".join(p for p in parts if p)})
+    topics.append({"id": tid, "num": NUM.get(tid, ""), "title": TOPN[tid], "sys": S(tp["System"]), "html": "".join(p for p in parts if p)})
 
 # ---------------- checklist and site conditions (also used by the Tool)
 checklist = [{"id": S(r["Item ID"]), "sys": S(r["System"]), "sec": S(r["Section"]), "q": S(r["Question"]), "look": S(r["Look for"]), "normal": S(r["Normal looks like"]),
