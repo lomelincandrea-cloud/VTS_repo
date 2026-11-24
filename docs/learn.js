@@ -18,11 +18,11 @@
   const dlg = () => q("#learnDlg");
   function openDlg(html) { dlg().innerHTML = `<div class="l-sheet"><button class="btn ghost sm l-x" type="button" aria-label="Close">Close</button>${html}</div>`; q(".l-x", dlg()).onclick = () => dlg().close(); dlg().showModal(); }
 
+  /* two tabs: Read online (the manual, the Field Guide) and Download documents (files, materials, sample reports) */
   function tabs(cur) {
-    qa("#learnTabs a").forEach(a => a.dataset.t === cur ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current"));
-    q("#learnMaterials").hidden = !(cur === "materials" || cur === "landing"); view().hidden = cur === "materials";
-    /* "How to use Learn" only on the landing page and on All materials */
-    const g = q("#learnGuide"); if (g) g.hidden = !(cur === "landing" || cur === "materials");
+    const tab = ["downloads", "materials"].includes(cur) ? "docs" : "read";
+    qa("#learnTabs a").forEach(a => a.dataset.t === tab ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current"));
+    q("#learnMaterials").hidden = tab !== "docs"; view().hidden = false;
   }
   const label = k => `<span class="l-mod l-mod-${k.toLowerCase().replace(/ /g, "")}">${esc(k)}</span>`;
 
@@ -34,34 +34,24 @@
     else if (which === "task") task(a);
     else if (which === "topic") topic(a);
     else if (which === "plants") plants();
-    else if (which === "downloads") downloads();
-    else if (which === "materials") {}
+    else if (which === "downloads" || which === "materials") downloads();
+    else if (which === "fieldguide") fieldGuide(a);
     else manual(a);
   };
 
   /* ---------- Learn landing: four doors, the maintenance cycle, Field Guide ---------- */
   const IP = chip("In progress", "y");
   function landing() {
-    const sheet = L.downloads.filter(d => /_F04$/.test(d.code)), natives = L.plants.filter(p => p.status === "Native").length;
-    const doors = [
-      ["Plan", "Plan a system", "For landowners and growers thinking about installing one.", [
-        [`<a href="#start">Which system fits →</a>`], [`<a href="#start">Where should it go →</a>`], [`Cost ranges ${IP}`], [`Permits to check ${IP}`]]],
-      ["Maintain", "Maintain a system", "For crews, irrigators and supervisors who look after one.", [
-        [`<a href="#lcycle" data-jump="lcycle">The maintenance cycle, step by step →</a>`], ...MAIN.map(k => [`<a href="#learn/manual/${k}">${esc(L.systems[k])}: parts, year and tasks →</a>`])],
-        `${L.tasks.length} tasks · ${L.checklist.length} checklist items`],
-      ["Food safety", "Food safety", "For growers and food safety staff who show the record to an auditor.", [
-        [`<a href="#report/food-safety/sample">Sample Food Safety Record →</a> · <a href="downloads/Sample_Food_Safety_Record_vegetated_ditch.pdf" download>PDF</a>`], [`<a href="#report/water-summary/sample">Sample Water Quality and Maintenance Summary →</a>`], [`<a href="downloads/VD_F04_visual_inspection_checklist.xlsx" download>Blank Visit Sheet (Excel)</a>`], [`<a href="#tool/dashboard">Dashboard and reports in the Tool →</a>`]]],
-      ["Plants", "Plants and tools", "For anyone choosing plants or looking for a form.", [
-        [`<a href="#learn/plants">Field Guide: find a plant →</a>`], [`<a href="#learn/downloads">Downloads →</a>`], [`<a href="#learn/materials">All materials →</a>`]],
-        `${natives} native plants · ${L.downloads.length} downloads`]];
     view().innerHTML = `
-      <p class="l-start"><b>New to this?</b> Begin with <a href="#start">Which system fits</a>.</p>
-      <div class="l-doors">${doors.map(([k, t, who, items, count]) => `<section class="l-door" aria-labelledby="ld-${k}">${label(k)}<h2 id="ld-${k}">${esc(t)}</h2><p>${esc(who)}</p>
-        <p class="l-src">${count || `${items.length} item${items.length === 1 ? "" : "s"}`}</p><ul class="plain">${items.map(i => `<li>${i[0]}</li>`).join("")}</ul></section>`).join("")}</div>
-      <section class="stack" id="lcycle" aria-labelledby="lcycleT"><h2 id="lcycleT">The maintenance cycle</h2>
-        <p class="muted">Where each step lives on this site. The cycle starts again every January.</p>
-        <ol class="l-cycle">${CYCLE.map(([n, t, w, href, where], i) => `<li><a class="l-cstep" href="${href}"><span class="l-cn">${i + 1}</span><b>${esc(t)}</b><span>${esc(w)}</span><span class="l-cw">${esc(where)} →</span></a></li>`).join("")}</ol></section>
-      <a class="l-feat" href="#learn/plants">${label("Plants")}<b>Field Guide: find a plant</b><span>Drag the seedling along the bank to a zone, then filter. ${natives} native plants, with how to recognize each one.</span></a>`;
+      <div class="l-entry" id="lmancard">
+        <a class="l-big" href="#learn/manual/SB"><span class="l-bigi" aria-hidden="true">${ico("book")}</span><b>Operation and Maintenance Manual</b><span>How to look after each system, task by task.</span><span class="btn l-ybtn">Start here →</span></a>
+        <a class="l-big" href="#learn/fieldguide"><span class="l-bigi" aria-hidden="true">${ico("leaf")}</span><b>Field Guide</b><span>Plants, signs of problems and parts of a system.</span><span class="btn l-ybtn">Browse →</span></a></div>
+      <p class="l-guide">New here? <a href="#lmancard" data-jump="lmancard">Start with the manual →</a></p>
+      ${wheelBlock(null, wSel)}
+      <div id="wTasks">${wheelTasks(wSel)}</div>
+      <section class="stack" id="lcycle" aria-labelledby="lcycleT"><h2 id="lcycleT" class="l-h">How the record works</h2>
+        <ol class="l-cycle l-cyc-s">${CYCLE.map(([n, t, w, href, where], i) => `<li><a class="l-cstep" href="${href}"><span class="l-cn">${i + 1}</span><b>${esc(t)}</b><span class="l-cw">${esc(where)} →</span></a></li>`).join("")}</ol></section>`;
+    wireWheel(k => { wSel = k; const y = window.scrollY; landing(); window.scrollTo(0, y); const g = q(`.w-seg[data-w="${k}"]`) || q("#wT"); if (g) g.focus({preventScroll: true}); });
     qa("[data-jump]").forEach(x => x.onclick = e => { e.preventDefault(); const t = q("#" + x.dataset.jump); t.scrollIntoView({block: "start"}); t.setAttribute("tabindex", "-1"); t.focus({preventScroll: true}); });
   }
   const CYCLE = [["1", "Plan", "January, in the office", "#tool/plan", "Annual plan in the Tool"],
@@ -69,6 +59,111 @@
     ["3", "Look and recognize", "Every visit", "#learn/plants", "Field Guide"],
     ["4", "Fix", "Quick fix or scheduled repair", "#learn/topic/TOP-16", "Corrective Maintenance"],
     ["5", "Record and review", "After every visit and in January", "#tool/vts", "Site History in the Tool"]];
+
+
+  /* ================= R8.7: Read online · the wheel of the year · the Field Guide complete ================= */
+  /* the wheel: one drawing of the year. Segments are buttons that filter the tasks below it (keyboard: Tab, Enter or Space). */
+  const WSEG = {
+    jan: ["January review (office)", "January, in the office", t => t.visit === "January review (office)"],
+    spring: ["Spring visit", "April", t => t.visit === "Spring visit"],
+    pre: ["Pre-storm visit", "August", t => t.visit === "Pre-storm visit"],
+    post: ["Post-storm visit", "October 1 to April 30: within 48 hours after 0.5 in of rain or more in 24 hours. A visual check", t => t.freq.some(f => /^(After storm|Post-storm)/i.test(f))],
+    sed: ["Sediment removal", "Once a year and when needed: best after the storm season, around April, only if the post-storm visit shows it is needed. Make sure basins have capacity before October 1.", t => /^Sediment Removal/.test(t.name)],
+    routine: ["Routine visit", "At every scheduled visit", t => t.visit === "Routine visit"],
+    needed: ["When needed", "No fixed month: planned when an inspection or a measurement calls for it", t => t.visit === "When needed"]};
+  function wheelSvg(sys, sel) {
+    const C = 220, R0 = 112, R1 = 150, rad = m => (-90 + m * 30) * Math.PI / 180, pt = (r, m) => [C + r * Math.cos(rad(m)), C + r * Math.sin(rad(m))];
+    const f = n => n.toFixed(1);
+    const sector = (r0, r1, m0, m1) => { const [a, b] = pt(r1, m0), [c, d] = pt(r1, m1), [e, g] = pt(r0, m1), [h, i] = pt(r0, m0), big = (m1 - m0) * 30 > 180 ? 1 : 0;
+      return `M${f(a)} ${f(b)}A${r1} ${r1} 0 ${big} 1 ${f(c)} ${f(d)}L${f(e)} ${f(g)}A${r0} ${r0} 0 ${big} 0 ${f(h)} ${f(i)}Z`; };
+    const on = k => sel === k ? " on" : "", btn = (k, label, inner) => `<g class="w-seg${on(k)}" data-w="${k}" role="button" tabindex="0" aria-pressed="${sel === k}" aria-label="${esc(label)}">${inner}</g>`;
+    const s = [];
+    s.push(`<path d="${sector(R0, R1, 9, 16)}" class="w-rain"/>`);   /* rainy season, October 1 to April 30 */
+    MONTHS.forEach((m, i) => { const [x1, y1] = pt(R0, i), [x2, y2] = pt(R1, i), [tx, ty] = pt((R0 + R1) / 2, i + .5);
+      s.push(`<line x1="${f(x1)}" y1="${f(y1)}" x2="${f(x2)}" y2="${f(y2)}" class="w-tick"/><text x="${f(tx)}" y="${f(ty + 4)}" class="w-mon" text-anchor="middle">${m}</text>`); });
+    s.push(`<circle cx="${C}" cy="${C}" r="${R1}" class="w-edge"/><circle cx="${C}" cy="${C}" r="${R0}" class="w-edge"/>`);
+    [1.5, 4.5, 7.5, 10.5].forEach(m => { const [x, y] = pt(R1 + 3, m), a = -90 + m * 30 + 90;   /* clockwise arrows */
+      s.push(`<path d="M-6 -5L6 0L-6 5Z" class="w-arrow" transform="translate(${f(x)} ${f(y)}) rotate(${a})"/>`); });
+    /* post-storm visit: a band over the storm season, up to April 30 */
+    const [plx, ply] = pt(R1 + 46, 11.2);
+    s.push(btn("post", "Post-storm visit: October 1 to April 30, within 48 hours after 0.5 inches of rain or more in 24 hours",
+      `<path d="${sector(R1 + 8, R1 + 24, 9, 16)}" class="w-post"/><text x="${f(plx - 10)}" y="${f(ply - 6)}" text-anchor="end" class="w-lab">Post-storm visit</text><text x="${f(plx - 10)}" y="${f(ply + 10)}" text-anchor="end" class="w-sub">after 0.5 in of rain in 24 h</text><text x="${f(plx - 10)}" y="${f(ply + 24)}" text-anchor="end" class="w-sub">Oct 1 to Apr 30</text>`));
+    /* the fixed visits on the rim */
+    [["jan", .5, "January review", "office, January", "middle", 0, -14], ["spring", 3.5, "Spring visit", "April", "start", 16, 0], ["pre", 7.5, "Pre-storm visit", "August", "end", -16, 6]].forEach(([k, m, t, sub, anc, dx, dy]) => {
+      const [x, y] = pt(R1 + 16, m), [lx, ly] = pt(R1 + 40, m);
+      s.push(btn(k, `${t}, ${sub}`, `<circle cx="${f(x)}" cy="${f(y)}" r="13" class="w-dot"/><text x="${f(lx + dx)}" y="${f(ly + dy)}" text-anchor="${anc}" class="w-lab">${t}</text><text x="${f(lx + dx)}" y="${f(ly + dy + 15)}" text-anchor="${anc}" class="w-sub">${sub}</text>`));
+    });
+    /* sediment removal: dashed and conditional, around April (not for woodchip bioreactors) */
+    if (sys !== "WB") { const [sx, sy] = pt(R1 + 52, 5.2);
+      s.push(btn("sed", "Sediment removal, around April, only if the post-storm visit shows it is needed", `<path d="${sector(R0 - 18, R0 - 6, 3, 4.8)}" class="w-sed"/><text x="${f(sx)}" y="${f(sy - 4)}" text-anchor="start" class="w-lab">Sediment removal</text><text x="${f(sx)}" y="${f(sy + 11)}" text-anchor="start" class="w-sub">around April, only if the post-</text><text x="${f(sx)}" y="${f(sy + 25)}" text-anchor="start" class="w-sub">storm visit shows it is needed</text>`)); }
+    /* routine visit: a ring label; when needed: the centre */
+    s.push(`<path id="wRoutineArc" d="M${C - 80} ${C} A80 80 0 0 1 ${C + 80} ${C}" fill="none"/>`);
+    s.push(btn("routine", "Routine visit: at every scheduled visit", `<circle cx="${C}" cy="${C}" r="80" class="w-ring"/><text class="w-lab w-sm"><textPath href="#wRoutineArc" startOffset="50%" text-anchor="middle">Routine visit · at every scheduled visit</textPath></text>`));
+    s.push(btn("needed", "When needed: no fixed month", `<circle cx="${C}" cy="${C}" r="44" class="w-mid"/><text x="${C}" y="${C - 2}" text-anchor="middle" class="w-lab">When</text><text x="${C}" y="${C + 14}" text-anchor="middle" class="w-lab">needed</text>`));
+    return `<svg class="w-svg" viewBox="-130 -10 700 460" role="group" aria-label="The maintenance year as a wheel. Each part is a button that shows the tasks of that visit.">${s.join("")}</svg>`;
+  }
+  function wheelBlock(sys, sel) {
+    const items = Object.entries(WSEG).filter(([k]) => !(sys === "WB" && k === "sed"));
+    return `<section class="stack w-box" aria-labelledby="wT"><h2 id="wT" class="l-h">The year</h2>
+      <p class="t-intro">Maintenance follows the seasons. Each part of the wheel shows which visit is due. Click it to see its tasks.</p>
+      <div class="w-wrap">${wheelSvg(sys, sel)}</div>
+      <ul class="vh">${items.map(([k, [n, w]]) => `<li>${esc(n)}: ${esc(w)}</li>`).join("")}<li>The rainy season is October 1 to April 30. The wheel turns clockwise and starts again every January.</li></ul>
+      ${sys === "WB" ? `<p class="l-src"><b>Woodchip bioreactors:</b> no sediment removal. At every routine visit, check that sediment is not entering the bioreactor (inlet box and woodchip surface).</p>`
+        : !sys ? `<p class="l-src">Woodchip bioreactors have no sediment removal: at every routine visit, check that sediment is not entering the bioreactor.</p>` : ""}
+      <div class="l-row w-sel"><span id="wSelT" aria-live="polite">${sel && WSEG[sel] ? `<b>${esc(WSEG[sel][0])}:</b> ${esc(WSEG[sel][1])}` : "All visits"}</span><span class="l-sp"></span>${sel ? `<button class="l-pill" type="button" id="wAll">Show all visits</button>` : ""}</div></section>`;
+  }
+  function wireWheel(onPick) {
+    qa(".w-seg").forEach(g => { const go = () => onPick(g.classList.contains("on") ? null : g.dataset.w);
+      g.onclick = go; g.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } }; });
+    const a = q("#wAll"); if (a) a.onclick = () => onPick(null);
+  }
+  let wSel = null;
+  /* tasks of the selected part of the wheel, across the four systems: one line per task name, with its systems */
+  function wheelTasks(sel) {
+    const ts = L.tasks.filter(t => MAIN.includes(t.sys) && (!sel || WSEG[sel][2](t))), by = {};
+    ts.forEach(t => (by[t.name] = by[t.name] || []).push(t));
+    return `<ul class="w-tasks">${Object.entries(by).map(([n, list]) => `<li><a href="#learn/task/${list[0].id}">${esc(n)}</a> ${list.map(t => `<a class="l-sys" style="background:${COLOR[t.sys]}" href="#learn/task/${t.id}" aria-label="${esc(n)}, ${esc(L.systems[t.sys])}">${t.sys}</a>`).join(" ")}</li>`).join("")}</ul>
+      ${sel === "routine" ? "" : sel ? "" : `<p class="l-src">${ts.length} tasks in the four systems.</p>`}`;
+  }
+
+  /* ---------- the Field Guide online: every section of the PDF; a section without data says Coming soon ---------- */
+  const FG = () => L.fg || {signs: [], wildlife: [], parts: [], stop: []};
+  function fgSections() {
+    const g = FG(), inv = L.plants.filter(p => p.status === "Invasive").length, nat = L.plants.filter(p => p.status === "Native").length, look = L.plants.filter(p => p.look).length;
+    return [["how", "How to use this guide", "When to stop and call the supervisor.", g.stop.length], ["signs", "Signs of problems", "What it is, why it matters, what to do.", g.signs.length],
+      ["parts", "Parts of a system", "The names used in the manual and the checklists.", g.parts.length], ["invasive", "Invasive plants", "Remove, control, or monitor; and the watchlist.", inv + L.watch.length],
+      ["look", "Look-alikes", "Pairs that are easy to mix up.", look], ["native", "Native plants", "Protect, encourage, and replant.", nat],
+      ["ask", "Plants to ask about", "Native or invasive depends on the strain.", 0], ["wildlife", "Wildlife", "Never trap, poison, or move animals.", g.wildlife.length],
+      ["key", "Icon key and zones", "How to read the plant cards.", Object.keys(L.iconNames || {}).length], ["refs", "References", "The sources of the guide.", Object.keys(L.plantSources || {}).length],
+      ["photos", "Photos", "Photos of each sign, part and animal.", 0]];
+  }
+  function fieldGuide(sec) {
+    const secs = fgSections(), cur = secs.find(x => x[0] === sec);
+    if (!cur) {
+      view().innerHTML = `<p><a href="#learn">← Read online</a></p><h2 class="l-title">Field Guide</h2><p class="t-intro">Plants, signs of problems, wildlife and the parts of a system: the same content as the Field Guide PDF.</p>
+        <div class="l-grid">${secs.map(([k, t, d, n]) => n ? `<a class="l-card" href="#learn/fieldguide/${k}"><b>${esc(t)}</b><span>${esc(d)}</span><span class="l-src">${n} ${k === "refs" ? "sources" : k === "key" ? "icons" : "entries"} →</span></a>`
+          : `<div class="l-card l-soon"><b>${esc(t)}</b><span>${esc(d)}</span>${chip("Coming soon", "y")}<span class="l-src">${k === "photos" ? "The photos are being collected." : "No entries yet in the Field Guide."}</span></div>`).join("")}</div>`;
+      return;
+    }
+    const [k, t] = cur, g = FG(), back = `<p><a href="#learn/fieldguide">← Field Guide</a></p><h2 class="l-title">${esc(t)}</h2>`, sysT = list => list.map(sysTag).join(" ");
+    let body = "";
+    if (k === "how") body = `<p>Find what you see, then do what the card says. If you are not sure, take a photo and ask the supervisor.</p><div class="l-box warn"><b>Stop and call the supervisor if you see</b><div><table class="t-kv">${g.stop.map(([a, b]) => `<tr><th>${esc(a)}</th><td>${esc(b)}</td></tr>`).join("")}</table></div></div>`;
+    else if (k === "signs") { const grs = [...new Set(g.signs.map(x => x.group))];
+      body = `<p class="l-src">Photos: ${chip("Coming soon", "y")}</p>` + grs.map(gr => `<h3 class="l-h">${esc(gr)}</h3><div class="l-grid">${g.signs.filter(x => x.group === gr).map(x => `<div class="panel stack"><b>${esc(x.name)}</b> <span>${sysT(x.sys)}</span>
+        <p><b>What it is:</b> ${esc(x.what)}</p><p><b>Why it matters:</b> ${esc(x.why)}</p><p><b>What to do:</b> ${esc(x.do)}</p>${x.task ? `<p class="l-src">Task: ${x.task.split(/[;,]\s*/).map(id => taskBy(id) ? `<a href="#learn/task/${id}">${esc(taskBy(id).name)}</a>` : esc(id)).join(", ")}</p>` : ""}<p class="l-src">${esc(x.src)}</p></div>`).join("")}</div>`).join(""); }
+    else if (k === "parts") body = `<div class="scroll"><table><thead><tr><th>Part</th><th>What it does</th><th>Systems</th></tr></thead><tbody>${g.parts.map(x => `<tr><td><b>${esc(x.part)}</b></td><td>${esc(x.what)}</td><td>${sysT(x.sys)}</td></tr>`).join("")}</tbody></table></div><p><a href="#learn/manual/SB">See the parts on the drawing of each system →</a></p>`;
+    else if (k === "invasive") body = `<p>Invasive plants are in the plant picker: <a href="#learn/plants">open it and choose "Show invasive plants" →</a></p><ul class="plain">${L.plants.filter(p => p.status === "Invasive").map(p => `<li><b>${esc(p.com)}</b> <i>${esc(p.sci)}</i></li>`).join("")}</ul>
+      <h3 class="l-h">Watchlist</h3><div class="scroll"><table><thead><tr><th>Plant</th><th>Look for</th></tr></thead><tbody>${L.watch.map(w => `<tr><td><b>${esc(w.com)}</b><br><i class="l-src">${esc(w.sci)}</i></td><td>${esc(w.look)}</td></tr>`).join("")}</tbody></table></div>`;
+    else if (k === "look") body = `<p>When two plants look alike, do not remove or plant either one until your supervisor confirms.</p><div class="scroll"><table><thead><tr><th>Plant</th><th>Be careful</th></tr></thead><tbody>${L.plants.filter(p => p.look).map(p => `<tr><td><b>${esc(p.com)}</b><br><i class="l-src">${esc(p.sci)}</i></td><td>${esc(p.look)}</td></tr>`).join("")}</tbody></table></div>`;
+    else if (k === "native") body = `<p>${L.plants.filter(p => p.status === "Native").length} native plants, with how to recognize each one: <a href="#learn/plants">open the plant picker →</a></p>`;
+    else if (k === "wildlife") body = `<p class="l-banner">If you think a protected animal or a nest may be there, stop work nearby, do not touch it, and tell the supervisor. The supervisor calls a qualified biologist.</p>
+      <div class="l-grid">${g.wildlife.map(x => `<div class="panel stack"><b>${esc(x.com)}</b>${x.sci ? `<i class="l-src">${esc(x.sci)}</i>` : ""}${x.group ? chip(x.group, x.group.startsWith("Protected") ? "r" : "") : ""}
+        <p><b>How to recognize it:</b> ${/to be written/i.test(x.how) || !x.how ? `${chip("In progress", "y")} <span class="l-src">The description is being written with a biologist.</span>` : esc(x.how)}</p><p><b>What to do:</b> ${esc(x.do)}</p><p class="l-src">${esc(x.src)}</p></div>`).join("")}</div>`;
+    else if (k === "key") body = `<div class="scroll"><table><thead><tr><th>Code</th><th>Meaning</th></tr></thead><tbody>${Object.entries(L.iconNames || {}).map(([a, b]) => `<tr><td><b>${esc(a)}</b></td><td>${esc(b)}</td></tr>`).join("")}</tbody></table></div><p><a href="#learn/plants">See the icons on the plant cards →</a></p>`;
+    else if (k === "refs") body = `<div class="refs">${Object.values(L.plantSources || {}).map(x => `<p>${esc(x.apa)}</p>`).join("")}</div>`;
+    else body = `<p>${chip("Coming soon", "y")} No entries yet.</p>`;
+    view().innerHTML = back + body;
+  }
 
   /* ---------- one system: illustration with parts, the year, the tasks, plants ---------- */
   const RAINY = [9, 10, 11, 0, 1, 2, 3];
@@ -99,20 +194,15 @@
           <h3>Parts of the ${esc(L.systems[s].toLowerCase())}</h3>
           <ol class="l-parts">${parts.map((p, i) => `<li><button type="button" class="l-partb" data-part="${p.id}" aria-pressed="${p.id === partSel}" aria-controls="lpart"><span class="l-pn" aria-hidden="true">${i + 1}</span>${esc(p.name)}</button></li>`).join("")}</ol></div>
         <div class="stack"><div class="panel" id="lpart" aria-live="polite">${partHtml(s, parts.find(p => p.id === partSel))}</div>${howHtml(s)}</div></div>` : ""}
-      <section class="stack" aria-labelledby="lyearT"><h2 id="lyearT" class="l-h">The year</h2>
-        <div class="l-year" role="img" aria-label="Months of the year. The rainy season is October to April.">${MONTHS.map((m, i) => `<span class="${RAINY.includes(i) ? "rain" : ""}">${m}</span>`).join("")}</div>
-        <div class="l-yvis" role="group" aria-label="Show the tasks of one visit">
-          <button type="button" class="l-vb" data-v="all" aria-pressed="${visF === "all"}">All visits <small>${ts.length}</small></button>
-          ${vis.map(v => `<button type="button" class="l-vb" data-v="${esc(v[0])}" aria-pressed="${visF === v[0]}" style="${barPos(v[4])}"><b>${esc(v[1])}</b> <small>${esc(v[2])} · ${ts.filter(v[3]).length}</small></button>`).join("")}</div>
-        <p class="l-src">Blue months: rainy season (October 1 to April 30). The cycle starts again every January.</p>
-        <div class="l-grid" id="lcards">${cards(ts)}</div></section>
+      ${wheelBlock(s, WSEG[visF] ? visF : null)}
+      <div class="l-grid" id="lcards">${cards(ts)}</div>
       <div class="l-two">
         <div class="panel"><h3>Read first</h3>${tlist(own)}<h3 style="margin-top:.8rem">All systems</h3>${tlist(general)}</div>
         <div class="stack">${sheet ? `<div class="panel"><h3>Visit Sheet</h3><p>The checklist for the ${esc(L.systems[s].toLowerCase())}, to fill in at each visit.</p><p><a class="btn sm" href="${sheet.file}" download>Download (Excel)</a> ${chip("Draft", "y")}</p></div>` : ""}
           ${plantsFor(s)}</div>
       </div>`;
     qa("[data-part]").forEach(b => b.onclick = () => { partSel = partSel === b.dataset.part ? null : b.dataset.part; qa("[data-part]").forEach(x => x.setAttribute("aria-pressed", x.dataset.part === partSel)); q("#lpart").innerHTML = partHtml(s, parts.find(p => p.id === partSel)); });
-    qa(".l-vb").forEach(b => b.onclick = () => { visF = b.dataset.v; qa(".l-vb").forEach(x => x.setAttribute("aria-pressed", x === b)); q("#lcards").innerHTML = cards(ts); });
+    wireWheel(k => { visF = k || "all"; const y = window.scrollY; manual(s); window.scrollTo(0, y); const g = q(`.w-seg[data-w="${k}"]`) || q("#wT"); if (g) g.focus({preventScroll: true}); });
     wireHow(s);
   }
   manual.last = null;
@@ -124,7 +214,7 @@
     return "grid-column:10/13";   /* after storms: Oct to Dec on the strip, and Jan to Apr in its text */
   }
   function cards(ts) {
-    const v = VISITS.find(x => x[0] === visF), list = v ? ts.filter(v[3]) : ts;
+    const v = WSEG[visF], list = v ? ts.filter(v[2]) : ts;
     return list.map(card).join("") || `<p class="muted">No tasks for this visit.</p>`;
   }
   function partHtml(s, p) {
@@ -171,7 +261,8 @@
       ${x.file ? `<a href="${x.file}" download>Download (${x.kind === "pdf" ? "PDF" : "Excel"}, ${size(x.size_kb)})</a>` : ""}
       ${x.tool ? `<a href="${x.tool[0]}">${x.file ? "Use it in the Tool" : esc(x.tool[1])} →</a>` : ""}</li>`).join("")}</ul></div>`;
   }
-  const ico = k => `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${IC[k]}</svg>`;
+  const XI = {book: '<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5M8 7h7M8 11h7"/>', leaf: '<path d="M5 19c0-9 6-14 15-14 0 9-5 15-14 15"/><path d="M5 19l7-7"/>'};
+  const ico = k => `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${IC[k] || XI[k]}</svg>`;
   function levelIcon(t) {
     const heavy = /contractor/i.test(t.type || ""), lv = t.level || "";
     const [keys, text] = heavy ? [["truck"], "Heavy maintenance by a contractor"] : /observe \+ minor/i.test(lv) ? [["eye", "wrench"], "Observe and a minor action"] : /observe/i.test(lv) ? [["eye"], "Observe or measure only"] : /action/i.test(lv) ? [["wrench"], "Action"] : [[], ""];
@@ -265,7 +356,7 @@
       <span>${p.sys.map(sysTag).join(" ")}</span><span class="l-src">${esc(src)}</span></span></button>`;
   }
   function plants() {
-    view().innerHTML = `${label("Plants")}<h2 class="l-title">Plant picker</h2><p>Where do you want to plant? Drag the seedling along the bank, or tap a zone. Then filter by system, type, or flowers. The same plants are in the Field Guide (VTS_D02).</p>
+    view().innerHTML = `${label("Plants")}<h2 class="l-title">Plant picker</h2><p>Where do you want to plant? Drag the seedling along the bank, or tap a zone. Then filter by system, type, or flowers. The same plants are in the Field Guide.</p>
       <div class="l-bank" id="lbank">${bankSvg()}${ZN.map(([c, n], i) => `<div class="l-zlab" data-z="${c}" style="left:${i * 25 + 12.5}%">${n}</div>`).join("")}
         <div class="l-pin" id="lpin" tabindex="0" role="slider" aria-label="Planting zone" aria-valuemin="0" aria-valuemax="3"><svg viewBox="0 0 54 54" aria-hidden="true"><circle cx="27" cy="27" r="25" fill="#fff" stroke="#03467E" stroke-width="3"/><path d="M27 42 V26" stroke="#3C9D5B" stroke-width="3.5" stroke-linecap="round"/><path d="M27 28 C17 28 13 20 13 15 C21 15 27 19 27 28Z" fill="#43a965"/><path d="M27 26 C35 26 41 20 41 13 C33 13 27 17 27 26Z" fill="#2F7D4A"/></svg></div>
         <div class="l-hint" id="lhint">Drag me or tap a zone</div></div>
@@ -333,8 +424,11 @@
 
   /* ---------- downloads ---------- */
   function downloads() {
-    view().innerHTML = `${label("Plants and tools")}<h2 class="l-title">Downloads</h2>
+    view().innerHTML = `<h2 class="l-title">Download documents</h2>
+      <p class="t-intro">Every document as a file: the forms named as in the Document Control Sheet (F01), the manual, the Field Guide, and sample reports.</p>
       <p class="l-banner">These are drafts for review. They have not had technical review yet, and they will change.</p>
+      <section class="panel stack"><h3 style="margin:0">Food safety: sample reports</h3><p>What the Tool prints for an auditor or a funder, made with sample data.</p>
+        <ul class="plain"><li><a href="#report/food-safety/sample">Sample Food Safety Record →</a> · <a href="downloads/Sample_Food_Safety_Record_vegetated_ditch.pdf" download>PDF</a></li><li><a href="#report/water-summary/sample">Sample Water Quality and Maintenance Summary →</a></li></ul></section>
       <div class="l-grid">${L.downloads.map((d, i) => `<div class="panel stack l-doc"><div class="l-row"><b>${esc(d.title)}</b><span class="l-sp"></span>${chip("Draft", "y")}</div>
         <span class="l-src">${esc(d.code)} · ${d.kind.toUpperCase()} · ${d.size_kb >= 1024 ? (d.size_kb / 1024).toFixed(1) + " MB" : d.size_kb + " KB"}</span><p>${esc(d.what)}</p>
         <div class="l-row"><a class="btn sm" href="${d.file}" download>Download</a>${d.kind === "pdf" ? `<button class="btn ghost sm" type="button" data-view="${i}" aria-expanded="false">View here</button>` : ""}</div></div>`).join("")}</div>

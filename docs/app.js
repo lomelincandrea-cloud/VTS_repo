@@ -153,13 +153,13 @@ $("#reqForm").addEventListener("submit",e=>{e.preventDefault();const f=e.target;
 /* learn */
 const MAT=[
  ["Sample reports: Food Safety Record and Water Summary","What the Tool prints, made with sample data. Open them in the browser and print or save as PDF.","crew ranch owner",ORDER,"Sample","#report/food-safety/sample"],
- ["Operation and Maintenance Manual (VTS_D01)","The full manual: every task, step by step, with safety notes.","crew",ORDER,"Draft"],
- ["Field Guide (VTS_D02)","Plants, signs of problems, wildlife and the parts of a system, with photos.","crew",ORDER,"Draft"],
+ ["Operation and Maintenance Manual","The full manual: every task, step by step, with safety notes.","crew",ORDER,"Draft"],
+ ["Field Guide","Plants, signs of problems, wildlife and the parts of a system, with photos.","crew",ORDER,"Draft"],
  ["Visit Sheet (F04)","One sheet per visit: the tasks of the visit, the inspection checklist, what you fixed on the spot, what was done, and overview photos. Excel and print.","crew ranch",ORDER,"Draft"],
  ["Annual Plan (F03)","Which task is done in which month.","crew owner",ORDER,"Draft"],
  ["Preventive Maintenance Reference (F02)","Tasks grouped by visit.","crew",ORDER,"Draft"],
- ["Site History (VTS_F06) and Corrective Maintenance Log (VTS_F05)","Site History is one line per visit, kept by the supervisor. The Corrective Maintenance Log records each fix. Paper forms.","crew ranch owner",ORDER,"Draft"],
- ["Site Card (VTS_F07)","One card for each site, kept with the site partners.","ranch owner",ORDER,"Draft"],
+ ["Site History (F06) and Corrective Maintenance Log (F05)","Site History is one line per visit, kept by the supervisor. The Corrective Maintenance Log records each fix. Paper forms.","crew ranch owner",ORDER,"Draft"],
+ ["Site Card (F07)","One card for each site, kept with the site partners.","ranch owner",ORDER,"Draft"],
  ["Quick cards, one page each","The short answer on the spot: what the system does, what not to do, who to call.","ranch",ORDER,"Proposed"],
  ["Before the rains and after a storm","Two short checks timed to the season.","ranch crew",ORDER,"Proposed"],
  ["Troubleshooting guide","If this, check that. For example: low flow into the wetland, check the inflow pipe and the pump.","crew ranch",ORDER,"Proposed"],
@@ -173,7 +173,8 @@ const MAT=[
 const AUD=[["all","Everyone"],["crew","Maintenance crew"],["ranch","Ranch manager or irrigator"],["owner","Landowner"]];
 const AUDN={crew:"Crew",ranch:"Ranch staff",owner:"Landowner"};
 let lAud="all",lSys="ALL";
-function learn(){$("#learnBody").innerHTML=MAT.filter(m=>(lAud==="all"||m[2].includes(lAud))&&(lSys==="ALL"||m[3].includes(lSys))).map(m=>`<tr><td><strong>${m[5]?`<a href="${m[5]}">${esc(m[0])}</a>`:esc(m[0])}</strong></td><td>${esc(m[1])}</td><td>${m[2].split(" ").map(a=>AUDN[a]).join(", ")}</td><td><span class="tag ${m[4]==="Draft"?"info":"due"}">${m[4]}</span></td></tr>`).join("")||`<tr><td colspan="4">Nothing for this combination yet.</td></tr>`}
+const matRow=m=>`<tr><td><strong>${m[5]?`<a href="${m[5]}">${esc(m[0])}</a>`:esc(m[0])}</strong></td><td>${esc(m[1])}</td><td>${m[2].split(" ").map(a=>AUDN[a]).join(", ")}</td><td><span class="tag ${m[4]==="Draft"?"info":"due"}">${m[4]}</span></td></tr>`;
+function learn(){const f=MAT.filter(m=>(lAud==="all"||m[2].includes(lAud))&&(lSys==="ALL"||m[3].includes(lSys))),now=f.filter(m=>m[4]!=="Proposed"),soon=f.filter(m=>m[4]==="Proposed");$("#learnBody").innerHTML=(now.map(matRow).join("")+(soon.length?`<tr class="m-soon"><td colspan="4"><details><summary><strong>Coming soon (${soon.length})</strong> <span class="small muted">ideas from the stakeholder interviews; they do not exist yet</span></summary><table class="m-soont"><tbody>${soon.map(matRow).join("")}</tbody></table></details></td></tr>`:""))||`<tr><td colspan="4">Nothing for this combination yet.</td></tr>`}
 
 stations();mapChips();mapLayers();homeMap();fadeIn();
 {const n=((window.VTS_GEO||{}).points||{}).features;if(n&&$("#siteCount"))$("#siteCount").textContent=n.length;}

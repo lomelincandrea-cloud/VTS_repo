@@ -184,6 +184,15 @@ plants = [{"id": S(r["Plant ID"]), "status": S(r["Status"]), "group": S(r["Group
            "sys": sp_(r["Found in"]), "ben": S(r["Benefits"]), "form": S(r["Form"]), "leaf": S(r["Leaf"]), "stem": S(r["Stem"]), "flower": S(r["Flower"]), "clue": S(r["Clue"]),
            "zones": sp_(r["Zones"]), "useful": sp_(r["Useful for"]), "look": S(r["Look-alike caution"]), "src": sp_(r["Sources"]), "note": S(r["Notes"])} for r in rows(pw, "Plants")]
 watch = [{"com": S(r["Common name"]), "sci": S(r["Scientific name"]), "look": S(r["Look for"]), "src": S(r["Source"])} for r in rows(pw, "Watchlist")]
+# the other sections of the Field Guide, from the same workbook (R8.7: the Field Guide complete online)
+fg_signs = [{"id": S(r["Sign ID"]), "group": S(r["Group"]), "name": S(r["Name"]), "what": S(r["What it is"]), "why": S(r["Why it matters"]), "do": S(r["What to do"]),
+             "sys": [x.strip() for x in S(r["Systems"]).split(";") if x.strip()], "task": S(r["Task"]), "photo": S(r["Photo"]), "src": S(r["Source"])} for r in rows(pw, "Signs") if S(r["Sign ID"])]
+fg_wild = [{"com": S(r["Common name"]), "sci": S(r["Scientific name"]), "group": S(r["Group"]), "how": S(r["How to recognize it"]), "do": S(r["What to do"]), "src": S(r["Source"])}
+           for r in rows(pw, "Wildlife") if S(r["Common name"])]
+fg_parts = [{"part": S(r["Part"]), "what": S(r["What it does"]), "sys": [x.strip() for x in S(r["Systems"]).split(";") if x.strip()]} for r in rows(pw, "Parts") if S(r["Part"])]
+import ast as _ast
+_tree = _ast.parse((PB / "build_field_guide.py").read_text(encoding="utf-8"))
+fg_stop = next(([[e.elts[0].value, e.elts[1].value] for e in n.value.elts] for n in _ast.walk(_tree) if isinstance(n, _ast.Assign) and getattr(n.targets[0], "id", "") == "STOP"), [])
 plant_sources = {S(r["Key"]): {"short": S(r["Short"]), "apa": S(r["Source"])} for r in rows(pw, "Sources")}
 icon_names = {S(r["Code"]): S(r["Meaning"]) for r in rows(pw, "Icons")}
 
@@ -267,7 +276,7 @@ if bad:
 parts = {sy: v["parts"] for sy, v in parts_src["systems"].items()}
 
 data = {"built": date.today().isoformat(), "visits": VISIT_ORDER, "systems": SYS_NAME, "tasks": tasks, "groups": groups, "topics": topics,
-        "checklist": checklist, "siteParams": site_params, "plants": plants, "watch": watch, "plantSources": plant_sources,
+        "checklist": checklist, "siteParams": site_params, "plants": plants, "watch": watch, "fg": {"signs": fg_signs, "wildlife": fg_wild, "parts": fg_parts, "stop": fg_stop}, "plantSources": plant_sources,
         "icons": icons["icons"], "iconNames": icon_names, "flowerHex": icons["flowerHex"], "downloads": docs, "parts": parts}
 out = DOCS / "learn_data.js"
 out.write_text("// Built by tools/build_site_data.py from the manual and plant catalogue workbooks. Do not edit by hand.\nwindow.VTS_LEARN=" + json.dumps(data, ensure_ascii=False, separators=(",", ":")) + ";\n", encoding="utf-8")
