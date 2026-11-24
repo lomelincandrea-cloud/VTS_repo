@@ -23,8 +23,8 @@
 <text x="46.0" y="152.5" font-family="Public Sans, DejaVu Sans, Arial, sans-serif" font-size="12.5" font-weight="400" fill="#2C2C2A" text-anchor="start">History of last year</text>
 <text x="36.0" y="174.8" font-family="Public Sans, DejaVu Sans, Arial, sans-serif" font-size="12.5" font-weight="400" fill="#2C2C2A" text-anchor="start">• Write the Annual Plan</text>
 <text x="46.0" y="191.3" font-family="Public Sans, DejaVu Sans, Arial, sans-serif" font-size="12.5" font-weight="400" fill="#2C2C2A" text-anchor="start">(F03)</text>
-<text x="36.0" y="213.6" font-family="Public Sans, DejaVu Sans, Arial, sans-serif" font-size="12.5" font-weight="400" fill="#2C2C2A" text-anchor="start">• Agree on after-storm</text>
-<text x="46.0" y="230.1" font-family="Public Sans, DejaVu Sans, Arial, sans-serif" font-size="12.5" font-weight="400" fill="#2C2C2A" text-anchor="start">checks with the site</text>
+<text x="36.0" y="213.6" font-family="Public Sans, DejaVu Sans, Arial, sans-serif" font-size="12.5" font-weight="400" fill="#2C2C2A" text-anchor="start">• Agree on post-storm</text>
+<text x="46.0" y="230.1" font-family="Public Sans, DejaVu Sans, Arial, sans-serif" font-size="12.5" font-weight="400" fill="#2C2C2A" text-anchor="start">visits with the site</text>
 <text x="46.0" y="246.6" font-family="Public Sans, DejaVu Sans, Arial, sans-serif" font-size="12.5" font-weight="400" fill="#2C2C2A" text-anchor="start">partners</text>
 <rect x="238" y="66" width="196" height="199.1" rx="9" fill="#E1F5EE" stroke="#0F6E56" stroke-width="1"/>
 <text x="336.0" y="88.0" font-family="Public Sans, DejaVu Sans, Arial, sans-serif" font-size="15" font-weight="700" fill="#085041" text-anchor="middle">Spring visit</text>
@@ -32,7 +32,7 @@
 <line x1="250" y1="118" x2="422" y2="118" stroke="#0F6E56" stroke-width="0.6"/>
 <text x="250.0" y="136.0" font-family="Public Sans, DejaVu Sans, Arial, sans-serif" font-size="12.5" font-weight="400" fill="#085041" text-anchor="start">• Vegetation survey</text>
 <text x="260.0" y="152.5" font-family="Public Sans, DejaVu Sans, Arial, sans-serif" font-size="12.5" font-weight="400" fill="#085041" text-anchor="start">(plants growing)</text>
-<text x="250.0" y="174.8" font-family="Public Sans, DejaVu Sans, Arial, sans-serif" font-size="12.5" font-weight="400" fill="#085041" text-anchor="start">• Water check: flow,</text>
+<text x="250.0" y="174.8" font-family="Public Sans, DejaVu Sans, Arial, sans-serif" font-size="12.5" font-weight="400" fill="#085041" text-anchor="start">• Water checks: flow,</text>
 <text x="260.0" y="191.3" font-family="Public Sans, DejaVu Sans, Arial, sans-serif" font-size="12.5" font-weight="400" fill="#085041" text-anchor="start">clarity, nitrate</text>
 <rect x="488" y="66" width="226" height="199.1" rx="9" fill="#E1F5EE" stroke="#0F6E56" stroke-width="1"/>
 <text x="601.0" y="88.0" font-family="Public Sans, DejaVu Sans, Arial, sans-serif" font-size="15" font-weight="700" fill="#085041" text-anchor="middle">Pre-storm visit</text>
@@ -45,7 +45,7 @@
 <text x="500.0" y="219.3" font-family="Public Sans, DejaVu Sans, Arial, sans-serif" font-size="12.5" font-weight="400" fill="#085041" text-anchor="start">• Condition check</text>
 <text x="500.0" y="241.6" font-family="Public Sans, DejaVu Sans, Arial, sans-serif" font-size="12.5" font-weight="400" fill="#085041" text-anchor="start">• Safety and skills refresher</text>
 <rect x="746" y="66" width="230" height="199.1" rx="9" fill="#FAECE7" stroke="#993C1D" stroke-width="1"/>
-<text x="861.0" y="88.0" font-family="Public Sans, DejaVu Sans, Arial, sans-serif" font-size="15" font-weight="700" fill="#712B13" text-anchor="middle">After storms</text>
+<text x="861.0" y="88.0" font-family="Public Sans, DejaVu Sans, Arial, sans-serif" font-size="15" font-weight="700" fill="#712B13" text-anchor="middle">Post-storm visit</text>
 <text x="861.0" y="107.0" font-family="Public Sans, DejaVu Sans, Arial, sans-serif" font-size="12.5" font-weight="400" fill="#993C1D" text-anchor="middle">Oct – Apr, within 48 h</text>
 <line x1="758" y1="118" x2="964" y2="118" stroke="#993C1D" stroke-width="0.6"/>
 <text x="758.0" y="136.0" font-family="Public Sans, DejaVu Sans, Arial, sans-serif" font-size="12.5" font-weight="400" fill="#712B13" text-anchor="start">• Routine Visual Inspection</text>
@@ -56,7 +56,7 @@
 <line x1="437" y1="96" x2="484" y2="96" stroke="#5F5E5A" stroke-width="1.6" marker-end="url(#ar)"/>
 <line x1="717" y1="96" x2="742" y2="96" stroke="#5F5E5A" stroke-width="1.6" marker-end="url(#ar)"/>
 <rect x="24" y="279.1" width="312.0" height="28" rx="5" fill="#FAECE7" stroke="#993C1D" stroke-width="0.8"/>
-<text x="180.0" y="298.1" font-family="Public Sans, DejaVu Sans, Arial, sans-serif" font-size="12.5" font-weight="400" fill="#712B13" text-anchor="middle">After-storm inspections continue until April 30</text>
+<text x="180.0" y="298.1" font-family="Public Sans, DejaVu Sans, Arial, sans-serif" font-size="12.5" font-weight="400" fill="#712B13" text-anchor="middle">Post-storm visits continue until April 30</text>
 <rect x="24" y="319.1" width="952" height="28" rx="5" fill="#F1EFE8" stroke="#888780" stroke-width="0.8"/>
 <text x="500.0" y="338.1" font-family="Public Sans, DejaVu Sans, Arial, sans-serif" font-size="12.5" font-weight="400" fill="#2C2C2A" text-anchor="middle">Routine — at every visit, all year: Routine Visual Inspection with the Visit Sheet (F04); Remove Trash and Debris; overview photos</text>
 <rect x="24" y="363.1" width="952" height="28" rx="5" fill="#FFFFFF" stroke="#888780" stroke-width="0.8" stroke-dasharray="5 4"/>
@@ -79,7 +79,7 @@
 <text x="232.0" y="505.1" font-family="Public Sans, DejaVu Sans, Arial, sans-serif" font-size="12.5" font-weight="600" fill="#534AB7" text-anchor="end">January</text>
 <text x="38.0" y="531.0" font-family="Public Sans, DejaVu Sans, Arial, sans-serif" font-size="12.5" font-weight="400" fill="#3C3489" text-anchor="start">Choose the tasks and visit dates</text>
 <text x="38.0" y="548.0" font-family="Public Sans, DejaVu Sans, Arial, sans-serif" font-size="12.5" font-weight="400" fill="#3C3489" text-anchor="start">for each system (F03). Agree on</text>
-<text x="38.0" y="565.0" font-family="Public Sans, DejaVu Sans, Arial, sans-serif" font-size="12.5" font-weight="400" fill="#3C3489" text-anchor="start">after-storm checks with the site</text>
+<text x="38.0" y="565.0" font-family="Public Sans, DejaVu Sans, Arial, sans-serif" font-size="12.5" font-weight="400" fill="#3C3489" text-anchor="start">post-storm visits with the site</text>
 <text x="38.0" y="582.0" font-family="Public Sans, DejaVu Sans, Arial, sans-serif" font-size="12.5" font-weight="400" fill="#3C3489" text-anchor="start">partners.</text>
 <line x1="249" y1="543.05" x2="266" y2="543.05" stroke="#5F5E5A" stroke-width="1.6" marker-end="url(#ar)"/>
 <rect x="270" y="479.05" width="222" height="128" rx="9" fill="#E1F5EE" stroke="#0F6E56" stroke-width="1"/>
@@ -103,5 +103,5 @@
 <text x="776.0" y="531.0" font-family="Public Sans, DejaVu Sans, Arial, sans-serif" font-size="12.5" font-weight="400" fill="#712B13" text-anchor="start">Review the Site History of the</text>
 <text x="776.0" y="548.0" font-family="Public Sans, DejaVu Sans, Arial, sans-serif" font-size="12.5" font-weight="400" fill="#712B13" text-anchor="start">year and change tasks, dates, or</text>
 <text x="776.0" y="565.0" font-family="Public Sans, DejaVu Sans, Arial, sans-serif" font-size="12.5" font-weight="400" fill="#712B13" text-anchor="start">the design.</text>
-<text x="500.0" y="625.0" font-family="Public Sans, DejaVu Sans, Arial, sans-serif" font-size="12.5" font-weight="600" fill="#5F5E5A" text-anchor="middle">↻ What the year shows (ACT) feeds the next plan (PLAN).</text>
+<path d="M873.0 607.05 L873.0 629.05 L135.0 629.05 L135.0 610.05" fill="none" stroke="#5F5E5A" stroke-width="1.6" marker-end="url(#ar)"/>
 </svg>

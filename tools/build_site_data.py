@@ -223,7 +223,7 @@ def annexes_of(t):
         add("VTS_F05", "Corrective Maintenance Log", FORMS_XLSX, "xlsx", "VTS_F05", ["#tool/corrective", "Step 5, Maintenance log"])
     if re.search(r"\bVTS_F07\b", text):
         add("VTS_F07", "Site Card", FORMS_XLSX, "xlsx", "VTS_F07", ["#tool/vts", "The card of each VTS"])
-    if re.search(r"\bVTS_D02\b", text):
+    if re.search(r"\bVTS_D02\b|\bField Guide\b", text):   # since the Nov 24 review the manual says "the Field Guide", without the code
         add("VTS_D02", "Field Guide", (DOCS / D02["file"]) if D02 else ROOT / "missing_Field_Guide.pdf", "pdf", None, ["#learn/plants", "Field Guide: find a plant"])
     return out
 for t in tasks:

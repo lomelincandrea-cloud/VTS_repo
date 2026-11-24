@@ -35,7 +35,7 @@ def _t(x, y, s, size=12.5, weight=400, fill="#2C2C2A", anchor="start"):
 
 def make_year_timeline(path, plan, spring, august, post, routine, as_needed, system_label="", pdca=False):
     boxes = [("January review", "In the office", plan, GRAY), ("Spring visit", "April", spring, TEAL),
-             ("Pre-storm visit", "August", august, TEAL), ("After storms", "Oct – Apr, within 48 h", post, CORAL)]
+             ("Pre-storm visit", "August", august, TEAL), ("Post-storm visit", "Oct – Apr, within 48 h", post, CORAL)]
     wrapped = [_wrap(b[2], COLS[i][1]) for i, b in enumerate(boxes)]
     lines = max(sum(len(w) for w in ws) + 0.35 * max(len(ws) - 1, 0) for ws in wrapped)
     top, lh = 66, 16.5
@@ -75,7 +75,7 @@ def make_year_timeline(path, plan, spring, august, post, routine, as_needed, sys
         s.append(f'<line x1="{xa}" y1="{top + 30}" x2="{xb}" y2="{top + 30}" stroke="#5F5E5A" stroke-width="1.6" marker-end="url(#ar)"/>')
     # barras: post-tormenta (ene–abr), rutina, según necesidad
     s.append(f'<rect x="{X0 + 4}" y="{y_post:.1f}" width="{4 * MW - 8:.1f}" height="28" rx="5" fill="{CORAL[0]}" stroke="{CORAL[1]}" stroke-width="0.8"/>')
-    s.append(_t(X0 + 2 * MW, y_post + 19, "After-storm inspections continue until April 30", 12.5, 400, CORAL[2], "middle"))
+    s.append(_t(X0 + 2 * MW, y_post + 19, "Post-storm visits continue until April 30", 12.5, 400, CORAL[2], "middle"))
     h_rut = 12 + 16 * len(rut_lines)
     s.append(f'<rect x="{X0 + 4}" y="{y_rut:.1f}" width="{X1 - X0 - 8}" height="{h_rut}" rx="5" fill="{GRAY[0]}" stroke="{GRAY[1]}" stroke-width="0.8"/>')
     for j, ln in enumerate(rut_lines): s.append(_t(W / 2, y_rut + 19 + 16 * j, ln, 12.5, 400, GRAY[2], "middle"))
@@ -99,15 +99,15 @@ def year_boxes(tasks, system, also=()):
     spring = [lab(t) for t in ts if t["visit"] == "Spring visit"]
     august = [lab(t) for t in ts if t["visit"] == "Pre-storm visit"] + ["Checklist items marked P (pre-storm)"]
     insp = [lab(t) for t in ts if t["kind"] == "Routine inspection"]
-    post = insp + ["Checklist items marked A (after storm)"]
+    post = insp + ["Checklist items marked A (post-storm)"]
     routine = [lab(t) for t in ts if t["primary"] == "Routine"]
     need = [lab(t) for t in ts if t["visit"] == "When needed"] + ["repairs (chapter 4)"]
     return dict(plan=plan, spring=spring, august=august, post=post, routine=routine, as_needed=need)
 
 
 GENERAL = dict(
-    plan=["Review the Site History of last year", "Write the Annual Plan (F03)", "Agree on after-storm checks with the site partners"],
-    spring=["Vegetation survey (plants growing)", "Water check: flow, clarity, nitrate"],
+    plan=["Review the Site History of last year", "Write the Annual Plan (F03)", "Agree on post-storm visits with the site partners"],
+    spring=["Vegetation survey (plants growing)", "Water checks: flow, clarity, nitrate"],
     august=["Vegetation maintenance", "Test and clear control structures", "Sediment monitoring", "Condition check", "Safety and skills refresher"],
     post=["Routine Visual Inspection after rain of 0.5 in or more in 24 h", "Checklist items marked A"],
     routine=["Routine Visual Inspection with the Visit Sheet (F04)", "Remove Trash and Debris", "overview photos"],
@@ -115,7 +115,7 @@ GENERAL = dict(
 )
 
 
-PDCA = [("PLAN", "January", "Choose the tasks and visit dates for each system (F03). Agree on after-storm checks with the site partners.", ("#EEEDFE", "#534AB7", "#3C3489")),
+PDCA = [("PLAN", "January", "Choose the tasks and visit dates for each system (F03). Agree on post-storm visits with the site partners.", ("#EEEDFE", "#534AB7", "#3C3489")),
         ("DO", "Every visit", "Inspect with the Visit Sheet (F04) and do the tasks of that visit.", ("#E1F5EE", "#0F6E56", "#085041")),
         ("CHECK", "After every visit", "The supervisor reads the Visit Sheet and photos, adds the visit to the Site History (F06), and schedules repairs (F05).", ("#FAEEDA", "#854F0B", "#633806")),
         ("ACT", "Next January", "Review the Site History of the year and change tasks, dates, or the design.", ("#FAECE7", "#993C1D", "#712B13"))]
@@ -131,13 +131,14 @@ def _pdca_row(y):
         for j, ln in enumerate(textwrap.wrap(txt, 33)): out.append(_t(x + 14, y + 52 + 17 * j, ln, 12.5, 400, tc))
         if i < 3: out.append(f'<line x1="{x + w + 3}" y1="{y + 64}" x2="{x + w + gap - 4}" y2="{y + 64}" stroke="#5F5E5A" stroke-width="1.6" marker-end="url(#ar)"/>')
         x += w + gap
-    out.append(_t(W / 2, y + 146, "↻ What the year shows (ACT) feeds the next plan (PLAN).", 12.5, 600, "#5F5E5A", "middle"))
+    xp, xa = X0 + 4 + w / 2, X0 + 4 + 3 * (w + gap) + w / 2   # ACT back to PLAN: the cycle starts again
+    out.append(f'<path d="M{xa:.1f} {y + 128} L{xa:.1f} {y + 150} L{xp:.1f} {y + 150} L{xp:.1f} {y + 131}" fill="none" stroke="#5F5E5A" stroke-width="1.6" marker-end="url(#ar)"/>')
     return out
 
 
 def make_monitor(path):
     """Qué se registra y a dónde va (sección Monitoring and Reporting)."""
-    cols = [("During the visit", "Crew", ["Overview photos from the photo points", "Visit Sheet F04: the tasks of the visit and the checklist", "A photo of everything abnormal", "What was done and observations", "On paper? Photograph the sheet and send it"], ("#E1F5EE", "#0F6E56", "#085041")),
+    cols = [("During the visit", "Crew", ["Overview photos of the system", "Visit Sheet F04: the tasks of the visit and the inspection checklist", "A photo of everything abnormal", "What was done and observations", "On paper? Photograph the sheet and send it"], ("#E1F5EE", "#0F6E56", "#085041")),
             ("After the visit", "Supervisor", ["Read the Visit Sheet and the photos", "Add the visit to the Site History F06", "Schedule repairs and record them in F05",
               "Talk findings through with the site partners", "Findings and photos stay within the team and the site partners"], ("#FAEEDA", "#854F0B", "#633806")),
             ("Every January", "Supervisor and team", ["Review the Site History of each system", "Recurring problems change the plan (F03)",
@@ -193,11 +194,11 @@ def _card(x, y, w, h, title, lines, pal, sub=None, wrap=30, size=12.5):
 
 def make_howto(path):
     """Mapa 'cómo usar este manual': cinco situaciones y a dónde ir."""
-    cards = [("I am planning the year", ["1.5 Preventive Maintenance: the visits of the year", "Annual Plan for each system (F03)"]),
+    cards = [("I am planning the year", ["1.3 Preventive Maintenance: the visits of the year", "Annual Plan for each system (F03)"]),
              ("I am going to a site", ["Visit Sheet for that system (appendices)", "Chapter 3: the tasks of that visit", "The routine kit"]),
-             ("I do not recognize something", ["Field Guide (VTS_D02): plants, signs of problems, wildlife, parts of a system"]),
+             ("I do not recognize something", ["Field Guide: plants, signs of problems, wildlife, parts of a system"]),
              ("I found a problem", ["Chapter 4: quick fixes during the visit", "Chapter 4: repairs that are scheduled"]),
-             ("The visit is over", ["Hand in the Visit Sheet", "1.6 Monitoring and Records: what happens with it"])]
+             ("The visit is over", ["Hand in the Visit Sheet", "1.4 Monitoring and Records: what happens with it"])]
     w, gap, h = 180, 14, 190; s = []; x = 20
     for i, (t, lines) in enumerate(cards):
         s += _card(x, 16, w, h, t, lines, PAL[i], wrap=22, size=12); x += w + gap
@@ -215,7 +216,7 @@ def make_corrective(path):
     s += _card(790, y + 46, 190, 120, "4. Record and check", ["Write it down (F05). At the next visit, check that it held"], PAL[3], wrap=24)
     for x1, y1, x2, y2 in ((212, y + 90, 254, y + 56), (212, y + 122, 254, y + 160), (510, y + 56, 552, y + 90), (510, y + 160, 552, y + 122), (748, y + 106, 786, y + 106)):
         s.append(f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" stroke="#5F5E5A" stroke-width="1.6" marker-end="url(#ar)"/>')
-    s.append(_t(500, y + 244, "↻ If it did not hold, it goes back to step 1 and the cause is looked at again. See also 1.6 Monitoring and Records.", 12.5, 600, "#5F5E5A", "middle"))
+    s.append(_t(500, y + 244, "↻ If it did not hold, it goes back to step 1 and the cause is looked at again. See also 1.4 Monitoring and Records.", 12.5, 600, "#5F5E5A", "middle"))
     return _svg(path, 1000, y + 258, s)
 
 
@@ -285,23 +286,23 @@ def make_schematic(path, system):
 def make_cycle(path):
     """Ciclo circular de uso del manual: planear, visitar, encontrar, arreglar, registrar y revisar."""
     import math
-    W_, H_ = 1000, 560; cx, cy, R = 500, 280, 205
-    st = [("1. Plan", "January, in the office", ["Annual Plan (F03)", "Section 1.5"], PAL[0]),
-          ("2. Visit", "Routine, spring, pre-storm", ["Visit Sheet (F04)", "Chapter 3: tasks by visit"], PAL[1]),
-          ("3. Look and recognize", "Every visit", ["Checklist of the Visit Sheet", "Field Guide (VTS_D02)"], PAL[2]),
-          ("4. Fix", "Quick fix or scheduled repair", ["Chapter 4", "Corrective Log (F05)"], PAL[4]),
-          ("5. Record and review", "After every visit and in January", ["Site History (F06)", "Section 1.6 Monitoring"], PAL[3])]
+    W_, H_ = 1000, 640; cx, cy, R = 500, 322, 250
+    st = [("1. Plan", "January, in the office", ["Annual Plan (F03)", "Reference section 1.3"], PAL[0]),
+          ("2. Visit", "Routine, spring, pre-storm", ["Visit Sheet (F04)", "Reference chapter 3"], PAL[1]),
+          ("3. Look and recognize", "Every visit", ["Inspection checklist", "Field Guide"], PAL[2]),
+          ("4. Fix", "Quick fix or scheduled repair", ["Reference chapter 4", "Corrective Log (F05)"], PAL[4]),
+          ("5. Record and review", "After every visit and in January", ["Site History (F06)", "Reference section 1.4"], PAL[3])]
     s = [f'<circle cx="{cx}" cy="{cy}" r="{R}" fill="none" stroke="#C4D3E2" stroke-width="16"/>']
     for k in range(5):
         a = math.radians(-90 + 72 * k + 36); x, y = cx + R * math.cos(a), cy + R * math.sin(a)
         s.append(f'<g transform="translate({x:.1f},{y:.1f}) rotate({72 * k + 36 + 90:.1f})"><path d="M-9 -10 L9 0 L-9 10 Z" fill="#8FA9C4"/></g>')
-    bw, bh = 230, 112
+    bw, bh = 272, 136
     for k, (t, sub, lines, pal) in enumerate(st):
         a = math.radians(-90 + 72 * k); x, y = cx + R * math.cos(a) - bw / 2, cy + R * math.sin(a) - bh / 2
         f, sk, tc = pal
         s.append(f'<rect x="{x:.1f}" y="{y:.1f}" width="{bw}" height="{bh}" rx="12" fill="{f}" stroke="{sk}" stroke-width="1.4"/>')
-        s.append(_t(x + 14, y + 26, t, 16, 800, tc)); s.append(_t(x + 14, y + 44, sub, 11.5, 600, sk))
-        for j, ln in enumerate(lines): s.append(_t(x + 14, y + 68 + 18 * j, "→ " + ln, 12.5, 400, tc))
-    s.append(_t(cx, cy - 18, "THE MAINTENANCE", 15, 800, BLUE_D, "middle")); s.append(_t(cx, cy + 2, "CYCLE", 15, 800, BLUE_D, "middle"))
-    s.append(_t(cx, cy + 26, "where to look in this manual", 12, 400, "#5F5E5A", "middle"))
+        s.append(_t(x + 14, y + 30, t, 20, 800, tc)); s.append(_t(x + 14, y + 52, sub, 14, 600, sk))
+        for j, ln in enumerate(lines): s.append(_t(x + 14, y + 82 + 22 * j, "→ " + ln, 16, 400, tc))
+    s.append(_t(cx, cy - 20, "THE MAINTENANCE", 19, 800, BLUE_D, "middle")); s.append(_t(cx, cy + 4, "CYCLE", 19, 800, BLUE_D, "middle"))
+    s.append(_t(cx, cy + 30, "for continual improvement", 15, 400, "#5F5E5A", "middle"))
     return _svg(path, W_, H_, s)

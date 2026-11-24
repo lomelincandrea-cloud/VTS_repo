@@ -17,7 +17,7 @@ def spring_rows(nitrate):
                  ("Laboratory pair this year (once a year): sent / not done this year; time of each sample", False)]
     return rows
 CLOSING = ["Every abnormal finding is recorded and photographed", "The supervisor has been notified", "Follow-up task(s) chosen (write the task codes in Notes)",
-           "Overview photos taken from all photo points (Routine, After storm and Pre-storm visits; required)"]
+           "Overview photos taken from all photo points (Routine, Post-storm and Pre-storm visits; required)"]
 def write_checklist_xlsx(system, items, sys_name, sys_color, tasks, site_params, path, blue="03467E", spring=None):
     wb = Workbook(); ws = wb.active; ws.title = "Checklist"; ws.sheet_view.showGridLines = False
     thin = Side(style="thin", color="C4D3E2"); B = Border(left=thin, right=thin, top=thin, bottom=thin)
@@ -28,7 +28,7 @@ def write_checklist_xlsx(system, items, sys_name, sys_color, tasks, site_params,
     # banda y título
     ws.merge_cells("A1:C1"); ws["A1"] = f"FORM {system}_F04"; ws["A1"].font = Font(name=FH, bold=True, size=10, color="FFFFFF"); ws["A1"].fill = fill(sys_color.lstrip("#")); ws["A1"].alignment = Alignment(horizontal="center", vertical="center")
     ws.row_dimensions[1].height = 18
-    ws.merge_cells("A2:L2"); ws["A2"] = f"VISUAL INSPECTION CHECKLIST — {sys_name.upper()}"; ws["A2"].font = Font(name=FH, bold=True, size=20, color=blue); ws.row_dimensions[2].height = 30
+    ws.merge_cells("A2:L2"); ws["A2"] = f"INSPECTION CHECKLIST — {sys_name.upper()}"; ws["A2"].font = Font(name=FH, bold=True, size=20, color=blue); ws.row_dimensions[2].height = 30
     for c in range(1, 13): ws.cell(row=2, column=c).border = Border(bottom=Side(style="thick", color=blue))
     ws.row_dimensions[3].height = 6
     # encabezado (tres filas de pares clave / valor)
@@ -113,15 +113,15 @@ def write_checklist_xlsx(system, items, sys_name, sys_color, tasks, site_params,
         for c in range(1, 13): ws.cell(row=r, column=c).border = B
         r += 1
     ws.merge_cells(start_row=r + 1, start_column=1, end_row=r + 1, end_column=12)
-    ws.cell(row=r + 1, column=1, value="Visit: R = Routine · A = After storm · P = Pre-storm (August). Observe and document; do only the small actions listed.").font = Font(name=FN, italic=True, size=8.5, color="566A7F")
+    ws.cell(row=r + 1, column=1, value="Visit: R = Routine · A = Post-storm · P = Pre-storm (August). Observe and document; do only the small actions listed.").font = Font(name=FN, italic=True, size=8.5, color="566A7F")
     # validaciones y formato condicional
     dv = DataValidation(type="list", formula1=f'"{BOX},{OFF}"', allow_blank=False); ws.add_data_validation(dv)
     dv.add(f"C{first}:E{items_last}"); dv.add(f"K{first}:K{items_last}"); dv.add(f"C{close0}:C{last}")
-    dvv = DataValidation(type="list", formula1='"Routine,After storm,Spring,Pre-storm"', allow_blank=True); ws.add_data_validation(dvv); dvv.add("J5")
+    dvv = DataValidation(type="list", formula1='"Routine,Post-storm,Spring,Pre-storm"', allow_blank=True); ws.add_data_validation(dvv); dvv.add("J5")
     rng = f"A{first}:L{items_last}"
     ws.conditional_formatting.add(rng, FormulaRule(formula=[f'$D{first}="{OFF}"'], fill=fill("F8D3CC")))
     ws.conditional_formatting.add(rng, FormulaRule(formula=[f'$C{first}="{OFF}"'], fill=fill("D9EFDD")))
-    ws.conditional_formatting.add(f"B{first}:E{items_last}", FormulaRule(formula=[f'AND($J$5<>"",OR(AND($J$5="Routine",$F{first}<>"R"),AND($J$5="After storm",$G{first}<>"A"),AND($J$5="Pre-storm",$H{first}<>"P")),$F{first}<>"")'], font=Font(color="A0A0A0")))
+    ws.conditional_formatting.add(f"B{first}:E{items_last}", FormulaRule(formula=[f'AND($J$5<>"",OR(AND($J$5="Routine",$F{first}<>"R"),AND($J$5="Post-storm",$G{first}<>"A"),AND($J$5="Pre-storm",$H{first}<>"P")),$F{first}<>"")'], font=Font(color="A0A0A0")))
     item_rng = f"C{first}:E{items_last}"
     ws["A7"] = (f'="Answered: "&COUNTIF({item_rng},"{OFF}")&"     Abnormal: "&COUNTIF(D{first}:D{items_last},"{OFF}")&"     Abnormal without photo: "&SUMPRODUCT((D{first}:D{items_last}="{OFF}")*(K{first}:K{items_last}<>"{OFF}"))')
     ws.freeze_panes = f"A{HR + 1}"; ws.page_setup.orientation = "landscape"; ws.page_setup.fitToWidth = 1; ws.page_setup.fitToHeight = 0; ws.sheet_properties.pageSetUpPr.fitToPage = True
