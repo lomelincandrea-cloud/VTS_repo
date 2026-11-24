@@ -812,3 +812,7 @@ dialog.t-side::backdrop{background:rgba(18,38,26,.35)}
 .g-card ul{margin:.3rem 0;padding-left:1.1rem}.g-card p{margin:.25rem 0}
 .g-card-t{font-weight:700;color:var(--water)}.g-card-f{border-top:1px solid var(--line);padding-top:.35rem;color:var(--muted);font-size:.78rem}
 .g-ctl{display:flex;flex-direction:column;gap:.2rem;max-height:55vh;overflow:auto}
+
+/* R8.6 Next visits: reschedule in place */
+.nv-edit{margin-top:.35rem;align-items:center;flex-wrap:wrap}
+.nv-edit input[type=date]{min-height:40px}

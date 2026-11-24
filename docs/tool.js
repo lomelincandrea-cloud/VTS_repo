@@ -38,7 +38,7 @@
     if (which === "vts" && a === "new" && window.ToolRegister) window.ToolRegister.page();
     else if (which === "vts" && a) card(a, parts[2], parts[3]);
     else if (which === "vts") myVts();
-    else if (which === "plan" && window.ToolPlan) window.ToolPlan.plan(a, parts[2]);
+    else if (which === "plan" && window.ToolPlan) window.ToolPlan.plan(a, parts[2], parts[3]);   /* #tool/plan/<VTS>/<year>/<planned visit>: that visit selected */
     else if (which === "visit" && window.ToolPlan) window.ToolPlan.visit(a);
     else if (which === "sheets" && window.ToolPlan) window.ToolPlan.sheets(a);
     else if (which === "visits" && window.ToolPlan) window.ToolPlan.next(a);

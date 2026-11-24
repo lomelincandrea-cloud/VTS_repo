@@ -82,8 +82,9 @@ window.ToolPlan = (function () {
   const visitHas = (s, pv, k) => k[0] === "+" ? pv.extra_tasks.some(x => keyOf(x) === k) : chosen(s.type, pv).includes(k) || pv.extra_tasks.some(x => x.task === k);
   const doneVisit = (s, pv) => St.visitsOf(s.id).find(v => v.status === "closed" && (v.planned_id === pv.id || v.date === pv.date));
 
-  function plan(siteId, yearArg) {
+  function plan(siteId, yearArg, recArg) {
     if (!siteId || siteId === "all") return overview(yearArg);
+    if (recArg) openRec = recArg;
     after = null;
     const active = St.sites().filter(s => s.status !== "decommissioned");
     const s = St.site(siteId) || active[0];
@@ -705,7 +706,7 @@ window.ToolPlan = (function () {
     const monthName = first.toLocaleDateString("en-US", {month: "long", year: "numeric"});
     K().view().innerHTML = `<div class="l-row"><h2 style="margin:0">Next visits</h2><span class="l-sp"></span>
         <label class="l-lab">VTS <select id="nSite"><option value="">All</option>${sites.map(s => `<option value="${s.id}"${s.id === cal.site ? " selected" : ""}>${esc(s.name)}</option>`).join("")}</select></label></div>
-      <p class="t-intro">What is coming up, across all your systems. Pick a day in the calendar to see only that day.</p>
+      <p class="t-intro">Your upcoming visits. Changes here update the Annual plan.</p><p class="l-src">Pick a day in the calendar to see only that day.</p>
       <div class="c-wrap">
         <div class="c-cal panel"><div class="l-row c-head"><button class="btn ghost sm" type="button" id="cPrev" aria-label="Previous month">‹</button><b id="cTitle" aria-live="polite">${esc(monthName)}</b><button class="btn ghost sm" type="button" id="cNext" aria-label="Next month">›</button></div>
           <table role="grid" class="c-grid" aria-labelledby="cTitle"><thead><tr role="row">${["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(d => `<th role="columnheader" scope="col">${d}</th>`).join("")}</tr></thead><tbody>${weeks.join("")}</tbody></table>
@@ -719,11 +720,23 @@ window.ToolPlan = (function () {
                 <td><details><summary>${tasks.length} task${tasks.length === 1 ? "" : "s"}</summary><ul class="t-tasks">${tasks.map(k => `<li>${k[0] === "+" ? esc(k.slice(1)) : taskLink(k)}</li>`).join("")}</ul></details></td>
                 <td><span class="l-src">Not assigned</span></td>
                 <td><span class="o-key ${x.status === "Overdue" ? "o-late" : x.status === "In progress" ? "o-prog" : "o-plan"}">${x.status === "Overdue" ? '<span aria-hidden="true">!</span> ' : ""}${x.status}</span></td>
-                <td><div class="row" style="gap:.4rem"><button class="btn sm" type="button" data-open="${x.pv.id}">${x.rec ? "Continue the Visit Sheet" : "Open the Visit Sheet"}</button><button class="btn ghost sm" type="button" data-send="${x.pv.id}">Send to phone</button></div></td></tr>`; }).join("")
+                <td><div class="row" style="gap:.4rem"><button class="btn sm" type="button" data-open="${x.pv.id}">${x.rec ? "Continue the Visit Sheet" : "Open the Visit Sheet"}</button><button class="btn ghost sm" type="button" data-send="${x.pv.id}">Send to phone</button></div>
+                  <div class="row nv-edit" style="gap:.4rem"><span data-resch-box="${x.pv.id}"><button class="btn ghost sm" type="button" data-resch="${x.pv.id}">Reschedule</button></span><a href="#tool/plan/${x.s.id}/${x.p.year}/${x.pv.id}">Edit tasks in the Annual plan →</a></div></td></tr>`; }).join("")
               || `<tr><td colspan="7">${cal.day ? "No open visits that day." : "No visits in the next four months."} <a href="#tool/plan">See the annual plan</a>.</td></tr>`}
           </tbody></table></div>
           <p class="l-src">"Who" stays empty until visits can be assigned to a person or crew.</p></div></div>`;
     q("#nSite").onchange = e => { cal.day = null; next(e.target.value); };
+    /* Reschedule in place: a date picker in the row; the same Annual plan changes (an approved plan asks for a reason) */
+    qa("[data-resch]").forEach(b => b.onclick = () => {
+      const x = all.find(y => y.pv.id === b.dataset.resch); if (!x) return;
+      const box = q(`[data-resch-box="${x.pv.id}"]`);
+      box.innerHTML = `<label class="vh" for="rs-${x.pv.id}">New date</label><input type="date" id="rs-${x.pv.id}" value="${x.pv.date}" min="${x.p.year}-01-01" max="${x.p.year}-12-31"> <button class="btn sm" type="button" data-rok>Save</button> <button class="btn ghost sm" type="button" data-rx>Cancel</button>`;
+      const inp = q("input", box); inp.focus();
+      q("[data-rx]", box).onclick = () => next();
+      q("[data-rok]", box).onclick = () => { const d = inp.value; if (!d || d === x.pv.date) return next();
+        after = () => next();
+        changePlan(x.s, x.p, clone(x.p.planned_visits).map(v => v.id === x.pv.id ? {...v, date: d} : v), `${VT(x.pv.type)} visit moved from ${x.pv.date} to ${d}`, false); };
+    });
     q("#cPrev").onclick = () => { moveMonth(-1); next(); q("#cPrev").focus(); };
     q("#cNext").onclick = () => { moveMonth(1); next(); q("#cNext").focus(); };
     if (q("#cAll")) q("#cAll").onclick = () => { cal.day = null; next(); };
